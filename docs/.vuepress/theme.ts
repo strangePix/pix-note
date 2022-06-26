@@ -6,11 +6,12 @@ import sidebar from "./sidebar";
  * 信息定制
  */
 export default hopeTheme({
-  hostname: "https://vuepress-theme-hope-v2-demo.mrhope.site",
+  //  部署域名
+  hostname: "http://note.strangest.cn",
 
   author: {
     name: "Pix",
-    url: "http://www.strangest.cn",
+    url: "http://note.strangest.cn",
   },
 
   iconAssets: "iconfont",
@@ -21,10 +22,10 @@ export default hopeTheme({
 
   docsDir: "demo/src",
 
-  // navbar
+  // navbar 导航栏
   navbar: navbar,
 
-  // sidebar
+  // sidebar  侧边栏
   sidebar: sidebar,
 
   footer: "默认页脚",
@@ -33,47 +34,48 @@ export default hopeTheme({
 
   pageInfo: ["Author", "Original", "Date", "Category", "Tag", "ReadingTime"],
 
-  blog: {
-    description: "一位后端开发菜鸡",
-    intro: "/intro.html",
-    medias: {
-      Baidu: "https://example.com",
-      Bitbucket: "https://example.com",
-      Dingding: "https://example.com",
-      Discord: "https://example.com",
-      Dribbble: "https://example.com",
-      Email: "https://example.com",
-      Evernote: "https://example.com",
-      Facebook: "https://example.com",
-      Flipboard: "https://example.com",
-      Gitee: "https://example.com",
-      GitHub: "https://example.com",
-      Gitlab: "https://example.com",
-      Gmail: "https://example.com",
-      Instagram: "https://example.com",
-      Lines: "https://example.com",
-      Linkedin: "https://example.com",
-      Pinterest: "https://example.com",
-      Pocket: "https://example.com",
-      QQ: "https://example.com",
-      Qzone: "https://example.com",
-      Reddit: "https://example.com",
-      Rss: "https://example.com",
-      Steam: "https://example.com",
-      Twitter: "https://example.com",
-      Wechat: "https://example.com",
-      Weibo: "https://example.com",
-      Whatsapp: "https://example.com",
-      Youtube: "https://example.com",
-      Zhihu: "https://example.com",
-    },
-  },
-
-  encrypt: {
-    config: {
-      "/guide/encrypt.html": ["1234"],
-    },
-  },
+  //  博客选项
+  // blog: {
+  //   description: "一位后端开发菜鸡",
+  //   intro: "/intro.html",
+  //   medias: {
+  //     Baidu: "https://example.com",
+  //     Bitbucket: "https://example.com",
+  //     Dingding: "https://example.com",
+  //     Discord: "https://example.com",
+  //     Dribbble: "https://example.com",
+  //     Email: "https://example.com",
+  //     Evernote: "https://example.com",
+  //     Facebook: "https://example.com",
+  //     Flipboard: "https://example.com",
+  //     Gitee: "https://example.com",
+  //     GitHub: "https://example.com",
+  //     Gitlab: "https://example.com",
+  //     Gmail: "https://example.com",
+  //     Instagram: "https://example.com",
+  //     Lines: "https://example.com",
+  //     Linkedin: "https://example.com",
+  //     Pinterest: "https://example.com",
+  //     Pocket: "https://example.com",
+  //     QQ: "https://example.com",
+  //     Qzone: "https://example.com",
+  //     Reddit: "https://example.com",
+  //     Rss: "https://example.com",
+  //     Steam: "https://example.com",
+  //     Twitter: "https://example.com",
+  //     Wechat: "https://example.com",
+  //     Weibo: "https://example.com",
+  //     Whatsapp: "https://example.com",
+  //     Youtube: "https://example.com",
+  //     Zhihu: "https://example.com",
+  //   },
+  // },
+  //  加密配置
+  // encrypt: {
+  //   config: {
+  //     "/guide/encrypt.html": ["1234"],
+  //   },
+  // },
 
   plugins: {
     blog: {
