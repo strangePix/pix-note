@@ -5,12 +5,44 @@ import {sidebar} from "vuepress-theme-hope";
  */
 export default sidebar([
     "/",
-    "/home",
     {
-        text: "java技术栈笔记",
+        text: "Java笔记",
         icon: "note",
+        //  分组是否可以折叠
         collapsable: true,
         prefix: "/java/",
+        // 分组子项目
+        children: [
+            "Java","JUC","JVM"
+        ]
+    },
+    {
+        text: "数据库笔记",
+        icon: "note",
+        //  分组是否可以折叠
+        collapsable: true,
+        prefix: "/database/",
+        // 分组子项目
+        children: [
+            "数据库","Mysql","Redis","MongoDB"
+        ]
+    },
+    {
+        text: "框架笔记",
+        icon: "note",
+        //  分组是否可以折叠
+        collapsable: true,
+        prefix: "/frame/",
+        // 分组子项目
+        children: "structure"
+    },
+    {
+        text: "中间件笔记",
+        icon: "note",
+        //  分组是否可以折叠
+        collapsable: true,
+        prefix: "/middleware/",
+        // 分组子项目
         children: "structure"
     },
     {
@@ -21,24 +53,17 @@ export default sidebar([
         children: "structure"
     },
     {
-        text: "运维笔记",
-        icon: "note",
-        collapsable: true,
-        prefix: "/operation/",
-        children: "structure"
-    },
-    {
-        text: "IDE笔记",
-        icon: "note",
-        collapsable: true,
-        prefix: "/ide/",
-        children: "structure"
-    },
-    {
         text: "算法笔记",
         icon: "note",
         collapsable: true,
         prefix: "/algorithm/",
+        children: "structure"
+    },
+    {
+        text: "运维笔记",
+        icon: "note",
+        collapsable: true,
+        prefix: "/server/",
         children: "structure"
     },
     {
