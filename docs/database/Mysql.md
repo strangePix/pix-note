@@ -1732,7 +1732,7 @@ where
 
 4. 用改造后的语句实验一下，只需要10ms 降低了近200倍！
 
-   ![image-20220522175113069](C:\Users\alienware\AppData\Roaming\Typora\typora-user-images\image-20220522175113069.png)
+   ![image-20220522175113069](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20220522175113069.png)
 
    
 

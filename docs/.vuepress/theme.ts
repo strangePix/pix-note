@@ -90,7 +90,9 @@ export default hopeTheme({
     // },
 
     plugins: {
+        //  博客插件
         blog: {
+            //  自动生成摘录
             autoExcerpt: true,
         },
 
@@ -119,12 +121,12 @@ export default hopeTheme({
         //     // provider: "Waline",
         //     // serverURL: "https://vuepress-theme-hope-comment.vercel.app",
         // },
-
-        mdEnhance: {
-            enableAll: true,
-            presentation: {
-                plugins: ["highlight", "math", "search", "notes", "zoom"],
-            },
-        },
+        //  md增强功能插件
+        // mdEnhance: {
+        //     enableAll: true,
+        //     presentation: {
+        //         plugins: ["highlight", "math", "search", "notes", "zoom"],
+        //     },
+        // },
     },
 });
