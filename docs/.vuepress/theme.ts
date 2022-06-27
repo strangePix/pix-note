@@ -8,12 +8,12 @@ import sidebar from "./sidebar";
 export default hopeTheme({
     //  部署域名
     hostname: "http://note.strangest.cn",
-
+    //  作者署名
     author: {
         name: "Pix",
         url: "http://note.strangest.cn",
     },
-
+    //  图标支持
     iconAssets: "iconfont",
     //  网站logo 对应绝对路径.vuepress/public
     logo: "/logo.svg",
@@ -39,9 +39,9 @@ export default hopeTheme({
 
     // sidebar  侧边栏
     sidebar: sidebar,
-
-    footer: "默认页脚",
-
+    //  页脚
+    footer: "说点啥好呢",
+    //  所有页面显示通用页脚
     displayFooter: true,
 
     pageInfo: ["Author", "Original", "Date", "Category", "Tag", "ReadingTime"],
@@ -97,28 +97,28 @@ export default hopeTheme({
         // 如果你不需要评论，可以直接删除 comment 配置，
         // 以下配置仅供体验，如果你需要评论，请自行配置并使用自己的环境，详见文档。
         // 为了避免打扰主题开发者以及消耗他的资源，请不要在你的正式环境中直接使用下列配置!!!!!
-        comment: {
-            /**
-             * Using Giscus
-             */
-            provider: "Giscus",
-            repo: "vuepress-theme-hope/giscus-discussions",
-            repoId: "R_kgDOG_Pt2A",
-            category: "Announcements",
-            categoryId: "DIC_kwDOG_Pt2M4COD69",
-
-            /**
-             * Using Twikoo
-             */
-            // provider: "Twikoo",
-            // envId: "https://twikoo.ccknbc.vercel.app",
-
-            /**
-             * Using Waline
-             */
-            // provider: "Waline",
-            // serverURL: "https://vuepress-theme-hope-comment.vercel.app",
-        },
+        // comment: {
+        //     /**
+        //      * Using Giscus
+        //      */
+        //     provider: "Giscus",
+        //     repo: "vuepress-theme-hope/giscus-discussions",
+        //     repoId: "R_kgDOG_Pt2A",
+        //     category: "Announcements",
+        //     categoryId: "DIC_kwDOG_Pt2M4COD69",
+        //
+        //     /**
+        //      * Using Twikoo
+        //      */
+        //     // provider: "Twikoo",
+        //     // envId: "https://twikoo.ccknbc.vercel.app",
+        //
+        //     /**
+        //      * Using Waline
+        //      */
+        //     // provider: "Waline",
+        //     // serverURL: "https://vuepress-theme-hope-comment.vercel.app",
+        // },
 
         mdEnhance: {
             enableAll: true,

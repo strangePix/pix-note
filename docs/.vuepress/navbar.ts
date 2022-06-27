@@ -7,7 +7,7 @@ export default navbar([
     "/",    // 首页 对应docs/README.md
     {
         text: "Java笔记",
-        icon: "note",
+        icon: "java",
         prefix: "/java/",
         children: [
             "Java",
@@ -17,7 +17,7 @@ export default navbar([
     },
     {
         text: "数据库笔记",
-        icon: "note",
+        icon: "table",
         prefix: "/database/",
         children: [
             "数据库",
@@ -28,7 +28,7 @@ export default navbar([
     },
     {
         text: "框架笔记",
-        icon: "note",
+        icon: "code",
         prefix: "/frame/",
         children: [
             "Spring",
@@ -38,7 +38,7 @@ export default navbar([
     },
     {
         text: "中间件笔记",
-        icon: "note",
+        icon: "install",
         prefix: "/middleware/",
         children: [
             "消息队列",
@@ -46,7 +46,7 @@ export default navbar([
     },
     {
         text: "算法笔记",
-        icon: "note",
+        icon: "variable",
         prefix: "/algorithm/",
         children: [
             "算法题",
@@ -54,7 +54,7 @@ export default navbar([
     },
     {
         text: "面试笔记",
-        icon: "note",
+        icon: "group",
         prefix: "/interview/",
         children: [
             "Java面试突击",

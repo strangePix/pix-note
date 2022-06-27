@@ -7,7 +7,7 @@ export default sidebar([
     "/",
     {
         text: "Java笔记",
-        icon: "note",
+        icon: "java",
         //  分组是否可以折叠
         collapsable: true,
         prefix: "/java/",
@@ -18,7 +18,7 @@ export default sidebar([
     },
     {
         text: "数据库笔记",
-        icon: "note",
+        icon: "table",
         //  分组是否可以折叠
         collapsable: true,
         prefix: "/database/",
@@ -29,7 +29,7 @@ export default sidebar([
     },
     {
         text: "框架笔记",
-        icon: "note",
+        icon: "code",
         //  分组是否可以折叠
         collapsable: true,
         prefix: "/frame/",
@@ -38,7 +38,7 @@ export default sidebar([
     },
     {
         text: "中间件笔记",
-        icon: "note",
+        icon: "install",
         //  分组是否可以折叠
         collapsable: true,
         prefix: "/middleware/",
@@ -46,24 +46,24 @@ export default sidebar([
         children: "structure"
     },
     {
-        text: "面试笔记",
-        icon: "note",
-        collapsable: true,
-        prefix: "/interview/",
-        children: "structure"
-    },
-    {
         text: "算法笔记",
-        icon: "note",
+        icon: "variable",
         collapsable: true,
         prefix: "/algorithm/",
         children: "structure"
     },
     {
         text: "运维笔记",
-        icon: "note",
+        icon: "linux",
         collapsable: true,
         prefix: "/server/",
+        children: "structure"
+    },
+    {
+        text: "面试笔记",
+        icon: "group",
+        collapsable: true,
+        prefix: "/interview/",
         children: "structure"
     },
     {
