@@ -11,7 +11,7 @@ export default defineUserConfig({
   //  站点的描述，作为<meta name="description" />标签的content 属性
   description: "俺是专业的",
   //  部署站点的基础路径，斜杠开始，斜杠结束
-  base: "/",
+  base: "/pix-note/",
   //  主题
   theme,
 });
