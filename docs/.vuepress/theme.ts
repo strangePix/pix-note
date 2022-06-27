@@ -19,7 +19,7 @@ export default hopeTheme({
     logo: "/logo.svg",
 
     //  对应git仓库 默认github，也可以是完整url
-    repo: "vuepress-theme-hope/vuepress-theme-hope",
+    repo: "strangePix/pix-note",
     repoLabel: "GitHub",
     repoDisplay: true,
 
