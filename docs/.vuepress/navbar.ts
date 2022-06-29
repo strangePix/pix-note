@@ -60,17 +60,30 @@ export default navbar([
         ]
     },
     {
+        text: "运维笔记",
+        icon: "group",
+        prefix: "/server/",
+        children: [
+            "Linux",
+            "Docker",
+            "Nginx",
+            "Tomcat",
+            "服务器运维",
+            "Maven"
+        ]
+    },
+    {
         text: "其他笔记",
         icon: "note",
+        prefix: "/other/",
         children: [
-            "/other/IDE",
-            "/other/开源项目学习记录",
-            "/server/服务器运维",
-            "/other/补充内容",
-            "/other/计算机网络",
-            "/other/系统设计",
-            "/other/补充内容-待分类内容",
-            "/other/Maven"
+            "IDEA使用",
+            "Maven",
+            "开源项目学习记录",
+            "补充内容",
+            "计算机网络",
+            "系统设计",
+            "补充内容-待分类内容"
         ]
     },
 
