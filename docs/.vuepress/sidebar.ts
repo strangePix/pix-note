@@ -12,9 +12,7 @@ export default sidebar([
         collapsable: true,
         prefix: "/java/",
         // 分组子项目
-        children: [
-            "Java","JUC","JVM"
-        ]
+        children: "structure"
     },
     {
         text: "数据库笔记",
@@ -23,9 +21,7 @@ export default sidebar([
         collapsable: true,
         prefix: "/database/",
         // 分组子项目
-        children: [
-            "数据库","Mysql","Redis","MongoDB"
-        ]
+        children: "structure"
     },
     {
         text: "框架笔记",

@@ -12,6 +12,7 @@ export default navbar([
             "Java",
             "JUC",
             "JVM",
+            "补充内容"
         ]
     },
     {
@@ -48,7 +49,10 @@ export default navbar([
         icon: "variable",
         prefix: "/algorithm/",
         children: [
-            "算法题",
+            "算法题集",
+            "算法整理",
+            "Leetcode刷题记录",
+            "数据结构"
         ]
     },
     {
@@ -68,8 +72,9 @@ export default navbar([
             "Docker",
             "Nginx",
             "Tomcat",
-            "服务器运维",
-            "Maven"
+            "Maven",
+            "版本控制",
+            "服务器运维"
         ]
     },
     {
@@ -78,12 +83,16 @@ export default navbar([
         prefix: "/other/",
         children: [
             "IDEA使用",
-            "Maven",
+            "标记语言Markdown",
+            "Windows",
             "开源项目学习记录",
             "补充内容",
+            "解决方案收集",
+            "实用资源收集",
+            "授权认证",
             "计算机网络",
-            "系统设计",
-            "补充内容-待分类内容"
+            "计算机原理",
+            "系统设计"
         ]
     },
 
