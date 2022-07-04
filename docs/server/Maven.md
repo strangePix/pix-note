@@ -47,16 +47,39 @@
 
 - idea配置里修改maven配置文件的位置为修改后的setting.xml
 
+  ![image-20220704231934863](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20220704231934863.png)
 
 
-## 使用
 
-### 本地jar安装到本地仓库
 
-```powershell
-mvn install:install-file -Dfile=D:/taobao-sdk-java-auto-20160607.jar -DgroupId=com.ganshane.specs -DartifactId=taobao-sdk-java-auto-20160607 -Dversion=1.0.0 -Dpackaging=jar
+
+## 添加jar包到本地仓库
+
+部分jar包在中央仓库没有，又没有私服可以上传，则添加到本地仓库进行引用
+
+#### 使用Maven命令安装jar包
+
+```sh
+# 以下命令不换行，不同参数用空格隔开
+mvn install:install-file
+-DgroupId=<groupId>       # 设置项目代码的包名(一般用组织名)
+-DartifactId=<artifactId> # 设置项目名或模块名
+-Dversion=1.0.0           # 版本号
+-Dpackaging=jar           # 什么类型的文件(jar包)
+-Dfile=<myfile.jar>       # 指定jar文件路径与文件名(同目录只需文件名)
+```
+
+如：
+
+```sh
+mvn install:install-file -DgroupId=com.baidu -DartifactId=ueditor -Dversion=1.0.0 -Dpackaging=jar -Dfile=ueditor-1.1.2.jar
+# 又如
 mvn install:install-file -Dfile=C:/Users/Stranger/Downloads/dingtalk-sdk-java/taobao-sdk-java-auto_1479188381469-20211105.jar -DgroupId=com.org.dingding -DartifactId=dingtalk -Dversion=2021.11 -Dpackaging=jar
 ```
+
+
+
+## 排除依赖冲突（待补充）
 
 
 
@@ -210,137 +233,153 @@ cat nexus-data/admin.password
 
 修改Maven的`settings.xml`文件
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
-    <!-- localRepository
-     | 将默认的仓库位置改为想要设置的位置
-     |
-     | Default: ${user.home}/.m2/repository
-     -->
-    <localRepository>D:\maven\repository</localRepository>
+- **servers服务器标签配置私服仓库的账号密码**
 
-    <!-- 插件组 -->
-    <pluginGroups/>
+  id是仓库的name，username和password是对应的用户名和密码
 
-    <!-- 代理 -->
-    <proxies/>
+  ```xml
+  <!-- servers服务器配置 -->
+  <servers>
+      <server>
+          <id>maven-releases</id>
+          <username>admin</username>
+          <password>admin111</password>
+      </server>
+  
+      <server>
+          <id>maven-snapshots</id>
+          <username>admin</username>
+          <password>admin111</password>
+      </server>
+  </servers>
+  ```
 
-    <!-- servers服务器(其中username和password是私服的用户名和密码) -->
-    <servers>
-        <server>
-            <id>maven-releases</id>
-            <username>admin</username>
-            <password>admin111</password>
-        </server>
+- **mirrors镜像标签配置私服的地址**
 
-        <server>
-            <id>maven-snapshots</id>
-            <username>admin</username>
-            <password>admin111</password>
-        </server>
-    </servers>
+  ```xml
+  <!-- 镜像
+       | 这是从远程存储库下载依赖时使用的镜像列表。
+       |-->
+  <mirrors>
+      <!--<mirror>
+              <id>alimaven</id>
+              <mirrorOf>central</mirrorOf>
+              <name>aliyun maven</name>
+              <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+          </mirror>-->
+      <mirror>
+          <id>ManaphyMirror</id>
+          <mirrorOf>*</mirrorOf>
+          <name>Manaphy Repository Mirror.</name>
+          <url>http://192.168.2.132:8081/repository/maven-public/</url>
+      </mirror>
+  </mirrors>
+  ```
 
-    <!-- 镜像
-     | 这是从远程存储库下载依赖时使用的镜像列表。
-     |-->
-    <mirrors>
-        <!--<mirror>
-            <id>alimaven</id>
-            <mirrorOf>central</mirrorOf>
-            <name>aliyun maven</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-        </mirror>-->
-        <mirror>
-            <id>ManaphyMirror</id>
-            <mirrorOf>*</mirrorOf>
-            <name>Manaphy Repository Mirror.</name>
-            <url>http://192.168.2.132:8081/repository/maven-public/</url>
-        </mirror>
-    </mirrors>
+- **profiles配置具体仓库的选择**
 
-    <!-- 服务器配置 -->
-    <profiles>
-        <!-- java编译插件,配jdk的编译版本-->
-        <profile>
-            <id>jdk-1.8</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <maven.compiler.source>1.8</maven.compiler.source>
-                <maven.compiler.target>1.8</maven.compiler.target>
-                <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
-            </properties>
-        </profile>
-        <!-- 自定义私服的配置 -->
-        <profile>
-            <id>Manaphy</id>
-            <repositories>
-                <repository>
-                    <id>nexus</id>
-                    <name>Public Repositories</name>
-                    <url>http://192.168.2.132:8081/repository/maven-public/</url>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                </repository>
-                <repository>
-                    <id>maven-central</id>
-                    <name>Central Repositories</name>
-                    <url>http://localhost:8082/repository/maven-central/</url>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                </repository>
-                <repository>
-                    <id>maven-releases</id>
-                    <name>Release Repositories</name>
-                    <url>http://192.168.2.132:8081/repository/maven-releases/</url>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                </repository>
-                <repository>
-                    <id>maven-snapshots</id>
-                    <name>Snapshot Repositories</name>
-                    <url>http://192.168.2.132:8081/repository/maven-snapshots/</url>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                </repository>
-            </repositories>
+  ```xml
+  <!-- 服务器配置 -->
+  <profiles>
+      <!-- java编译插件,配jdk的编译版本-->
+      <profile>
+          <id>jdk-1.8</id>
+          <activation>
+              <activeByDefault>true</activeByDefault>
+              <jdk>1.8</jdk>
+          </activation>
+          <properties>
+              <maven.compiler.source>1.8</maven.compiler.source>
+              <maven.compiler.target>1.8</maven.compiler.target>
+              <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+          </properties>
+      </profile>
+      <!-- 自定义私服的配置 -->
+      <profile>
+          <id>Manaphy</id>
+          <repositories>
+              <repository>
+                  <id>nexus</id>
+                  <name>Public Repositories</name>
+                  <url>http://192.168.2.132:8081/repository/maven-public/</url>
+                  <releases>
+                      <enabled>true</enabled>
+                  </releases>
+              </repository>
+              <repository>
+                  <id>maven-central</id>
+                  <name>Central Repositories</name>
+                  <url>http://localhost:8082/repository/maven-central/</url>
+                  <releases>
+                      <enabled>true</enabled>
+                  </releases>
+                  <snapshots>
+                      <enabled>false</enabled>
+                  </snapshots>
+              </repository>
+              <repository>
+                  <id>maven-releases</id>
+                  <name>Release Repositories</name>
+                  <url>http://192.168.2.132:8081/repository/maven-releases/</url>
+                  <releases>
+                      <enabled>true</enabled>
+                  </releases>
+                  <snapshots>
+                      <enabled>false</enabled>
+                  </snapshots>
+              </repository>
+              <repository>
+                  <id>maven-snapshots</id>
+                  <name>Snapshot Repositories</name>
+                  <url>http://192.168.2.132:8081/repository/maven-snapshots/</url>
+                  <releases>
+                      <enabled>true</enabled>
+                  </releases>
+                  <snapshots>
+                      <enabled>true</enabled>
+                  </snapshots>
+              </repository>
+          </repositories>
+  		<!-- 插件仓库配置 -->
+          <pluginRepositories>
+              <pluginRepository>
+                  <id>plugins</id>
+                  <name>Plugin Repositories</name>
+                  <url>http://192.168.2.132:8081/repository/maven-public/</url>
+              </pluginRepository>
+          </pluginRepositories>
+      </profile>
+  </profiles>
+  ```
 
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>plugins</id>
-                    <name>Plugin Repositories</name>
-                    <url>http://192.168.2.132:8081/repository/maven-public/</url>
-                </pluginRepository>
-            </pluginRepositories>
-        </profile>
-    </profiles>
+- **activeProfiles标签激活profiles内的特定profile**
 
-    <!-- 激活Profiles
-     | 为所有生成激活的配置文件的列表。
-     |-->
-    <activeProfiles>
-        <activeProfile>jdk-1.8</activeProfile>
-        <activeProfile>Manaphy</activeProfile>
-    </activeProfiles>
+  ```xml
+  <!-- 激活Profiles
+       | 为所有生成激活的配置文件的列表。
+       |-->
+  <activeProfiles>
+      <activeProfile>jdk-1.8</activeProfile>
+      <activeProfile>Manaphy</activeProfile>
+  </activeProfiles>
+  ```
 
-</settings>
+
+
+### 发布到私有公库
+
+执行指令
+
+```sh
+mvn clean deploy
 ```
+
+项目会作为jar包存在私有库中
+
+![image-20200904115256759](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202207042324mavensdfsfsf.png)
+
+> - 项目版本号末尾带有 -SNAPSHOT，则会发布到snapshots快照版本仓库`repository/maven-snapshots/`
+> - 项目版本号末尾带有 -RELEASES 或什么都不带，则会发布到releases正式版本仓库
+
+
 
