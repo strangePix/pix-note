@@ -199,3 +199,29 @@ vim /usr/apache-tomcat-7.0.107/conf/server.xml
 
 启动后，可以使用http://localhost:8080/来访问Tomcat，访问的就是ROOT对应的Web应用。
 
+
+
+
+
+## 问题处理
+
+### IDEA中tomcat启动时控制台乱码（淇℃伅）
+
+#### 问题描述
+
+![图1.tomcat启动时的报错](https://img-blog.csdnimg.cn/20201104190238969.png#pic_center)
+
+服务器：tomcat10
+
+#### 解决方案
+
+到tomcat安装目录下的文件夹里的`/conf/logging.properties`文件
+
+将控制台打印的编码格式改为GBK
+
+```properties
+#java.util.logging.ConsoleHandler.encoding = UTF-8
+java.util.logging.ConsoleHandler.encoding = GBK
+```
+
+并保证IDEA的文件编码格式为UTF-8
