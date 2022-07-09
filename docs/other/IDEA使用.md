@@ -426,6 +426,12 @@ groovyScript("
 |             查看类的所有方法列表              |      `Ctrl`+`F12`<br />`Alt`+`7`       |
 |            调用常规的实时代码模板             |         `Tab` 和 `Ctrl + J`。          |
 
+
+
+
+
+
+
 ## 推荐插件
 
 https://cdk8s.gitbook.io/github/plugins-settings#cha-jian-tui-jian

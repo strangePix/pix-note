@@ -4,6 +4,8 @@
 
 #### Win
 
+##### 5.7
+
 - 前提： 解压mysql-5.7.25-winx64.zip压缩包的文件夹到某一路径，如D:\mysql-5.7.25-winx64
 
   保证安装包中没有data文件夹
@@ -32,11 +34,11 @@
 - 访问mysql的bin目录，输入指令
 
   ```powershell
-  #安装
-  mysqld --install
-  .\mysqld.exe --install
   #初始化  --initialize-insecure  生成无密码用户
   mysqld --initialize-insecure --user=root
+  #安装服务
+  mysqld --install
+  .\mysqld.exe --install
   #启动mysql服务
   net start mysql
   #查看版本
@@ -62,6 +64,85 @@
 - 配置开机自启
 
   ![image-20210927103415585](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20210927103415585.png)
+
+
+
+##### 8.0
+
+- 下载：这里选择压缩包解压，下载地址使用华为镜像：https://repo.huaweicloud.com/mysql/
+
+- 解压后将文件夹放在自选的位置，然后在环境变量配置Path增加mysql文件夹的bin目录
+
+  ![在这里插入图片描述](https://img-blog.csdnimg.cn/2020120208380385.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzYwNTI2Ng==,size_16,color_FFFFFF,t_70)
+
+- 在mysql文件夹内创建my.ini文件
+
+  ![在这里插入图片描述](https://img-blog.csdnimg.cn/20201124184338369.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzYwNTI2Ng==,size_16,color_FFFFFF,t_70#pic_center)
+
+- 编辑my.ini文件
+
+  ```ini
+  [mysql]
+  # 设置mysql客户端默认字符集
+  default-character-set=utf8mb4
+  [client]
+  # 设置mysql客户端连接服务端时默认字符集
+  default-character-set=utf8mb4
+  [mysqld]
+  # 设置3306端口
+  port = 3306
+  # 设置mysql的安装目录 这里目录的间隔符是双斜杠
+  basedir=E:\\soft\\mysql-8.0.19-winx64
+  # 设置mysql的数据目录
+  datadir=E:\\soft\\mysql-8.0.19-winx64
+  # 允许最大连接数
+  max_connections=200
+  # 允许连接失败的次数。这是为了防止从该主机试图攻击数据库系统
+  max_connect_errors=10
+  # 服务端使用的字符集默认为8比特编码的latin1字符集
+  character-set-server=utf8mb4
+  # 创建新表时将使用的默认存储引擎
+  default-storage-engine=INNODB
+  # 默认使用“mysql_native_password”插件认证
+  default_authentication_plugin=mysql_native_password
+  # 关闭ssl
+  skip_ssl
+  # 配置时区
+  default-time_zone='+8:00'
+  ```
+
+- 进入命令行（`Win+R`输入cmd），进入mysql的bin目录
+
+  ![在这里插入图片描述](https://img-blog.csdnimg.cn/20201124184453416.png#pic_center)
+
+- 执行如下指令安装并初始化
+
+  ```sh
+  #初始化  --initialize-insecure  生成无密码用户
+  mysqld --initialize-insecure --user=root
+  # 安装mysql 如果出现Install/Remove of the Service Denied!，则使用管理员启动命令行再执行指令
+  mysqld --install
+  #启动mysql服务
+  net start mysql
+  #查看版本
+  mysql -V
+  # 登录
+  mysql -u root -p
+  ```
+
+
+
+##### 设置开机自启
+
+- `Win+R`输入`services.msc`快速打开电脑”服务“
+
+  ![在这里插入图片描述](https://img-blog.csdnimg.cn/20201128174401981.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzYwNTI2Ng==,size_16,color_FFFFFF,t_70)
+
+- 找到mysql服务，自行选择开启/开机自启
+
+  <img src="https://img-blog.csdnimg.cn/20201124185352684.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzYwNTI2Ng==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" style="zoom: 67%;" />
+
+  <img src="https://img-blog.csdnimg.cn/2020112321065774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzYwNTI2Ng==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" style="zoom:80%;" />
 
 
 

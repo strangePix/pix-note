@@ -28,9 +28,11 @@ Redis是一个高性能的分布式内存数据库，在国内外个大互联网
 
 **下载地址：**https://github.com/tporadowski/redis/releases
 
-- 下载 **Redis-x64-xxx.zip**压缩包到 C 盘，解压后，将文件夹重新命名为 **redis**
+- 下载 **Redis-x64-xxx.zip**压缩包并解压，此时直接启动redis-server.exe即可启动服务器
 
   ![image-20210927104734903](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20210927104734903.png)
+
+**设置后台启动/安装服务**
 
 - 配置环境变量
 
@@ -39,18 +41,17 @@ Redis是一个高性能的分布式内存数据库，在国内外个大互联网
   Path=%REDIS_HOME%
   ```
 
-- 启动服务器指令
+- 配置文件，这里选择和redis-server.exe同级的redis.windows.conf，手动启动可以这么用
 
-  ```powershell
-  # 使用的默认的配置文件E:\redis.windows.conf
-  redis-server
+  ```sh
   redis-server E:\redis\redis.windows.conf
   ```
 
-- 设为服务方便自启
+- 安装服务
 
   ```powershell
-  redis-server --service-install redis.windows.conf --loglevel verbose
+  redis-server --service-install D:\soft\Redis\Redis-x64-5.0.14.1\redis.windows.conf --service-name redis-server --loglevel verbose
+  # --service-name 服务名
   ```
 
   
