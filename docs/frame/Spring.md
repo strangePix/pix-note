@@ -1765,3 +1765,12 @@ Nacos和Consul一样都支持动态刷新配置，当我们在Nacos页面上修�
 
 
 
+
+
+
+
+# Spring使用经验
+
+## 使用转换器将前端参数转换为枚举（待补充）
+
+https://www.modb.pro/db/105923
