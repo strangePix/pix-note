@@ -36,8 +36,8 @@
   ```powershell
   #初始化  --initialize-insecure  生成无密码用户
   mysqld --initialize-insecure --user=root
-  #安装服务
-  mysqld --install
+  #安装服务 服务名为mysql5 不写默认MYSQL
+  mysqld --install mysql5
   .\mysqld.exe --install
   #启动mysql服务
   net start mysql
