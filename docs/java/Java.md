@@ -76,15 +76,59 @@
 
 ### 类之间的关系-类图
 
-#### 泛化关系（generalization）
+#### 泛化关系（Generalization）
 
-用于描述继承关系，java中使用`extends`关键字
+- 用于描述继承关系，java中使用`extends`关键字
 
-用一条带空心箭头的直接表示：（A继承自B）
+- 用一条带空心箭头的直接表示：（A继承自B）
 
-![_images/uml_generalization.jpg](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/uml_generalization.jpg)
+  ![_images/uml_generalization.jpg](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202207201630478.jpeg)
 
-#### 实现关系（realize）
+
+
+#### 实现关系（Realization）
+
+- 用来描述实现关系，在 Java 中使用 implement 关键字。
+
+- 用一条带空心箭头的虚线表示：（小汽车/自行车 实现 车）
+
+  ![_images/uml_realize.jpg](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/uml_realize.jpg)
+
+
+
+
+
+####  聚合关系 (Aggregation)
+
+- 表示整体由部分构成的语义，如一个部门由多个员工组成。
+
+- 用一条带空心菱形箭头的直线表示：（A聚合到B上，B由A组成）
+
+![_images/uml_aggregation.jpg](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/uml_aggregation.jpg)
+
+- 与组合关系的区别：整体与部分不是强依赖，即使整体不存在，也不影响部分的存在。
+
+  如部门解散，人员并不会消失。
+
+
+
+#### 组合关系 (Composition)
+
+- 同样表示整体由部分构成的语义，如一个公司由多个部门组成。
+
+- 用一条带实心菱形箭头直线表示：（A组成B，B由A组成）
+
+  ![_images/uml_composition.jpg](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/uml_composition.jpg)
+
+- 与聚合关系的区别：是一种强依赖关系，整体不存在，则部分也不存在。
+
+  如公司解散，则部门也不再存在。
+
+
+
+#### 关联关系(association)
+
+- 
 
 
 
