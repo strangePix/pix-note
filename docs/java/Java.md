@@ -24,6 +24,8 @@
 
 
 
+
+
 ## 面向对象
 
 ### 三大特性
@@ -78,17 +80,19 @@
 
 
 
-## Java基本数据类型
 
-### 八种基本数据类型
+
+## 数据类型
+
+
+
+### 基本数据类型
 
 - 六种数字类型：
   - 四种整数类型：`byte`，`short`，`int`，`long`
   - 两种浮点型：`float`，`double`
 - 一种字符类型：`char`
 - 一种布尔类型：`boolean`
-
-### 默认值，占用空间，取值范围
 
 | 基本类型  | 位数 | 字节 | 默认值  | 取值范围                                   |
 | :-------- | :--- | :--- | :------ | ------------------------------------------ |
@@ -103,35 +107,59 @@
 
 > - boolean的位数逻辑上是1位，实际依赖于JVM厂商实现，考虑计算机高效存储因素。
 
-### 包装类型与基本类型的区别
 
-- 包装类不赋值默认为null，基本类型有默认值且不为null
-- 包装类型可用于泛型，基本类型不能
-- 基本数据类型的局部变量存放在虚拟机栈的局部变量表中，基本数据类型的成员变量（非静态）存放在虚拟机堆中。包装类型属于对象类型，几乎所有对象实例均存在于堆中。
-- 相对于包装类型，基本数据类型占用空间极小。
 
-> **"几乎所有对象实例均存在于堆中"**
->
-> HotSpot 虚拟机引入了 JIT 优化之后，会对对象进行逃逸分析，如果发现某一个对象并没有逃逸到方法外部，那么就可能通过标量替换来实现栈上分配，而避免堆上分配内存。
+### 包装类
 
-> **基本数据类型存放在栈中是一个常见的误区！** 基本数据类型的成员变量如果没有被 `static` 修饰的话（不建议这么使用，应该要使用基本数据类型对应的包装类型），就存放在堆中。
->
-> ```java
-> class BasicTypeVar{
-> private int x;
-> }
-> ```
+#### 包装类型与基本类型的区别
 
-### 包装类型的缓存机制
+- **默认值**：包装类不赋值默认为null，基本类型有默认值且不为null
+
+- **泛型类型**：包装类型可用于泛型，基本类型不能
+
+- **存储位置**：
+
+  - 基本数据类型的局部变量存放在虚拟机栈的局部变量表中，基本数据类型的成员变量（非静态）存放在虚拟机堆中。
+  - 包装类型属于对象类型，几乎所有对象实例均存在于堆中。
+
+  > - **"几乎所有对象实例均存在于堆中"**
+  >
+  >   HotSpot 虚拟机引入了 JIT 优化之后，会对对象进行逃逸分析，如果发现某一个对象并没有逃逸到方法外部，那么就可能通过标量替换来实现栈上分配，而避免堆上分配内存。
+  >
+  > - **基本数据类型存放在栈中是一个常见的误区！** 
+  >
+  >   基本数据类型的成员变量如果没有被 `static` 修饰的话（不建议这么使用，应该要使用基本数据类型对应的包装类型），就存放在堆中。
+
+- **空间**：相对于包装类型，基本数据类型占用空间极小。
+
+
+
+#### 包装类型的缓存机制/缓存池
 
 Java 基本数据类型的包装类型的大部分都用到了缓存机制来提升性能。
 
-- `Byte`,`Short`,`Integer`,`Long` 这 4 种包装类默认创建了数值 **[-128，127]** 的相应类型的缓存数据，`Character` 创建了数值在 **[0,127]** 范围的缓存数据，`Boolean` 直接返回 `True` or `False`。
+- 通过new方式每次都会创建新的对象，而通过valueOf()会使用缓存池中的对象。
 
+  > valueOf() 方法的实现比较简单，就是先判断值是否在缓存池中，如果在的话就直接返回缓存池的内容。
+  >
+  > ```java
+  > public static Integer valueOf(int i) {
+  >     if (i >= IntegerCache.low && i <= IntegerCache.high)
+  >         return IntegerCache.cache[i + (-IntegerCache.low)];
+  >     return new Integer(i);
+  > }
+  > ```
+
+- 所有包装类都有对应的缓存池，其范围：
+  - `Byte`,`Short`,`Integer`,`Long`： **[-128,127]**  （包含了全部byte值）
+  - `Character` ： **[0,127]**，对应**[\u0000,\u007F]**
+  - `Boolean`： **True**和**False**
 - 如果超出对应范围仍然会去创建新的对象，缓存的范围区间的大小只是在性能和资源之间的权衡。
 - 两种浮点数类型的包装类 `Float`,`Double` 并没有实现缓存机制。
 
-#### Integer缓存源码
+
+
+##### Integer缓存源码
 
 ```java
 public static Integer valueOf(int i) {
@@ -149,18 +177,22 @@ private static class IntegerCache {
 }
 ```
 
-### 所有整形包装类对象之间的值比较，全部用equals方法
+
+
+##### 整形包装类对象之间的值比较，建议用equals方法
 
 ![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/20210422164544846.png)
 
-### 自动装箱与拆箱
 
-#### 概念
+
+#### 自动装箱与拆箱
+
+**概念**
 
 - **装箱**：将基本类型用它们对应的引用类型包装起来；
 - **拆箱**：将包装类型转换为基本数据类型；
 
-#### 本质
+**本质**
 
 ```java
 Integer i = 10;  //装箱
@@ -179,15 +211,19 @@ Integer i = Integer.valueOf(10);
 int n = i.intValue();
 ```
 
-#### 性能问题
+**性能问题**
 
-**如果频繁拆装箱的话，也会严重影响系统的性能。我们应该尽量避免不必要的拆装箱操作**
+如果频繁拆装箱的话，也会严重影响系统的性能。我们应该尽量避免不必要的拆装箱操作
 
 
 
 ## String 字符串
 
+
+
 ### String为什么是不可变的
+
+#### 不可变性的实现
 
 `String` 类中使用 `final` 关键字修饰字符数组来保存字符串。
 
@@ -199,34 +235,69 @@ public final class String implements java.io.Serializable, Comparable<String>, C
 ```
 
 - 保存字符串的数组被 `final` 修饰且为私有的，并且`String` 类没有提供/暴露修改这个字符串的方法。
-- `String` 类被 `final` 修饰导致其不能被继承，进而避免了子类破坏 `String` 不可变。
 
-> 在 Java 9 之后，`String` 、`StringBuilder` 与 `StringBuffer` 的实现改用 `byte` 数组存储字符串。
->
-> ```java
-> public final class String implements java.io.Serializable,Comparable<String>, CharSequence {
->  // @Stable 注解表示变量最多被修改一次，称为“稳定的”。
->  @Stable
->  private final byte[] value;
-> }
-> 
-> abstract class AbstractStringBuilder implements Appendable, CharSequence {
->  byte[] value;
-> 
-> }
-> ```
->
-> **为何要将 `String` 的底层实现由 `char[]` 改成了 `byte[]` ?**
->
-> 新版的 String 其实支持两个编码方案： Latin-1 和 UTF-16。
->
-> 如果字符串中包含的汉字没有超过 Latin-1 可表示范围内的字符，那就会使用 Latin-1 作为编码方案。Latin-1 编码方案下，`byte` 占一个字节(8 位)，`char` 占用 2 个字节（16），`byte` 相较 `char` 节省一半的内存空间。
->
-> JDK 官方就说了绝大部分字符串对象只包含 Latin-1 可表示的字符。
->
-> 如果字符串中包含的汉字超过 Latin-1 可表示范围内的字符，`byte` 和 `char` 所占用的空间是一样的。
->
-> 参考：https://openjdk.java.net/jeps/254 
+  意味着value数组在初始化之后不能再修改为其他数组引用，也不能修改该数组的内容。
+
+- `String` 类被 `final` 修饰导致其不能被继承，进而避免了子类破坏 `String` 的内容。
+
+#### 不可变的好处
+
+[参考](https://www.programcreek.com/2013/04/why-string-is-immutable-in-java/)
+
+1. **可以缓存hash值**
+
+   因为 String 的 hash 值经常被使用，例如 String 用做 HashMap 的 key。
+
+   不可变的特性可以使得 hash 值也不可变，因此只需要进行一次计算。
+
+2. **字符串常量池的需要**
+
+   如果一个 String 对象已经被创建过了，那么就会从 String Pool 中取得引用。
+
+   只有 String 是不可变的，才可能使用 String Pool。
+
+3. **安全性**
+
+   String 经常作为参数，String 不可变性可以保证参数不可变。
+
+   例如在作为网络连接参数的情况下如果 String 是可变的，那么在网络连接过程中，String 被改变，改变 String 对象的那一方以为现在连接的是其它主机，而实际情况却不一定是。
+
+4. **线程安全**
+
+   String 不可变性天生具备线程安全，可以在多个线程中安全地使用。
+
+
+
+### 为何要将 String 的底层实现由 `char[]` 改成了 `byte[]` ?
+
+在 Java 9 之后，`String` 、`StringBuilder` 与 `StringBuffer` 的实现改用 `byte` 数组存储字符串。
+
+```java
+public final class String implements java.io.Serializable,Comparable<String>, CharSequence {
+// @Stable 注解表示变量最多被修改一次，称为“稳定的”。
+@Stable
+private final byte[] value;
+}
+
+abstract class AbstractStringBuilder implements Appendable, CharSequence {
+byte[] value;
+
+}
+```
+
+
+
+新版的 String 其实支持两个编码方案： Latin-1 和 UTF-16。
+
+如果字符串中包含的汉字没有超过 Latin-1 可表示范围内的字符，那就会使用 Latin-1 作为编码方案。Latin-1 编码方案下，`byte` 占一个字节(8 位)，`char` 占用 2 个字节（16），`byte` 相较 `char` 节省一半的内存空间。
+
+JDK 官方就说了绝大部分字符串对象只包含 Latin-1 可表示的字符。
+
+如果字符串中包含的汉字超过 Latin-1 可表示范围内的字符，`byte` 和 `char` 所占用的空间是一样的。
+
+参考：https://openjdk.java.net/jeps/254 
+
+（节约空间）
 
 
 
