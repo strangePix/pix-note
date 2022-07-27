@@ -246,7 +246,7 @@ public final class String implements java.io.Serializable, Comparable<String>, C
 
 1. **可以缓存hash值**
 
-   因为 String 的 hash 值经常被使用，例如 String 用做 HashMap 的 key。
+   因为 String 的 hash 值经常被使用，例如 String 用做 HashMap 的 key值。
 
    不可变的特性可以使得 hash 值也不可变，因此只需要进行一次计算。
 
@@ -298,6 +298,10 @@ JDK 官方就说了绝大部分字符串对象只包含 Latin-1 可表示的字�
 参考：https://openjdk.java.net/jeps/254 
 
 （节约空间）
+
+
+
+
 
 
 
