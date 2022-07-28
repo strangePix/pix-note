@@ -221,7 +221,7 @@ int n = i.intValue();
 
 
 
-### String为什么是不可变的
+### String的不可变性
 
 #### 不可变性的实现
 
@@ -301,11 +301,19 @@ JDK 官方就说了绝大部分字符串对象只包含 Latin-1 可表示的字�
 
 
 
+### 字符串类型的选择：String/StringBuffer/StringBuilder
+
+- **可变性**
+  - String不可变
+  - StringBuffer与StringBuilder可变
+- **线程安全**
+  - String不可变，所以线程安全
+  - StringBuilder线程不安全
+  - StringBuffer线程安全，内部使用synchronized进行同步
 
 
 
-
-### 字符串拼接用“+” 还是 StringBuilder?
+### 字符串拼接用 '+' 还是 StringBuilder?
 
 Java 语言本身并不支持运算符重载，“+”和“+=”是专门为 String 类重载过的运算符，也是 Java 中仅有的两个重载过的元素符。
 
@@ -330,22 +338,26 @@ String str4 = str1 + str2 + str3;
 
 
 
-### 字符串常量池的了解（待补充）
+### 字符串常量池
 
 **字符串常量池** 是 JVM 为了提升性能和减少内存消耗针对字符串（String 类）专门开辟的一块区域，主要目的是为了避免字符串的重复创建。
 
-**待补充**
 
 
+#### String.intern()方法：返回常量池引用
 
-### intern方法用途
+##### 作用
 
-`String.intern()` 是一个 native（本地）方法，其作用是将指定的字符串对象的引用保存在字符串常量池中。
+`String.intern()` 是一个 native（本地）方法，其作用是将指定的字符串对象的引用保存在字符串常量池中，从而保证**相同内容的字符串变量引用同一的内存对象**。
+
+##### 处理方式
 
 分为两种情况：
 
 - 如果字符串常量池中保存了对应的字符串对象的引用，就直接返回该引用。
-- 如果字符串常量池中没有保存了对应的字符串对象的引用，那就在常量池中创建一个指向该字符串对象的引用并返回。
+- 如果字符串常量池中没有保存对应的字符串对象的引用，那就在常量池中创建一个指向该字符串对象的引用并返回。
+
+示例：
 
 ```java
 // 在堆中创建字符串对象”Java“
@@ -353,7 +365,7 @@ String str4 = str1 + str2 + str3;
 String s1 = "Java";
 // 直接返回字符串常量池中字符串对象”Java“对应的引用
 String s2 = s1.intern();
-// 会在堆中在单独创建一个字符串对象
+// 在堆中在单独创建一个字符串对象
 String s3 = new String("Java");
 // 直接返回字符串常量池中字符串对象”Java“对应的引用
 String s4 = s3.intern();
@@ -365,13 +377,96 @@ System.out.println(s3 == s4); // false
 System.out.println(s1 == s4); //true
 ```
 
-个人理解就是返回这个对象的字符串常量池的引用，有就直接返回，没有就加入常量池再返回。
+> intern方法返回这个对象的字符串常量池的引用，有就直接返回，没有就加入常量池再返回。
+>
+> 与调用方法的对象本身没有必然关联，不一定是同一个对象。
 
 
 
-## BigDecimal(待补充)
+#### （HotSpot中）字符串常量池的存放位置
 
-https://javaguide.cn/java/basis/bigdecimal.html#bigdecimal-%E4%BB%8B%E7%BB%8D
+##### 运行时常量池与字符串常量池的关系
+
+- 运行时常量池 在虚拟机规范中是方法区的一部分，在加载类和结构到虚拟机后，就会创建对应的运行时常量池。
+- 字符串常量池是这个过程中存放常量字符串的位置。
+
+##### 方法区、永久代、元空间、堆区的区别
+
+- 字符串常量池属于运行时常量池，属于方法区，是一种逻辑上的概念
+- 堆区、永久代、元空间是实际的位置
+- 不同虚拟机对规范实现不同，如对方法区的实现。只有HotSpot有永久代的概念。
+- HotSpot也在发展，逐渐考虑去永久代，对于不同版本JDK，用到永久代的地方会不太一样。
+
+##### 再看HotSpot中字符串常量池的存放
+
+- **jdk1.6及之前**
+  - 此时的方法区由永久代实现
+  - 运行时常量池（含字符串常量池），静态变量存放在永久代上
+- **jdk1.7**
+  - 逐步“去永久代”，此时方法区由永久代和堆共同实现
+  - 永久代存放 类型信息、字段、方法、常量；堆存放 字符串常量池、静态变量
+- **jdk1.8及之后**
+  - 取消永久代，方法区由元空间和堆共同实现
+  - 本地内存的元空间存放 类型信息、字段、方法、常量；堆存放字符串常量池、静态变量
+
+
+
+## BigDecimal
+
+`BigDecimal` 可以实现对浮点数的运算，不会造成精度丢失。
+
+通常情况下，大部分需要浮点数精确运算结果的业务场景（比如涉及到钱的场景）都是通过 `BigDecimal` 来做的。
+
+
+
+### BigDecimal常见方法及注意事项
+
+#### 创建
+
+- 推荐使用构造方法或者valueOf静态方法来创建对象。
+
+  ```java
+  BigDecimal num1 = new BigDecimal(1);
+  BigDecimal num2 = BigDecimal.valueOf(1);
+  ```
+
+- 防止精度丢失，创建时的传参不要使用浮点类型，如double；
+
+  相应地，使用String类型。
+
+  ![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202207290039354.png)
+
+#### 四则运算
+
+- add加法；subtract减法；multiply乘法；divide除法
+
+  ```java
+  BigDecimal a = new BigDecimal("1.0");
+  BigDecimal b = new BigDecimal("0.9");
+  System.out.println(a.add(b));// 1.9
+  System.out.println(a.subtract(b));// 0.1
+  System.out.println(a.multiply(b));// 0.90
+  System.out.println(a.divide(b));// 无法除尽，抛出 ArithmeticException 异常
+  System.out.println(a.divide(b, 2, RoundingMode.HALF_UP));// 1.11
+  ```
+
+- 除法存在除不尽的情况，需要设置保留规则，尽量使用三个参数的版本
+
+  - 如果不设置，无限循环小数会抛出`ArithmeticException`异常
+
+  - `scale` 表示要保留几位小数，`roundingMode` 代表保留规则
+
+    ```java
+    public BigDecimal divide(BigDecimal divisor, int scale, RoundingMode roundingMode) {
+        return divide(divisor, scale, roundingMode.oldMode);
+    }
+    ```
+
+  - 保留规则`RoundingMode`尽量不要设置`UNNECESSARY`，即不控制。
+
+
+
+#### 大小比较
 
 
 
