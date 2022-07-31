@@ -76,7 +76,206 @@
 
 
 
+### 继承
 
+
+
+#### 抽象类
+
+- 抽象类和抽象方法都使用 abstract 关键字进行声明。
+
+- 抽象类一般会包含抽象方法，抽象方法一定位于抽象类中。
+- 抽象类和普通类最大的区别：抽象类不能被实例化，需要继承抽象类才能实例化其子类。
+
+
+
+#### 接口
+
+- 在 Java 8 之前，可以看成是一个完全抽象的类，也就是说它不能有任何的方法实现。
+
+- 从 Java 8 开始，接口也可以拥有默认的方法实现。
+
+  >  这是因为不支持默认方法的接口的维护成本太高了。
+  >
+  > 在 Java 8 之前，如果一个接口想要添加新的方法，那么要修改所有实现了该接口的类。
+
+- 接口的成员(字段 + 方法)默认都是 public 的，并且不允许定义为 private 或者 protected。
+
+- 接口的字段默认都是 static 和 final 的。
+
+
+
+#### 抽象类与接口的比较与选择
+
+**比较**
+
+- 设计层面：
+  - 抽象类提供了一种IS-A关系，就要求必须满足里氏替换原则，即子类必须能够替换掉所有父类对象。
+  - 接口更像是LIKE-A关系，只是提供一种方法实现契约，不要求接口与实现类有IS-A关系。
+- 使用层面：一个类可以实现多个接口，但只能继承一个类。
+- 接口字段只能是static和final，成员只能是public；抽象类没有这个限制。
+
+**选择/使用场景**
+
+- **接口**
+  - 让关联不大的多个类实现同一个方法，如比较功能compareTo，就实现Compareable接口；
+  - 需要多继承的场景，用多实现替代；
+- **抽象类**
+  - 需要在几个相关类中，共享一段代码；
+  - 需要能控制其子类成员的访问权限，而不都是public；
+  - 需要继承非静态以及非常量字段。
+
+
+
+#### super作用
+
+- **访问父类构造函数**
+
+  通过super()访问父类构造函数，委托父类完成一些初始化工作。
+
+- **访问父类成员**
+
+  子类重写父类的方法实现后，可以通过super调用引用父类的方法实现。
+
+  ```java
+  public class Parent{
+      public int test(){
+          return 1;
+      }
+  }
+  class Child extends Parent{
+      @Override
+      public int test(){
+          return super.test()+1;
+      }
+  }
+  ```
+
+  
+
+
+
+## 关键字
+
+
+
+### final 不可变
+
+- **数据**
+
+  声明数据为不可变量，
+
+  既可以是编译时常量，也可以是运行时初始化后常量。
+
+  - 基本数据类型：保持其值不可变；
+  - 引用类型：保持其引用不可变，不能修改为其他对象。但被引用对象本身的属性可以修改。
+
+- **方法**
+
+  声明方法不可被重写。
+
+  > private方法被隐式指定为final，
+  >
+  > 如果子类定义一个与父类私有方法同名的方法，不会被视为重写，而是定义一个新方法。
+
+- **类**
+
+  声明类不能被继承。
+
+
+
+
+
+### static 静态
+
+#### 静态变量
+
+又被称为类变量，指明这个类是属于类的，所有类的对象共享静态变量，通过类名进行访问。
+
+在内存中只有一份。
+
+> **实例变量**
+>
+> 相对应的实例变量，属于类的对象，每创建一个对象就产生一个实例变量，与对象同生共死。
+
+```java
+public class A{
+    private static int x = 1;
+    private int y = 2;
+
+	public static void main(String[] args) {
+        A a = new A();
+        //	静态变量
+        int x = A.x;
+        //	实例变量
+        int y = a.y;
+    }
+}
+```
+
+#### 静态方法
+
+- 在类加载时就存在，不依赖于对象的创建；
+
+- 静态方法必须有实现，不能是抽象方法；
+- 只能访问所属类的静态字段和方法，不能有this和super关键字。
+
+```java
+public class A {
+    private static int i = 1;
+    public static void func1(){
+        int a = i;
+    }
+}
+```
+
+#### 静态代码块
+
+静态代码块只会在类初始化时运行一次。
+
+```java
+public class A {
+    static {
+        System.out.println("123");
+    }
+}
+```
+
+#### 静态内部类
+
+- 非静态的内部类依赖于外部类的对象，静态内部类不需要。
+
+  ```java
+  public class OuterClass {
+      class InnerClass {
+      }
+  
+      static class StaticInnerClass {
+      }
+  
+      public static void main(String[] args) {
+          OuterClass outerClass = new OuterClass();
+          //	非静态内部类
+          InnerClass innerClass = outerClass.new InnerClass();
+          //	静态内部类
+          StaticInnerClass staticInnerClass = new StaticInnerClass();
+      }
+  }
+  ```
+
+- 静态内部类不能访问外部类的非静态变量和方法。
+
+  
+
+#### 静态导包
+
+import时使用static修饰，则在该类中可以不带ClassName前缀的引用静态变量。
+
+缺点是可读性降低。
+
+```java
+import static com.xxx.ClassName.*;
+```
 
 
 
@@ -106,6 +305,43 @@
 | `boolean` | 1    |      | false   | true、false                                |
 
 > - boolean的位数逻辑上是1位，实际依赖于JVM厂商实现，考虑计算机高效存储因素。
+
+
+
+#### float与double
+
+- 字面的小数属于double类型，不能直接赋值给float类型，因为是向下转型。
+
+  Java不支持隐式向下转型，会降低精度。
+
+  ```java
+  // float f = 1.1;
+  ```
+
+- f结尾使小数为float类型。
+
+  ```java
+  float f = 1.1f;
+  ```
+
+
+
+#### 隐式类型转换
+
+- 字面量1属于int类型，精度高于short类型，故执行+1运算后结果为int类型。
+
+  ```java
+  short a = 1;
+  // a = a + 1;
+  ```
+
+- += 运算符可以执行隐式类型转换。
+
+  ```java
+  a += 1;
+  // 等价于
+  a = (short) (a + 1);
+  ```
 
 
 
@@ -214,6 +450,14 @@ int n = i.intValue();
 **性能问题**
 
 如果频繁拆装箱的话，也会严重影响系统的性能。我们应该尽量避免不必要的拆装箱操作
+
+
+
+
+
+
+
+
 
 
 
@@ -411,11 +655,33 @@ System.out.println(s1 == s4); //true
 
 
 
-## BigDecimal
+## BigDecimal 浮点数运算
 
 `BigDecimal` 可以实现对浮点数的运算，不会造成精度丢失。
 
 通常情况下，大部分需要浮点数精确运算结果的业务场景（比如涉及到钱的场景）都是通过 `BigDecimal` 来做的。
+
+
+
+### 浮点数double/float运算的精度丢失风险
+
+计算机是二进制的，在表示一个数字时，宽度是有限的，无限循环的小数存储在计算机时，只能被截断，导致小数精度发生损失的情况。
+
+如：十进制0.2无法精确转换为小数：
+
+```java
+// 0.2 转换为二进制数的过程为，不断乘以 2，直到不存在小数为止，
+// 在这个计算过程中，得到的整数部分从上到下排列就是二进制的结果。
+0.2 * 2 = 0.4 -> 0
+0.4 * 2 = 0.8 -> 0
+0.8 * 2 = 1.6 -> 1
+0.6 * 2 = 1.2 -> 1
+0.2 * 2 = 0.4 -> 0（发生循环）
+```
+
+
+
+
 
 
 
@@ -467,6 +733,857 @@ System.out.println(s1 == s4); //true
 
 
 #### 大小比较
+
+**a.compareTo(b)**
+
+1表示 a 小于 b ；0表示相等；1表示 a 大于 b 
+
+```java
+BigDecimal a = new BigDecimal("1.0");
+BigDecimal b = new BigDecimal("0.9");
+// 1
+System.out.println(a.compareTo(b));
+```
+
+
+
+#### 保留小数位数
+
+**setScale**方法设置保留小数的位数和保留规则。
+
+```java
+BigDecimal m = new BigDecimal("1.255433");
+BigDecimal n = m.setScale(3,RoundingMode.HALF_DOWN);
+// 1.255
+System.out.println(n);
+```
+
+
+
+
+
+### 等值比较使用equals还是compareTo
+
+根据开发手册：
+
+![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202207311531152.png)
+
+- equals方法比较时，不仅会比较值（value），还会比较精度（scale），精度不同即使值相同也会返回不等。
+
+  而compareTo比较时会忽略精度。
+
+  ![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202207311534524.png)
+
+
+
+## 注解
+
+### 注解概念
+
+- Annotation是JDK5.0开始引入的新技术
+- Annotation的作用
+  - 不是程序本身，可以对程序做出解释（这一点和注释没有什么区别）
+  - 可以被其它程序，比如编译器读取
+- Annotation的格式
+  - 注解以 `@注释名` 在代码中存在的，还可以添加一些参数值
+  - 例如：`@SuppressWarnings(value = "unchecked")`
+- Annotation在那里使用？
+  - 可以附加在package、class、method、field等上面，相当于给他们添加了额外的辅助信息
+  - 通过反射机制变成实现对这些元数据的控制
+
+
+
+### 本质
+
+注解本质是一个继承了`Annotation` 的特殊接口：
+
+```java
+// 这里是一个@Override注解
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.SOURCE)
+public @interface Override {
+
+}
+
+public interface Override extends Annotation{
+
+}
+```
+
+注解只有被解析之后才会生效，常见的解析方法有两种：
+
+- **编译期直接扫描** ：编译器在编译 Java 代码的时候扫描对应的注解并处理，比如某个方法使用`@Override` 注解，编译器在编译的时候就会检测当前的方法是否重写了父类对应的方法。
+- **运行期通过反射处理** ：像框架中自带的注解(比如 Spring 框架的 `@Value` 、`@Component`)都是通过反射来进行处理的。
+
+
+
+### 内置注解
+
+- @Override：定义在 `java.lang.Override`中，此注释只适用于修饰方法，表示一个方法声明打算重写超类中的另一个方法声明
+
+- @Deprecated：定义在`java.lang.Deprecated`中，此注释可以用于修饰方法，属性，类，表示不鼓励程序员使用这样的元素，通常是因为它很危险，或者存在更好的选择
+
+- @SuppressWarnings：定义在
+
+  ```
+  java.lang.SuppressWarnings
+  ```
+
+  中，用来抑制编译时的警告信息，与前面的两个注释不同，你需要额外添加一个参数才能正确使用，这些参数都是已经定义好了的，我们选择性的使用就好了。
+
+  - @SuppressWarnings("all")
+  - @SuppressWarnings("unchecked")
+  - @SuppressWarnings(value={"unchecked", "deprecation"})
+  - ...
+
+
+
+### 元注解
+
+元注解的作用就是负责注解其它注解，Java定义了4个标准的meta-annotation类型，他们被用来提供对其它annotation类型作说明。
+
+这些类型和它们所支持的类在 `java.lang.annotation`包可以找到 `@Target` 、`@Retention`、`@Documented`、`@Inherited`
+
+- @Target：用于描述注解的使用范围，即：被描述的注解可以在什么地方使用
+
+  - ElementType.METHOD 表示可以加在方法上
+
+  - ElementType.TYPE 表示可以加在类上
+
+- @Retention：表示需要什么保存该注释信息，用于描述注解的生命周期
+
+  - RetentionPolicy.RUNTIME 运行时有效
+  - RetentionPolicy.SOURCE
+  - RetentionPolicy.CLASS
+
+  - 级别范围：Source < Class < Runtime
+
+- @Document：说明该注解被包含在java doc中
+
+- @Inherited：说明子类可以集成父类中的注解
+
+如
+
+```java
+@MyAnnotation
+public class MateAnnotationDemo {
+
+}
+
+/**
+ * 定义一个注解
+ */
+@Target(value={ElementType.METHOD, ElementType.TYPE})  // target表示我们注解应用的范围，在方法上，和类上有效
+@Retention(RetentionPolicy.RUNTIME)   // Retention：表示我们的注解在什么时候还有效，运行时候有效
+@Documented   // 表示说我们的注解是否生成在java doc中
+@Inherited   // 表示子类可以继承父类的注解
+@interface MyAnnotation {
+
+}
+```
+
+
+
+### 自定义注解
+
+使用 `@interface`自定义注解时，自动继承了 `java.lang.annotation.Annotation`接口
+
+- @interface 用来声明一个注解，格式：public @interface 注解名 {定义内容
+- 其中的每个方法实际上是申明了一个配置参数
+- 方法的名称就是参数的类型
+- 返回值类型就是参数的类型（返回值只能是基本数据类型，Class，String，enum）
+- 通过default来申明参数的默认值
+- 如果只有一个参数成员，一般参数名为 value
+- 注解元素必须要有值，我们定义元素时，经常使用空字符串或者0作为默认值
+
+示例
+
+```java
+/**
+ * 自定义注解
+ *
+ * @author: 陌溪
+ * @create: 2020-03-28-22:57
+ */
+public class MateAnnotationDemo {
+
+    // 注解可以显示赋值，如果没有默认值，我们就必须给注解赋值
+    @MyAnnotation(schools = {"大学"})
+    public void test(){
+
+    }
+
+}
+
+/**
+ * 定义一个注解
+ */
+@Target(value={ElementType.METHOD, ElementType.TYPE})  // target表示我们注解应用的范围，在方法上，和类上有效
+@Retention(RetentionPolicy.RUNTIME)   // Retention：表示我们的注解在什么时候还有效，运行时候有效
+@Documented   // 表示说我们的注解是否生成在java doc中
+@Inherited   // 表示子类可以继承父类的注解
+@interface MyAnnotation {
+
+    // 注解的参数：参数类型 + 参数名()
+    String name() default "";
+
+    int age() default 0;
+
+    // 如果默认值为-1，代表不存在
+    int id() default -1;
+
+    String[] schools();
+}
+```
+
+
+
+## 反射
+
+### 动态语言与静态语言
+
+##### 动态语言
+
+是一类在运行时可以改变其结构的语言：例如新的函数，对象，甚至代码可以被引进，已有的函数可以被删除或是其它结构上的变化。通俗点说就是在运行时代码可以根据某些条件改变自身结构
+
+主要的动态语言有：Object-c、C#、JavaScript、PHP、Python等
+
+##### 静态语言
+
+运行时结构不可变的语言就是静态语言。例如Java、C、C++
+
+Java不是动态语言，但是Java可以称为“准动态语言”。即Java有一定的动态性，我们可以利用反射机制来获取类似于动态语言的 特性，Java的动态性让编程的时候更加灵活。
+
+
+
+
+
+### 什么是反射
+
+每个类都有一个 **Class** 对象，包含了与类有关的信息。当编译一个新类时，会产生一个同名的 .class 文件，该文件内容保存着 Class 对象。
+
+Java反射是Java被视为动态语言的关键，反射机制运行程序在执行期借助于Reflection API 去访问任何类内部的信息，并能直接操作任意对象的内部属性及方法。
+
+类的加载相当于Class对象的加载，类在第一次使用时动态加载到JVM中。也可以使用如下方式控制类的加载：
+
+```java
+Class c = Class.forName("java.lang.String")
+```
+
+在加载完类后，在堆内存的方法区就产生了一个Class类型的对象（一个类只有一个Class对象），这个对象就包含了完整的类的结构信息，我们可以通过这个对象看到类的结构，这个对象就像一面镜子，透过这个镜子看到类的结构，所以我们形象的称之为：反射。
+
+![image-20200328232620190](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20200328232620190.png)
+
+
+
+### 反射的优缺点（待翻译）
+
+**优点**
+
+- **可扩展性**
+
+  程序可以通过反射动态创建对象和编译，体现出很大的灵活性。
+
+- **Class Browsers and Visual Development Environments**
+
+   A class browser needs to be able to enumerate the members of classes. Visual development environments can benefit from making use of type information available in reflection to aid the developer in writing correct code.
+
+- **Debuggers and Test Tools**
+
+  Debuggers need to be able to examine private members on classes. Test harnesses can make use of reflection to systematically call a discoverable set APIs defined on a class, to insure a high level of code coverage in a test suite.
+
+**缺点**
+
+对性能有影响。使用反射基本上是一种解释操作，我们可以告诉JVM，我们希望做什么并且它满足我们的要求，这类操作总是慢于直接执行相同的操作。也就是说new创建和对象，比反射性能更高
+
+Reflection is powerful, but should not be used indiscriminately. If it is possible to perform an operation without using reflection, then it is preferable to avoid using it. The following concerns should be kept in mind when accessing code via reflection.
+
+- **Performance Overhead**  : Because reflection involves types that are dynamically resolved, certain Java virtual machine optimizations can not be performed. Consequently, reflective operations have slower performance than their non-reflective counterparts, and should be avoided in sections of code which are called frequently in performance-sensitive applications.
+- **Security Restrictions**  : Reflection requires a runtime permission which may not be present when running under a security manager. This is in an important consideration for code which has to run in a restricted security context, such as in an Applet.
+- **Exposure of Internals**  :Since reflection allows code to perform operations that would be illegal in non-reflective code, such as accessing private fields and methods, the use of reflection can result in unexpected side-effects, which may render code dysfunctional and may destroy portability. Reflective code breaks abstractions and therefore may change behavior with upgrades of the platform.
+
+
+
+### 理解Class类
+
+- 一个类在内存中只有一个Class对象
+- 一个类被加载后，类的整体结构都会被封装在Class对象中
+
+在Object类中定义了以下的方法，此方法将被所有子类继承
+
+```java
+public final Class getClass()
+```
+
+以上方法的返回值的类型是一个Class类，此类是Java反射的源头，实际上所谓反射从程序的运行结果来看也很好理解，即：可以通过对象反射求出类的名称。也就是说，我们通过对象来获取到它的Class，相当于逆过程。
+
+- Class本身也是一个类
+- Class对象只能由系统建立对象
+- 一个加载的类在JVM中只会有一个Class实例
+- 一个Class对象对应的是一个加载到JVM中的一个.class文件
+- 每个类的实例都会记得自己是由哪个Class实例所生成
+- 通过Class可以完整地得到一个类中所有被加载的结构
+- Class类是Reflection的根源，针对任何你想动态加载、运行的类、唯有先获得相应的Class对象
+
+#### Class类常用方法
+
+- Class.forName(String name)：返回指定类name的Class对象
+- newInstance()：调用缺省构造函数，返回Class对象的一个实例
+- getName()：返回此Class对象所表示的实体（类，接口，数组或void）的名称
+- getSuperClass()：返回当前Class对象的父类Class对象
+- getinterfaces()：返回当前对象的接口
+- getClassLoader()：返回该类的类加载器
+- getConstructors()：返回一个包含某些Constructor对象的数组
+- getMethod(String name, Class.. T)：返回一个Method对象，此对象的形参类型为paramsType
+- getDeclaredFields()：返回Field对象的一个数组
+
+#### 获取Class对象的方式
+
+1. **已知具体的类**：通过类的class属性获取
+
+   ```java
+   Class alunbarClass = TargetObject.class;
+   ```
+
+   通过此方式获取 Class 对象不会进行初始化。
+
+2. **通过 `Class.forName()`传入类的全路径获取：**
+
+   ```java
+   Class alunbarClass1 = Class.forName("cn.javaguide.TargetObject");
+   ```
+
+3. **通过对象实例`instance.getClass()`获取：**
+
+   以及`getSuperclass`获取父类
+
+   ```java
+   TargetObject o = new TargetObject();
+   Class alunbarClass2 = o.getClass();
+   Class superClass = o.getSuperClass();
+   ```
+
+4. **通过类加载器`xxxClassLoader.loadClass()`传入类路径获取:**
+
+   ```java
+   Class clazz = ClassLoader.loadClass("cn.javaguide.TargetObject");
+   ```
+
+   通过类加载器获取 Class 对象不会进行初始化，意味着不进行包括初始化等一系列步骤，静态代码块和静态对象不会得到执行
+
+5. **内置数据类型可以直接通过 `类名.Type`获取**
+
+   ```java
+   Class c4 = Integer.TYPE;
+   ```
+
+
+
+#### 那些类型有Class对象
+
+- class：外部类，成员（成员内部类，静态内部类），局部内部类，匿名内部类
+
+- interface：接口
+
+- []：数组
+
+- enum：枚举
+
+- annotation：注解@interface
+
+- primitive type：基本数据类型
+
+- void：空数据类型
+
+> 只要类型和维度一样，那就是同一个Class对象
+
+```java
+public class GetClassDemo {
+    public static void main(String[] args) {
+        Class c1 = Object.class; // 类
+        Class c2 = Comparable.class; // 接口
+        Class c3 = String[].class; // 数组
+        Class c4 = int[][].class; // 二维数组
+        Class c5 = Override.class; // 注解
+        Class c6 = ElementType.class; // 枚举
+        Class c7 = Integer.class; // 基本数据类型
+        Class c8 = void.class; // void，空数据类型
+        Class c9 = Class.class; // Class
+
+        System.out.println(c1);
+        System.out.println(c2);
+        System.out.println(c3);
+        System.out.println(c4);
+        System.out.println(c5);
+        System.out.println(c6);
+        System.out.println(c7);
+        System.out.println(c8);
+        System.out.println(c9);
+    }
+}
+/**
+运行结果
+class java.lang.Object
+interface java.lang.Comparable
+class [Ljava.lang.String;
+class [[I
+interface java.lang.Override
+class java.lang.annotation.ElementType
+class java.lang.Integer
+void
+class java.lang.Class
+**/
+```
+
+
+
+#### 内存模型
+
+java内存分为以下三部分
+
+- 堆
+  - 存放new的对象和数组
+  - 可以被所有的线程共享，不会存放别的对象引用
+- 栈
+  - 存放基本变量（会包含这个基本类型的具体数值）
+  - 引用对象的变量（会存放这个引用在对堆里面的具体地址）
+- 方法区
+  - 可以被所有线程共享
+  - 包含了所有的class和static变量
+
+
+
+### 类的加载与ClassLoader
+
+#### 类加载过程
+
+当程序主动使用某个类时，如果该类还未被加载到内存中，则系统会通过如下三个步骤对该类进行初始化：
+
+![image-20200329105217945](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20200329105217945.png)
+
+- **加载**  将class文件字节码内容加载到内存，并将这些静态数据转换成方法区的运行时数据结构，然后生成一个代表这个类的 `java.lang.Class` 对象。
+- **链接**  将Java类的二进制代码合并到JVM的运行状态之中的过程。
+  - 验证：确保加载的类信息符合JVM规范，没有安全方面的问题
+  - 准备：正式为类变量(static)分配内存并设置类变量默认初始值的阶段，这些内存都将在方法区中进行分配。
+  - 解析：虚拟机常量池的符号引用(常量名)替换为直接引用(地址)的过程
+- **初始化**
+  - 执行类构造器方法的过程，类构造器 方法是由编译期自动收集类中所有类变量的赋值动作和静态代码块中的语句合并产生的。（类构造器是构造类信息的，不是构造该类对象的构造器）
+  - 当初始化一个类的时候，如果发现其父类还没有初始化完成，则需要先触发其父类的初始化
+  - 虚拟机会保证一个类的方法在多相差环境中被正确的加锁和同步
+
+
+
+
+
+#### 什么时候发生类初始化
+
+##### 类的主动引用（一定发生初始化）
+
+- 当虚拟机启动，先初始化main方法所有在类
+- new 一个类的对象
+- 调用类的静态成员（除了 final常量）和静态方法
+- 使用 java.lang.reflect包的方法对类进行反射调用
+- 当初始化一个类，如果其父类没有被初始化，则会先初始化它的父类
+
+##### 类的被动引用（不会发生初始化）
+
+- 当访问一个静态域时，只有真正的申明这个域的类才会被初始化，如：当通过子类引用父类的静态变量，不会导致子类初始化
+- 通过数组定义类引用，不会触发此类的初始化
+- 引用常量不会触发此类的初始化（常量在链接阶段就存入调用类的常量池了）
+
+
+
+#### 类加载器的作用
+
+- **类加载的作用**：将class文件字节码内容加载到内存中，并将这些静态数据转换成方法区的运行时数据结构，然后在堆中生成了一个代表这个类的 `java.lang.Class`对象，作为方法区中类数据的访问入口。
+- **类缓存**：标准的JavaSE类加载器可以按要求查找类，但是一旦某个类被加载到类加载器中，它将维持加载（缓存）一段时间。不过JVM垃圾回收机制可以回收这些Class对象
+
+![image-20200329114720558](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20200329114720558.png)
+
+类加载器的作用是用来把类（Class）装载进内存的，JVM规范定义了如下类型的类的加载器
+
+![image-20200329114953888](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20200329114953888.png)
+
+我们通过代码查询一下实际的类加载器的情况：
+
+```java
+/**
+ * 获取类加载器的情况
+ */
+public class ClassLoaderTypeDemo {
+    public static void main(String[] args) {
+
+        //当前类是哪个加载器
+        ClassLoader loader = ClassLoaderTypeDemo.class.getClassLoader();
+        System.out.println(loader);
+
+        // 获取系统类加载器
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        System.out.println(classLoader);
+
+        // 获取系统类加载器的父类加载器 -> 扩展类加载器
+        ClassLoader parentClassLoader = classLoader.getParent();
+        System.out.println(parentClassLoader);
+
+        // 获取扩展类加载器的父类加载器 -> 根加载器（C、C++）
+        ClassLoader superParentClassLoader = parentClassLoader.getParent();
+        System.out.println(superParentClassLoader);
+
+        // 测试JDK内置类是谁加载的
+        ClassLoader loader2 = Object.class.getClassLoader();
+        System.out.println(loader2);
+    }
+}
+```
+
+```bash
+# 结果
+sun.misc.Launcher$AppClassLoader@18b4aac2
+sun.misc.Launcher$AppClassLoader@18b4aac2
+sun.misc.Launcher$ExtClassLoader@45ee12a7
+null
+null
+```
+
+能够查看系统类加载器和扩展类加载器，而底层的类加载器无法获取（native）。
+
+
+
+#### 查询类加载器能加载的路径
+
+```java
+// 如何获取类加载器可以加载的路径
+System.out.println(System.getProperty("java.class.path"));
+```
+
+比如我个人在项目中查询的结果
+
+```bash
+E:\java\JDK8\jdk1.8.0_291\jre\lib\charsets.jar;
+E:\java\JDK8\jdk1.8.0_291\jre\lib\deploy.jar;
+E:\java\JDK8\jdk1.8.0_291\jre\lib\ext\access-bridge-64.jar;
+E:\java\JDK8\jdk1.8.0_291\jre\lib\ext\cldrdata.jar;
+E:\java\JDK8\jdk1.8.0_291\jre\lib\ext\dnsns.jar;
+E:\java\JDK8\jdk1.8.0_291\jre\lib\ext\jaccess.jar;
+E:\java\JDK8\jdk1.8.0_291\jre\lib\ext\jfxrt.jar;
+E:\java\JDK8\jdk1.8.0_291\jre\lib\ext\localedata.jar;
+E:\java\JDK8\jdk1.8.0_291\jre\lib\ext\nashorn.jar;
+...
+F:\idea-projects\mogu_blog_v2\mogu_admin\target\classes;
+F:\idea-projects\mogu_blog_v2\mogu_xo\target\classes;
+F:\idea-projects\mogu_blog_v2\mogu_commons\target\classes;
+F:\idea-projects\mogu_blog_v2\mogu_base\target\classes;
+...
+E:\repository\cn\hutool\hutool-all\4.6.4\hutool-all-4.6.4.jar;
+E:\repository\org\springframework\boot\spring-boot-starter-amqp\2.2.2.RELEASE\spring-boot-starter-amqp-2.2.2.RELEASE.jar;
+E:\repository\org\springframework\spring-messaging\5.2.2.RELEASE\spring-messaging-5.2.2.RELEASE.jar;
+...
+```
+
+大概包含了jdk内的jar包，项目class文件夹jar包，maven仓库jar包等。
+
+能够发现，类在加载的时候，都是有自己的加载区域的，而不是任何地方的类都能够被加载
+
+
+
+#### 获取运行时类的完整结构
+
+通过反射能够获取运行时类的完整结构
+
+- 实现的全部接口
+- 所继承的父类
+- 全部的构造器
+- 全部的方法
+- 全部的Field
+- 注解
+
+```java
+public class GetClassInfo {
+    public static void main(String[] args) throws ClassNotFoundException, NoSuchFieldException, NoSuchMethodException {
+        Class clazz = Class.forName("com.moxi.interview.study.annotation.User");
+
+        // 获取类名字
+        System.out.println(clazz.getName()); // 包名 + 类名
+        System.out.println(clazz.getSimpleName()); // 类名
+
+        // 获取类属性
+        System.out.println("================");
+        // 只能找到public属性
+        Field [] fields = clazz.getFields();
+
+        // 找到全部的属性
+        Field [] fieldAll = clazz.getDeclaredFields();
+
+        for (int i = 0; i < fieldAll.length; i++) {
+            System.out.println(fieldAll[i]);
+        }
+
+        // 获取指定属性的值
+        Field name = clazz.getDeclaredField("name");
+
+        // 获取方法
+        Method [] methods = clazz.getDeclaredMethods(); // 获取本类和父类的所有public方法
+        Method [] methods2 = clazz.getMethods(); // 获取本类所有方法
+
+        // 获得指定方法
+        Method method = clazz.getDeclaredMethod("getName", null);
+
+        // 获取方法的时候，可以把参数也丢进去，这样因为避免方法重载，而造成不知道加载那个方法
+        Method method2 = clazz.getDeclaredMethod("setName", String.class);
+
+    }
+}
+```
+
+
+
+### 双亲委派机制
+
+如果我们想定义一个：java.lang.string 包，我们会发现无法创建
+
+因为类在加载的时候，会逐级往上，也就是说当前的系统加载器，不会马上的创建该类，而是将该类委派给 扩展类加载器，扩展类加载器再委派给根加载器，
+
+然后引导类加载器去看这个类在不在能访问的路径下，发现 sring包已经存在了，所以就无法进行，也就是我们无法使用自己自定义的string类，而是使用初始化的string类。
+
+————
+
+当一个类收到了类加载请求，他首先不会尝试自己去加载这个类，而是把这个请求委派给父类去完成，每一个层次类加载器都是如此，因此所有的加载请求都应该传送到启动类加载其中，只有当父类加载器反馈自己无法完成这个请求的时候（在它的加载路径下没有找到所需加载的Class），子类加载器才会尝试自己去加载。
+
+采用双亲委派的一个好处是比如加载位于rt.jar 包中的类java.lang.Object，不管是哪个加载器加载这个类，最终都是委托给顶层的启动类加载器进行加载，这样就保证了使用不同的类加载器最终得到的都是同样一个Object 对象。
+
+![image-20200329122029227](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20200329122029227.png)
+
+### 能用Class对象做什么
+
+#### 创建类的对象
+
+通过调用Class对象的newInstance()方法
+
+- 类必须有一个无参数的构造器
+- 类的构造器的权限需要足够
+
+> **如果没有无参构造器就不能创建对象？**
+>
+> 只要在操作的时候明确的调用类中的构造器，并将参数传递进去之后，也可以实例化操作。
+>
+> 步骤如下：
+>
+> - 通过Class类的getDeclaredConstructor(Class ... parameterTypes)取得本类的指定形参类型的构造器
+> - 向构造器的形参中，传递一个对象数组进去，里面包含了构造器中所需的各个参数
+> - 通过Constructor实例化对象
+
+#### 调用指定方法
+
+通过反射Method类完成，调用类中的方法。
+
+- 通过Class类的getMethod方法取得一个Method对象，并设置此方法操作是所需要的参数类型
+- 之后使用Object invoke进行调用，并向方法中传递要设置的obj对象的参数信息
+
+##### Invoke方法
+
+```java
+Object invoke(Object obj， Object ... args)
+```
+
+- Object对应原方法的返回值，若原方法无返回值，此时返回null
+- 若原方法为静态方法，此时形参Object 可以为null
+- 若原方法形参列表为空，则Object[] args 为 null
+- 若原方法声明private，则需要在调用此invoke() 方法前，显示调用方法对象的setAccessible(true)方法，将可访问private的方法
+
+##### setAccessible方法
+
+- Method、Field和Constructor对象都有setAccessible()方法
+- setAccessible作用是启动和禁用访问安全检查的开关
+- 参数值为true则指示反射对象再使用时应该取消Java语言访问检查
+  - 提高反射效率，如果代码中必须使用反射，而这句代码需要频繁被嗲用，那么设置成true
+  - 使得原本无法访问的私有成员也可以访问
+- 参数值为false则指示反射的对象应该实行Java语言访问检查
+
+
+
+### 反射操作泛型
+
+Java采用泛型擦除机制来引入泛型，Java中的泛型仅仅是给编译器Java才使用的，确保数据的安全性和免去强制类型转换的问题，但是一旦编译完成后，所有的泛型有关的类型全部被擦除。
+
+为了通过反射操作这些类型，Java新增了ParameterizedType，GenericArrayType，TypeVariable和WildcardType几种类型来代表不能被归一到Class类中的类型但是有何原始类型齐名的类型。
+
+- **ParameterizedType**：代表被参数化的类型，也就是增加了泛型限制的类型。如List<?>
+- **GenericArrayType**：表示一种元素类型是参数化类型或者类型变量的数组类型
+- **TypeVariable**：是各种类型变量的公共父接口
+- **WildcardType**：代表一种通配符类型的表达式
+
+> 我没看懂
+
+代码测试：
+
+```java
+/**
+ * 反射获取泛型
+ */
+public class GenericityDemo {
+
+    public void test01(Map<String, User> map, List<User> list) {
+        System.out.println("test01");
+    }
+
+    public Map<String, User> test02() {
+        System.out.println("test02");
+        return null;
+    }
+
+    public static void main(String[] args) throws Exception{
+
+        Method method = GenericityDemo.class.getMethod("test01", Map.class, List.class);
+
+        // 获取所有的泛型，也就是参数泛型
+        Type[] genericParameterTypes = method.getGenericParameterTypes();
+
+        // 遍历打印全部泛型
+        for (Type genericParameterType : genericParameterTypes) {
+            System.out.println(" # " +genericParameterType);
+            if(genericParameterType instanceof ParameterizedType) {
+                //	获取这个类的所有泛型信息
+                Type[] actualTypeArguments = ((ParameterizedType) genericParameterType).getActualTypeArguments();
+                for (Type actualTypeArgument : actualTypeArguments) {
+                    System.out.println(actualTypeArgument);
+                }
+            }
+        }
+
+        // 获取返回值泛型
+        Method method2 = GenericityDemo.class.getMethod("test02", null);
+        Type returnGenericParameterTypes = method2.getGenericReturnType();
+
+        // 遍历打印全部泛型
+        if(returnGenericParameterTypes instanceof ParameterizedType) {
+            Type[] actualTypeArguments = ((ParameterizedType) returnGenericParameterTypes).getActualTypeArguments();
+            for (Type actualTypeArgument : actualTypeArguments) {
+                System.out.println(actualTypeArgument);
+            }
+        }
+
+    }
+}
+```
+
+打印结果
+
+```bash
+ # java.util.Map<java.lang.String, com.moxi.interview.study.annotation.User>
+class java.lang.String
+class com.moxi.interview.study.annotation.User
+ # java.util.List<com.moxi.interview.study.annotation.User>
+class com.moxi.interview.study.annotation.User
+###################
+class java.lang.String
+class com.moxi.interview.study.annotation.User
+```
+
+
+
+### 反射操作注解
+
+通过反射能够获取到 类、方法、字段...等上的注解
+
+- getAnnotation
+- getAnnotations
+
+#### 应用：ORM对象关系映射
+
+ORM即为：Object relationship Mapping，对象关系映射
+
+- 类和表结构对应
+- 属性和字段对应
+- 对象和记录对应
+
+![image-20200329153301047](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20200329153301047.png)
+
+通过代码模拟配合反射注解完成ORM对象关系映射：
+
+表（类）/字段（属性）注解：
+
+```java
+/**
+ * 自定义注解：类名的注解
+ */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@interface TableKuang {
+    String value();
+}
+/**
+ * 自定义注解：属性的注解
+ */
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+@interface FieldKuang {
+    String columnName();
+    String type();
+    int length() default 0;
+}
+```
+
+实体类，通过类注解配置表名，属性注解配置字段名：
+
+```java
+@Data
+@TableKuang("db_student")
+class Student2 {
+    @FieldKuang(columnName = "db_id", type="int", length = 10)
+    private int id;
+
+    @FieldKuang(columnName = "db_age", type="int", length = 10)
+    private int age;
+
+    @FieldKuang(columnName = "db_name", type="varchar", length = 10)
+    private String name;
+
+    public Student2() {
+    }
+
+    public Student2(int id, int age, String name) {
+        this.id = id;
+        this.age = age;
+        this.name = name;
+    }
+
+}
+```
+
+通过注解获取属性对应的字段
+
+```java
+public class ORMDemo {
+
+    public static void main(String[] args) throws Exception{
+        // 获取Student 的 Class对象
+        Class c1 = Class.forName("com.moxi.interview.study.annotation.Student2");
+
+        // 通过反射，获取到全部注解
+        Annotation [] annotations = c1.getAnnotations();
+
+        for (Annotation annotation : annotations) {
+            System.out.println(annotation);
+        }
+
+        // 获取表名
+        TableKuang tableKuang = (TableKuang)c1.getAnnotation(TableKuang.class);
+        String value = tableKuang.value();
+        System.out.println(value);
+
+        // 获得name属性的字段配置属性
+        Field f = c1.getDeclaredField("name");
+        FieldKuang fieldKuang = f.getAnnotation(FieldKuang.class);
+        System.out.println(fieldKuang.columnName());	//	字段名
+        System.out.println(fieldKuang.type());	//	字段对应数据库类型
+        System.out.println(fieldKuang.length());	//	限制长度
+    }
+}
+```
+
+可以用来自动生成数据表或者其他操作。
+
+
 
 
 
@@ -3509,782 +4626,6 @@ CGLib必须依赖于CGLib的类库，但是它不需要类来实现任何接口�
 
 
 
-
-## 注解与反射
-
-### 注解概念
-
-- Annotation是JDK5.0开始引入的新技术
-- Annotation的作用
-  - 不是程序本身，可以对程序做出解释（这一点和注释没有什么区别）
-  - 可以被其它程序，比如编译器读取
-- Annotation的格式
-  - 注解以 `@注释名` 在代码中存在的，还可以添加一些参数值
-  - 例如：`@SuppressWarnings(value = "unchecked")`
-- Annotation在那里使用？
-  - 可以附加在package、class、method、field等上面，相当于给他们添加了额外的辅助信息
-  - 通过反射机制变成实现对这些元数据的控制
-
-
-
-### 本质
-
-注解本质是一个继承了`Annotation` 的特殊接口：
-
-```java
-// 这里是一个@Override注解
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.SOURCE)
-public @interface Override {
-
-}
-
-public interface Override extends Annotation{
-
-}
-```
-
-注解只有被解析之后才会生效，常见的解析方法有两种：
-
-- **编译期直接扫描** ：编译器在编译 Java 代码的时候扫描对应的注解并处理，比如某个方法使用`@Override` 注解，编译器在编译的时候就会检测当前的方法是否重写了父类对应的方法。
-- **运行期通过反射处理** ：像框架中自带的注解(比如 Spring 框架的 `@Value` 、`@Component`)都是通过反射来进行处理的。
-
-
-
-### 内置注解
-
-- @Override：定义在 `java.lang.Override`中，此注释只适用于修饰方法，表示一个方法声明打算重写超类中的另一个方法声明
-
-- @Deprecated：定义在`java.lang.Deprecated`中，此注释可以用于修饰方法，属性，类，表示不鼓励程序员使用这样的元素，通常是因为它很危险，或者存在更好的选择
-
-- @SuppressWarnings：定义在
-
-  ```
-  java.lang.SuppressWarnings
-  ```
-
-  中，用来抑制编译时的警告信息，与前面的两个注释不同，你需要额外添加一个参数才能正确使用，这些参数都是已经定义好了的，我们选择性的使用就好了。
-
-  - @SuppressWarnings("all")
-  - @SuppressWarnings("unchecked")
-  - @SuppressWarnings(value={"unchecked", "deprecation"})
-  - ...
-
-
-
-### 元注解
-
-元注解的作用就是负责注解其它注解，Java定义了4个标准的meta-annotation类型，他们被用来提供对其它annotation类型作说明。
-
-这些类型和它们所支持的类在 `java.lang.annotation`包可以找到 `@Target` 、`@Retention`、`@Documented`、`@Inherited`
-
-- @Target：用于描述注解的使用范围，即：被描述的注解可以在什么地方使用
-
-  - ElementType.METHOD 表示可以加在方法上
-
-  - ElementType.TYPE 表示可以加在类上
-
-- @Retention：表示需要什么保存该注释信息，用于描述注解的生命周期
-
-  - RetentionPolicy.RUNTIME 运行时有效
-  - RetentionPolicy.SOURCE
-  - RetentionPolicy.CLASS
-
-  - 级别范围：Source < Class < Runtime
-
-- @Document：说明该注解被包含在java doc中
-
-- @Inherited：说明子类可以集成父类中的注解
-
-如
-
-```java
-@MyAnnotation
-public class MateAnnotationDemo {
-
-}
-
-/**
- * 定义一个注解
- */
-@Target(value={ElementType.METHOD, ElementType.TYPE})  // target表示我们注解应用的范围，在方法上，和类上有效
-@Retention(RetentionPolicy.RUNTIME)   // Retention：表示我们的注解在什么时候还有效，运行时候有效
-@Documented   // 表示说我们的注解是否生成在java doc中
-@Inherited   // 表示子类可以继承父类的注解
-@interface MyAnnotation {
-
-}
-```
-
-
-
-### 自定义注解
-
-使用 `@interface`自定义注解时，自动继承了 `java.lang.annotation.Annotation`接口
-
-- @interface 用来声明一个注解，格式：public @interface 注解名 {定义内容
-- 其中的每个方法实际上是申明了一个配置参数
-- 方法的名称就是参数的类型
-- 返回值类型就是参数的类型（返回值只能是基本数据类型，Class，String，enum）
-- 通过default来申明参数的默认值
-- 如果只有一个参数成员，一般参数名为 value
-- 注解元素必须要有值，我们定义元素时，经常使用空字符串或者0作为默认值
-
-示例
-
-```java
-/**
- * 自定义注解
- *
- * @author: 陌溪
- * @create: 2020-03-28-22:57
- */
-public class MateAnnotationDemo {
-
-    // 注解可以显示赋值，如果没有默认值，我们就必须给注解赋值
-    @MyAnnotation(schools = {"大学"})
-    public void test(){
-
-    }
-
-}
-
-/**
- * 定义一个注解
- */
-@Target(value={ElementType.METHOD, ElementType.TYPE})  // target表示我们注解应用的范围，在方法上，和类上有效
-@Retention(RetentionPolicy.RUNTIME)   // Retention：表示我们的注解在什么时候还有效，运行时候有效
-@Documented   // 表示说我们的注解是否生成在java doc中
-@Inherited   // 表示子类可以继承父类的注解
-@interface MyAnnotation {
-
-    // 注解的参数：参数类型 + 参数名()
-    String name() default "";
-
-    int age() default 0;
-
-    // 如果默认值为-1，代表不存在
-    int id() default -1;
-
-    String[] schools();
-}
-```
-
-
-
-### 反射机制
-
-#### 动态语言与静态语言
-
-##### 动态语言
-
-是一类在运行时可以改变其结构的语言：例如新的函数，对象，甚至代码可以被引进，已有的函数可以被删除或是其它结构上的变化。通俗点说就是在运行时代码可以根据某些条件改变自身结构
-
-主要的动态语言有：Object-c、C#、JavaScript、PHP、Python等
-
-##### 静态语言
-
-运行时结构不可变的语言就是静态语言。例如Java、C、C++
-
-Java不是动态语言，但是Java可以称为“准动态语言”。即Java有一定的动态性，我们可以利用反射机制来获取类似于动态语言的 特性，Java的动态性让编程的时候更加灵活。
-
-#### 什么是反射
-
-Java Reflection：Java反射是Java被视为动态语言的关键，反射机制运行程序在执行期借助于Reflection API 去访问任何类内部的信息，并能直接操作任意对象的内部属性及方法。
-
-```java
-Class c = Class.forName("java.lang.String")
-```
-
-在加载完类后，在堆内存的方法区就产生了一个Class类型的对象（一个类只有一个Class对象），这个对象就包含了完整的类的结构信息，我们可以通过这个对象看到类的结构，这个对象就像一面镜子，透过这个镜子看到类的结构，所以我们形象的称之为：反射。
-
-![image-20200328232620190](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20200328232620190.png)
-
-#### 反射的优缺点
-
-- 优点：可以实现动态创建对象和编译，体现出很大的灵活性
-- 缺点：对性能有影响。使用反射基本上是一种解释操作，我们可以告诉JVM，我们希望做什么并且它满足我们的要求，这类操作总是慢于直接执行相同的操作。也就是说new创建和对象，比反射性能更高
-
-
-
-### 理解Class类
-
-- 一个类在内存中只有一个Class对象
-- 一个类被加载后，类的整体结构都会被封装在Class对象中
-
-在Object类中定义了以下的方法，此方法将被所有子类继承
-
-```java
-public final Class getClass()
-```
-
-以上方法的返回值的类型是一个Class类，此类是Java反射的源头，实际上所谓反射从程序的运行结果来看也很好理解，即：可以通过对象反射求出类的名称。也就是说，我们通过对象来获取到它的Class，相当于逆过程。
-
-- Class本身也是一个类
-- Class对象只能由系统建立对象
-- 一个加载的类在JVM中只会有一个Class实例
-- 一个Class对象对应的是一个加载到JVM中的一个.class文件
-- 每个类的实例都会记得自己是由哪个Class实例所生成
-- 通过Class可以完整地得到一个类中所有被加载的结构
-- Class类是Reflection的根源，针对任何你想动态加载、运行的类、唯有先获得相应的Class对象
-
-#### Class类常用方法
-
-- Class.forName(String name)：返回指定类name的Class对象
-- newInstance()：调用缺省构造函数，返回Class对象的一个实例
-- getName()：返回此Class对象所表示的实体（类，接口，数组或void）的名称
-- getSuperClass()：返回当前Class对象的父类Class对象
-- getinterfaces()：返回当前对象的接口
-- getClassLoader()：返回该类的类加载器
-- getConstructors()：返回一个包含某些Constructor对象的数组
-- getMethod(String name, Class.. T)：返回一个Method对象，此对象的形参类型为paramsType
-- getDeclaredFields()：返回Field对象的一个数组
-
-#### 获取Class对象的方式
-
-1. **已知具体的类**：通过类的class属性获取
-
-   ```java
-   Class alunbarClass = TargetObject.class;
-   ```
-
-   通过此方式获取 Class 对象不会进行初始化。
-
-2. **通过 `Class.forName()`传入类的全路径获取：**
-
-   ```java
-   Class alunbarClass1 = Class.forName("cn.javaguide.TargetObject");
-   ```
-
-3. **通过对象实例`instance.getClass()`获取：**
-
-   以及`getSuperclass`获取父类
-
-   ```java
-   TargetObject o = new TargetObject();
-   Class alunbarClass2 = o.getClass();
-   Class superClass = o.getSuperClass();
-   ```
-
-4. **通过类加载器`xxxClassLoader.loadClass()`传入类路径获取:**
-
-   ```java
-   Class clazz = ClassLoader.loadClass("cn.javaguide.TargetObject");
-   ```
-
-   通过类加载器获取 Class 对象不会进行初始化，意味着不进行包括初始化等一系列步骤，静态代码块和静态对象不会得到执行
-
-5. **内置数据类型可以直接通过 `类名.Type`获取**
-
-   ```java
-   Class c4 = Integer.TYPE;
-   ```
-
-
-
-#### 那些类型有Class对象
-
-- class：外部类，成员（成员内部类，静态内部类），局部内部类，匿名内部类
-
-- interface：接口
-
-- []：数组
-
-- enum：枚举
-
-- annotation：注解@interface
-
-- primitive type：基本数据类型
-
-- void：空数据类型
-
-> 只要类型和维度一样，那就是同一个Class对象
-
-```java
-public class GetClassDemo {
-    public static void main(String[] args) {
-        Class c1 = Object.class; // 类
-        Class c2 = Comparable.class; // 接口
-        Class c3 = String[].class; // 数组
-        Class c4 = int[][].class; // 二维数组
-        Class c5 = Override.class; // 注解
-        Class c6 = ElementType.class; // 枚举
-        Class c7 = Integer.class; // 基本数据类型
-        Class c8 = void.class; // void，空数据类型
-        Class c9 = Class.class; // Class
-
-        System.out.println(c1);
-        System.out.println(c2);
-        System.out.println(c3);
-        System.out.println(c4);
-        System.out.println(c5);
-        System.out.println(c6);
-        System.out.println(c7);
-        System.out.println(c8);
-        System.out.println(c9);
-    }
-}
-/**
-运行结果
-class java.lang.Object
-interface java.lang.Comparable
-class [Ljava.lang.String;
-class [[I
-interface java.lang.Override
-class java.lang.annotation.ElementType
-class java.lang.Integer
-void
-class java.lang.Class
-**/
-```
-
-
-
-#### 内存模型
-
-java内存分为以下三部分
-
-- 堆
-  - 存放new的对象和数组
-  - 可以被所有的线程共享，不会存放别的对象引用
-- 栈
-  - 存放基本变量（会包含这个基本类型的具体数值）
-  - 引用对象的变量（会存放这个引用在对堆里面的具体地址）
-- 方法区
-  - 可以被所有线程共享
-  - 包含了所有的class和static变量
-
-
-
-### 类的加载与ClassLoader
-
-#### 类加载过程
-
-当程序主动使用某个类时，如果该类还未被加载到内存中，则系统会通过如下三个步骤对该类进行初始化：
-
-![image-20200329105217945](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20200329105217945.png)
-
-- **加载**  将class文件字节码内容加载到内存，并将这些静态数据转换成方法区的运行时数据结构，然后生成一个代表这个类的 `java.lang.Class` 对象。
-- **链接**  将Java类的二进制代码合并到JVM的运行状态之中的过程。
-  - 验证：确保加载的类信息符合JVM规范，没有安全方面的问题
-  - 准备：正式为类变量(static)分配内存并设置类变量默认初始值的阶段，这些内存都将在方法区中进行分配。
-  - 解析：虚拟机常量池的符号引用(常量名)替换为直接引用(地址)的过程
-- **初始化**
-  - 执行类构造器方法的过程，类构造器 方法是由编译期自动收集类中所有类变量的赋值动作和静态代码块中的语句合并产生的。（类构造器是构造类信息的，不是构造该类对象的构造器）
-  - 当初始化一个类的时候，如果发现其父类还没有初始化完成，则需要先触发其父类的初始化
-  - 虚拟机会保证一个类的方法在多相差环境中被正确的加锁和同步
-
-
-
-
-
-#### 什么时候发生类初始化
-
-##### 类的主动引用（一定发生初始化）
-
-- 当虚拟机启动，先初始化main方法所有在类
-- new 一个类的对象
-- 调用类的静态成员（除了 final常量）和静态方法
-- 使用 java.lang.reflect包的方法对类进行反射调用
-- 当初始化一个类，如果其父类没有被初始化，则会先初始化它的父类
-
-##### 类的被动引用（不会发生初始化）
-
-- 当访问一个静态域时，只有真正的申明这个域的类才会被初始化，如：当通过子类引用父类的静态变量，不会导致子类初始化
-- 通过数组定义类引用，不会触发此类的初始化
-- 引用常量不会触发此类的初始化（常量在链接阶段就存入调用类的常量池了）
-
-
-
-#### 类加载器的作用
-
-- **类加载的作用**：将class文件字节码内容加载到内存中，并将这些静态数据转换成方法区的运行时数据结构，然后在堆中生成了一个代表这个类的 `java.lang.Class`对象，作为方法区中类数据的访问入口。
-- **类缓存**：标准的JavaSE类加载器可以按要求查找类，但是一旦某个类被加载到类加载器中，它将维持加载（缓存）一段时间。不过JVM垃圾回收机制可以回收这些Class对象
-
-![image-20200329114720558](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20200329114720558.png)
-
-类加载器的作用是用来把类（Class）装载进内存的，JVM规范定义了如下类型的类的加载器
-
-![image-20200329114953888](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20200329114953888.png)
-
-我们通过代码查询一下实际的类加载器的情况：
-
-```java
-/**
- * 获取类加载器的情况
- */
-public class ClassLoaderTypeDemo {
-    public static void main(String[] args) {
-
-        //当前类是哪个加载器
-        ClassLoader loader = ClassLoaderTypeDemo.class.getClassLoader();
-        System.out.println(loader);
-
-        // 获取系统类加载器
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        System.out.println(classLoader);
-
-        // 获取系统类加载器的父类加载器 -> 扩展类加载器
-        ClassLoader parentClassLoader = classLoader.getParent();
-        System.out.println(parentClassLoader);
-
-        // 获取扩展类加载器的父类加载器 -> 根加载器（C、C++）
-        ClassLoader superParentClassLoader = parentClassLoader.getParent();
-        System.out.println(superParentClassLoader);
-
-        // 测试JDK内置类是谁加载的
-        ClassLoader loader2 = Object.class.getClassLoader();
-        System.out.println(loader2);
-    }
-}
-```
-
-```bash
-# 结果
-sun.misc.Launcher$AppClassLoader@18b4aac2
-sun.misc.Launcher$AppClassLoader@18b4aac2
-sun.misc.Launcher$ExtClassLoader@45ee12a7
-null
-null
-```
-
-能够查看系统类加载器和扩展类加载器，而底层的类加载器无法获取（native）。
-
-
-
-#### 查询类加载器能加载的路径
-
-```java
-// 如何获取类加载器可以加载的路径
-System.out.println(System.getProperty("java.class.path"));
-```
-
-比如我个人在项目中查询的结果
-
-```bash
-E:\java\JDK8\jdk1.8.0_291\jre\lib\charsets.jar;
-E:\java\JDK8\jdk1.8.0_291\jre\lib\deploy.jar;
-E:\java\JDK8\jdk1.8.0_291\jre\lib\ext\access-bridge-64.jar;
-E:\java\JDK8\jdk1.8.0_291\jre\lib\ext\cldrdata.jar;
-E:\java\JDK8\jdk1.8.0_291\jre\lib\ext\dnsns.jar;
-E:\java\JDK8\jdk1.8.0_291\jre\lib\ext\jaccess.jar;
-E:\java\JDK8\jdk1.8.0_291\jre\lib\ext\jfxrt.jar;
-E:\java\JDK8\jdk1.8.0_291\jre\lib\ext\localedata.jar;
-E:\java\JDK8\jdk1.8.0_291\jre\lib\ext\nashorn.jar;
-...
-F:\idea-projects\mogu_blog_v2\mogu_admin\target\classes;
-F:\idea-projects\mogu_blog_v2\mogu_xo\target\classes;
-F:\idea-projects\mogu_blog_v2\mogu_commons\target\classes;
-F:\idea-projects\mogu_blog_v2\mogu_base\target\classes;
-...
-E:\repository\cn\hutool\hutool-all\4.6.4\hutool-all-4.6.4.jar;
-E:\repository\org\springframework\boot\spring-boot-starter-amqp\2.2.2.RELEASE\spring-boot-starter-amqp-2.2.2.RELEASE.jar;
-E:\repository\org\springframework\spring-messaging\5.2.2.RELEASE\spring-messaging-5.2.2.RELEASE.jar;
-...
-```
-
-大概包含了jdk内的jar包，项目class文件夹jar包，maven仓库jar包等。
-
-能够发现，类在加载的时候，都是有自己的加载区域的，而不是任何地方的类都能够被加载
-
-
-
-#### 获取运行时类的完整结构
-
-通过反射能够获取运行时类的完整结构
-
-- 实现的全部接口
-- 所继承的父类
-- 全部的构造器
-- 全部的方法
-- 全部的Field
-- 注解
-
-```java
-public class GetClassInfo {
-    public static void main(String[] args) throws ClassNotFoundException, NoSuchFieldException, NoSuchMethodException {
-        Class clazz = Class.forName("com.moxi.interview.study.annotation.User");
-
-        // 获取类名字
-        System.out.println(clazz.getName()); // 包名 + 类名
-        System.out.println(clazz.getSimpleName()); // 类名
-
-        // 获取类属性
-        System.out.println("================");
-        // 只能找到public属性
-        Field [] fields = clazz.getFields();
-
-        // 找到全部的属性
-        Field [] fieldAll = clazz.getDeclaredFields();
-
-        for (int i = 0; i < fieldAll.length; i++) {
-            System.out.println(fieldAll[i]);
-        }
-
-        // 获取指定属性的值
-        Field name = clazz.getDeclaredField("name");
-
-        // 获取方法
-        Method [] methods = clazz.getDeclaredMethods(); // 获取本类和父类的所有public方法
-        Method [] methods2 = clazz.getMethods(); // 获取本类所有方法
-
-        // 获得指定方法
-        Method method = clazz.getDeclaredMethod("getName", null);
-
-        // 获取方法的时候，可以把参数也丢进去，这样因为避免方法重载，而造成不知道加载那个方法
-        Method method2 = clazz.getDeclaredMethod("setName", String.class);
-
-    }
-}
-```
-
-
-
-### 双亲委派机制
-
-如果我们想定义一个：java.lang.string 包，我们会发现无法创建
-
-因为类在加载的时候，会逐级往上，也就是说当前的系统加载器，不会马上的创建该类，而是将该类委派给 扩展类加载器，扩展类加载器再委派给根加载器，
-
-然后引导类加载器去看这个类在不在能访问的路径下，发现 sring包已经存在了，所以就无法进行，也就是我们无法使用自己自定义的string类，而是使用初始化的string类。
-
-————
-
-当一个类收到了类加载请求，他首先不会尝试自己去加载这个类，而是把这个请求委派给父类去完成，每一个层次类加载器都是如此，因此所有的加载请求都应该传送到启动类加载其中，只有当父类加载器反馈自己无法完成这个请求的时候（在它的加载路径下没有找到所需加载的Class），子类加载器才会尝试自己去加载。
-
-采用双亲委派的一个好处是比如加载位于rt.jar 包中的类java.lang.Object，不管是哪个加载器加载这个类，最终都是委托给顶层的启动类加载器进行加载，这样就保证了使用不同的类加载器最终得到的都是同样一个Object 对象。
-
-![image-20200329122029227](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20200329122029227.png)
-
-### 能用Class对象做什么
-
-#### 创建类的对象
-
-通过调用Class对象的newInstance()方法
-
-- 类必须有一个无参数的构造器
-- 类的构造器的权限需要足够
-
-> **如果没有无参构造器就不能创建对象？**
->
-> 只要在操作的时候明确的调用类中的构造器，并将参数传递进去之后，也可以实例化操作。
->
-> 步骤如下：
->
-> - 通过Class类的getDeclaredConstructor(Class ... parameterTypes)取得本类的指定形参类型的构造器
-> - 向构造器的形参中，传递一个对象数组进去，里面包含了构造器中所需的各个参数
-> - 通过Constructor实例化对象
-
-#### 调用指定方法
-
-通过反射Method类完成，调用类中的方法。
-
-- 通过Class类的getMethod方法取得一个Method对象，并设置此方法操作是所需要的参数类型
-- 之后使用Object invoke进行调用，并向方法中传递要设置的obj对象的参数信息
-
-##### Invoke方法
-
-```java
-Object invoke(Object obj， Object ... args)
-```
-
-- Object对应原方法的返回值，若原方法无返回值，此时返回null
-- 若原方法为静态方法，此时形参Object 可以为null
-- 若原方法形参列表为空，则Object[] args 为 null
-- 若原方法声明private，则需要在调用此invoke() 方法前，显示调用方法对象的setAccessible(true)方法，将可访问private的方法
-
-##### setAccessible方法
-
-- Method、Field和Constructor对象都有setAccessible()方法
-- setAccessible作用是启动和禁用访问安全检查的开关
-- 参数值为true则指示反射对象再使用时应该取消Java语言访问检查
-  - 提高反射效率，如果代码中必须使用反射，而这句代码需要频繁被嗲用，那么设置成true
-  - 使得原本无法访问的私有成员也可以访问
-- 参数值为false则指示反射的对象应该实行Java语言访问检查
-
-
-
-### 反射操作泛型
-
-Java采用泛型擦除机制来引入泛型，Java中的泛型仅仅是给编译器Java才使用的，确保数据的安全性和免去强制类型转换的问题，但是一旦编译完成后，所有的泛型有关的类型全部被擦除。
-
-为了通过反射操作这些类型，Java新增了ParameterizedType，GenericArrayType，TypeVariable和WildcardType几种类型来代表不能被归一到Class类中的类型但是有何原始类型齐名的类型。
-
-- **ParameterizedType**：代表被参数化的类型，也就是增加了泛型限制的类型。如List<?>
-- **GenericArrayType**：表示一种元素类型是参数化类型或者类型变量的数组类型
-- **TypeVariable**：是各种类型变量的公共父接口
-- **WildcardType**：代表一种通配符类型的表达式
-
-> 我没看懂
-
-代码测试：
-
-```java
-/**
- * 反射获取泛型
- */
-public class GenericityDemo {
-
-    public void test01(Map<String, User> map, List<User> list) {
-        System.out.println("test01");
-    }
-
-    public Map<String, User> test02() {
-        System.out.println("test02");
-        return null;
-    }
-
-    public static void main(String[] args) throws Exception{
-
-        Method method = GenericityDemo.class.getMethod("test01", Map.class, List.class);
-
-        // 获取所有的泛型，也就是参数泛型
-        Type[] genericParameterTypes = method.getGenericParameterTypes();
-
-        // 遍历打印全部泛型
-        for (Type genericParameterType : genericParameterTypes) {
-            System.out.println(" # " +genericParameterType);
-            if(genericParameterType instanceof ParameterizedType) {
-                //	获取这个类的所有泛型信息
-                Type[] actualTypeArguments = ((ParameterizedType) genericParameterType).getActualTypeArguments();
-                for (Type actualTypeArgument : actualTypeArguments) {
-                    System.out.println(actualTypeArgument);
-                }
-            }
-        }
-
-        // 获取返回值泛型
-        Method method2 = GenericityDemo.class.getMethod("test02", null);
-        Type returnGenericParameterTypes = method2.getGenericReturnType();
-
-        // 遍历打印全部泛型
-        if(returnGenericParameterTypes instanceof ParameterizedType) {
-            Type[] actualTypeArguments = ((ParameterizedType) returnGenericParameterTypes).getActualTypeArguments();
-            for (Type actualTypeArgument : actualTypeArguments) {
-                System.out.println(actualTypeArgument);
-            }
-        }
-
-    }
-}
-```
-
-打印结果
-
-```bash
- # java.util.Map<java.lang.String, com.moxi.interview.study.annotation.User>
-class java.lang.String
-class com.moxi.interview.study.annotation.User
- # java.util.List<com.moxi.interview.study.annotation.User>
-class com.moxi.interview.study.annotation.User
-###################
-class java.lang.String
-class com.moxi.interview.study.annotation.User
-```
-
-
-
-### 反射操作注解
-
-通过反射能够获取到 类、方法、字段...等上的注解
-
-- getAnnotation
-- getAnnotations
-
-#### 应用：ORM对象关系映射
-
-ORM即为：Object relationship Mapping，对象关系映射
-
-- 类和表结构对应
-- 属性和字段对应
-- 对象和记录对应
-
-![image-20200329153301047](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20200329153301047.png)
-
-通过代码模拟配合反射注解完成ORM对象关系映射：
-
-表（类）/字段（属性）注解：
-
-```java
-/**
- * 自定义注解：类名的注解
- */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@interface TableKuang {
-    String value();
-}
-/**
- * 自定义注解：属性的注解
- */
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-@interface FieldKuang {
-    String columnName();
-    String type();
-    int length() default 0;
-}
-```
-
-实体类，通过类注解配置表名，属性注解配置字段名：
-
-```java
-@Data
-@TableKuang("db_student")
-class Student2 {
-    @FieldKuang(columnName = "db_id", type="int", length = 10)
-    private int id;
-
-    @FieldKuang(columnName = "db_age", type="int", length = 10)
-    private int age;
-
-    @FieldKuang(columnName = "db_name", type="varchar", length = 10)
-    private String name;
-
-    public Student2() {
-    }
-
-    public Student2(int id, int age, String name) {
-        this.id = id;
-        this.age = age;
-        this.name = name;
-    }
-
-}
-```
-
-通过注解获取属性对应的字段
-
-```java
-public class ORMDemo {
-
-    public static void main(String[] args) throws Exception{
-        // 获取Student 的 Class对象
-        Class c1 = Class.forName("com.moxi.interview.study.annotation.Student2");
-
-        // 通过反射，获取到全部注解
-        Annotation [] annotations = c1.getAnnotations();
-
-        for (Annotation annotation : annotations) {
-            System.out.println(annotation);
-        }
-
-        // 获取表名
-        TableKuang tableKuang = (TableKuang)c1.getAnnotation(TableKuang.class);
-        String value = tableKuang.value();
-        System.out.println(value);
-
-        // 获得name属性的字段配置属性
-        Field f = c1.getDeclaredField("name");
-        FieldKuang fieldKuang = f.getAnnotation(FieldKuang.class);
-        System.out.println(fieldKuang.columnName());	//	字段名
-        System.out.println(fieldKuang.type());	//	字段对应数据库类型
-        System.out.println(fieldKuang.length());	//	限制长度
-    }
-}
-```
-
-可以用来自动生成数据表或者其他操作。
 
 
 
