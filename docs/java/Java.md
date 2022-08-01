@@ -8,12 +8,11 @@
 
 - 环境变量配置：
 
-  Path变量值添加 ;%JAVA_HOME%\bin;%JAVA_HOME%\jre\bin;
+  - 添加变量JAVA_HOME，值为JDK安装位置，如`C:\Program Files\Java\jdk1.8.0_201`
 
-  添加变量JAVA_HOME，值为JDK安装位置，如C:\Program Files\Java\jdk1.8.0_201
-
-  添加变量CLASSPATH，值为 .;%JAVA_HOME%\lib\dt.jar;%JAVA_HOME%\lib\tools.jar
-
+  - Path变量值添加`;%JAVA_HOME%\bin;%JAVA_HOME%\jre\bin;`
+- 添加变量CLASSPATH，值为 `.;%JAVA_HOME%\lib\dt.jar;%JAVA_HOME%\lib\tools.jar`
+  
 - 检验安装
 
   控制台分别输入java，javac，java -version命令，显示JDK相关信息
@@ -994,13 +993,11 @@ Class c = Class.forName("java.lang.String")
 
 **缺点**
 
-对性能有影响。使用反射基本上是一种解释操作，我们可以告诉JVM，我们希望做什么并且它满足我们的要求，这类操作总是慢于直接执行相同的操作。也就是说new创建和对象，比反射性能更高
-
 Reflection is powerful, but should not be used indiscriminately. If it is possible to perform an operation without using reflection, then it is preferable to avoid using it. The following concerns should be kept in mind when accessing code via reflection.
 
-- **Performance Overhead**  : Because reflection involves types that are dynamically resolved, certain Java virtual machine optimizations can not be performed. Consequently, reflective operations have slower performance than their non-reflective counterparts, and should be avoided in sections of code which are called frequently in performance-sensitive applications.
-- **Security Restrictions**  : Reflection requires a runtime permission which may not be present when running under a security manager. This is in an important consideration for code which has to run in a restricted security context, such as in an Applet.
-- **Exposure of Internals**  :Since reflection allows code to perform operations that would be illegal in non-reflective code, such as accessing private fields and methods, the use of reflection can result in unexpected side-effects, which may render code dysfunctional and may destroy portability. Reflective code breaks abstractions and therefore may change behavior with upgrades of the platform.
+- **Performance Overhead**  : Because reflection involves types that are dynamically resolved, certain Java virtual machine optimizations can not be performed. Consequently, reflective operations have slower performance than their non-reflective counterparts, and should be avoided in sections of code which are called frequently in performance-sensitive applications.（性能开销）
+- **Security Restrictions**  : Reflection requires a runtime permission which may not be present when running under a security manager. This is in an important consideration for code which has to run in a restricted security context, such as in an Applet.（安全性）
+- **Exposure of Internals**  :Since reflection allows code to perform operations that would be illegal in non-reflective code, such as accessing private fields and methods, the use of reflection can result in unexpected side-effects, which may render code dysfunctional and may destroy portability. Reflective code breaks abstractions and therefore may change behavior with upgrades of the platform.（暴露内部）
 
 
 
