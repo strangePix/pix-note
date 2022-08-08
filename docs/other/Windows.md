@@ -70,6 +70,26 @@ sc delete xxx
 
 
 
+### 解决win + R 键运行窗口中无历史记录
+
+[参考](https://blog.csdn.net/qq_33999977/article/details/123376165)
+
+**问题描述**
+
+电脑win+R 键调出的运行窗口中是空白的，不显示历史记录，每次需要手动重新输入，很麻烦
+
+<img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208081728904.png" alt="在这里插入图片描述" style="zoom:50%;" />
+
+**解决方法**
+
+进入设置，找到隐私设置-选择常规
+
+![在这里插入图片描述](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208081729852.png)
+
+打开”允许windows跟踪应用启动“，再操作运行窗口即可。
+
+
+
 
 
 ## 额外内容补充
