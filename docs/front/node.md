@@ -9,11 +9,13 @@
 - 卸载已安装Node
 - 在https://github.com/coreybutler/nvm-windows/releases下载最新安装包进行安装
 
-#### 多版本管理安装
 
-##### fnm
 
-这里没用nvm，而是[fnm](https://github.com/Schniz/fnm)
+## 多版本管理安装
+
+### fnm
+
+项目地址：https://github.com/Schniz/fnm
 
 - 官方提供了很多种安装方式，这里选用最朴实的，下载二进制安装包https://github.com/Schniz/fnm/releases
 
@@ -70,21 +72,94 @@
 
   重新启动powershell即可使用`node -v` 和`npm -v`指令
 
-> 实际上并不是，经过实测，目前这种安装方式安装的node无法直接响应node指令
+> 目前这种安装方式安装的node无法直接响应node指令
 >
 > 需要找到已经安装的node文件的位置（通过`fnm env` 查看）
 >
 > 将node.exe 文件拷贝到node_modules\npm目录下
 >
-> 所以笔者目前不再使用这种方式。
+> 所以目前暂时不使用这种方式。
 
 
 
+### nvm-windows
+
+网上评价性能可能稍差，但作为开发不影响
+
+- 下载安装包 https://github.com/coreybutler/nvm-windows/releases
+- 运行[nvm-setup.exe](https://github.com/coreybutler/nvm-windows/releases/download/1.1.9/nvm-setup.exe)，选择nvm安装路径和nodejs安装路径，软件会自动配置Path
+
+**相关指令**
+
+```powershell
+# 查看nvm版本
+nvm v  
+# 查看可安装版本 去掉available看已安装版本
+nvm list available
+# 下载最新的 node 版本
+nvm install latest 
+# 查看当前版本
+nvm current
+# 选择版本
+nvm use 6.2.0
+# 卸载对应的版本
+nvm uninstall 6.2.0 
+```
+
+### 安装优化和问题处理
+
+#### 配置npm全局安装路径
+
+用于避免包路径不共享，导致切换node版本时已安装的包需要重新安装
+
+- 执行指令
+
+  ```shell
+  npm config set prefix "E:\nodejs\npm-global"
+  ```
+
+- 该指令会在`C:\\Users\\你的用户名\\` 会生成个 `.npmrc` 文件，内容如下
+
+  ```properties
+  prefix=E:\nodejs\npm-global
+  ```
+
+  此时通过全局指令`npm install xxx -g`会将包安装到`E:\nodejs\npm-global\node_modules`
+
+- 配置npm到环境变量Path
+
+  ```properties
+  Path=E:\nodejs\npm-global
+  ```
 
 
 
+#### 安装cnpm
 
-### Linux
+```shell
+npm install -g cnpm -registry=https://registry.npm.taobao.org
+```
 
 
 
+#### 换源提高nvm下载速度
+
+找到nvm安装目录下的`settings.txt`文件
+
+添加下两行配置
+
+```txt
+root: C:\Program Files\nvm
+path: C:\Program Files\nodejs
+
+node_mirror: https://npm.taobao.org/mirrors/node/
+npm_mirror: https://npm.taobao.org/mirrors/npm/
+```
+
+
+
+#### nvm切换版本报错
+
+![5.png](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208091033386.png)
+
+使用管理员权限打开cmd，重新操作即可
