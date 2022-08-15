@@ -87,9 +87,54 @@
 ### 相关指令
 
 ```powershell
-# 删除名为xxx的服务(管理员权限)
+# 启动服务
+net start xxx
+# 停止服务
+net stop xxx
+```
+
+### SC命令操作服务
+
+**创建服务**
+
+```powershell
+sc create XXX binpath= "xxx.exe" displayname= "XXXService" start= auto
+```
+
+- XXX：服务名
+- binpath：exe文件的完整路径
+- displayname：服务别名
+- start：启动方式（auto自动）
+
+但对exe文件的要求较高，必须符合系统服务规范，否则无法启动。
+
+> 使用工具软件注册服务，不仅可以越过麻烦的规范，也可以简化步骤，
+>
+> 比如nssm等（待补充）
+
+**删除服务**
+
+```powershell
+# 删除名为xxx的服务(需要管理员权限)
 sc delete xxx
 ```
+
+> - [SC] DeleteService 失败 1072
+>
+>   需要在删除服务前要做几个清理工作，确保：
+>
+>   - 服务已停止：net stop xxx
+>   - 服务控制面板已关闭：
+>     - 确保关闭服务services.msc窗口；
+>     - mmc.exe 进程不存在（"服务"列表窗口） taskkill / F / IM mmc.exe
+>   - 服务未打开任何文件句柄（？）
+>   - ProcessExplorer没有运行（？）
+>
+> - [SC] OpenService FAILED 1060
+>
+>   服务已删除，需要在注册表删除对应服务，在`HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services`中找到对应服务键值
+
+
 
 
 
