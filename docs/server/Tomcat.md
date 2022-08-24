@@ -148,56 +148,68 @@ vim /usr/apache-tomcat-7.0.107/conf/server.xml
 
 这里选用jdk自带的keytool工具生成进行测试
 
-- 配置证书指令
+#### 配置证书指令
 
-  ```shell
-  keytool -genkeypair -alias thekeystore -keyalg RSA -storepass changeit -keyalg RSA -keysize 2048 -validity 3650 -keystore ./thekeystore  -deststoretype pkcs12
-  ```
+```shell
+keytool -genkeypair -alias ssoKey  -keyalg RSA -keysize 2048 -keypass 123456 -storepass 123456 -keyalg RSA  -validity 3650  -keystore ./.keystore   -dname "CN=test.sso.com,OU=pix,O=pix,L=ZZ,ST=HN,C=CN" -deststoretype pkcs12
+```
 
-  - -alias testKey：证书项名称 必填
-  - -keyalg RSA：证书签名算法，tomcat建议RSA
-  - -storepass 123456：密钥库密码，也就是等下要生成的test.keystore的访问密码，妥善保管
-  - -validity 3650：证书有效期，3650天，即10年
-  - -keystore ./test.keystore：要生成的文件的位置，./test.keystore表示存储在当前目录下
+- **-alias**	证书项名称 必填
 
-  运行指令时还需要输入密钥口令，这里选择与密钥库口令一致
+- **-keyalg**	证书签名算法，tomcat建议RSA
 
-  如果要本地模拟域名，则名称与姓氏最好同步这个域名，用于某些机制的检测
+- **-keysize**	密钥长度 大于1024否则会提示过时，不填也行
+
+- **-keypass**	密钥密码，建议与密钥密码一致
+
+- **-storepass**	密钥库密码
+
+- **-validity**	证书有效期，单位为天 3650代表10年
+
+- **-keystore**	要生成的文件名及位置，./.keystore表示文件名.keystore，并存储在当前目录下
+
+- **-deststoretype pkcs12	**不填的话会有提示，使用密钥库专用格式PKCS12
+
+- **-dname**	不填的话，会有指令提示填写如下内容，帮助你完成配置
 
   ![image-20220823131445440](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208231314397.png)
 
+  > 其中**姓氏名字**建议与域名一致（如CAS校验证书会检查该项），即CN=test.sso.com
+
+#### 证书安装到jdk中
+
+用于某些情况，校验本地证书时
+
+- 导出crt格式证书
+
   ```shell
-  keytool -genkey -alias thekeystore -keyalg RSA -keysize 2048 -keypass changeit -storepass changeit -keystore ./thekeystore -dname "CN=sso.test.com,OU=localhost,O=localhost,L=localhost,ST=localhost,C=CN" -deststoretype pkcs12
+  # alias与证书一致
+  keytool -export -file ./.keystore.crt -alias ssoKey -keystore ./.keystore
   ```
 
-- 如果没有带 -deststoretype pkcs12 ，可以根据提示运行指令
+- 安装到jdk
 
-  ```shell
-  keytool -importkeystore -srckeystore ./test.keystore -destkeystore ./test.keystore -deststoretype pkcs12
+  ```powershell
+  # cmd下$env:JAVA_HOME 对应%JAVA_HOME% 环境变量
+  # 这里alias可以与之前不一样 存进去会变成全小写
+  keytool -import -alias ssokey -file ./.keystore.crt -keystore $env:JAVA_HOME\jre\lib\security\cacerts -storepass changeit
   ```
 
-  ![image-20220823131629279](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208231316304.png)
+  ![image-20220824234702673](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208242347788.png)
 
-  此时证书已经生成成功，名为test.keystore
+- 查看证书
 
-**导出数字证书**
+  ```shell
+  keytool -list -keystore $env:JAVA_HOME\jre\lib\security\cacerts -storepass changeit|findstr ssokey 
+  ```
 
-```shell
-# alias与上面一致
-keytool -export -file .\test.crt -alias thekeystore -keystore .\test.keystore
-```
+- 删除证书
 
-**数字证书导入到JDK中**
+  ```shell
+  keytool -delete -alias ssokey -keystore $env:JAVA_HOME\jre\lib\security\cacerts -storepass changeit
+  ```
 
-```shell
-keytool -import -keystore D:/soft/Java/jdk8/jre/lib/security/cacerts -file .\test.crt -alias testKey -storepass changeit
-```
-
-
-
-
-
-
+  
 
 ### 配置证书
 
@@ -219,7 +231,7 @@ keytool -import -keystore D:/soft/Java/jdk8/jre/lib/security/cacerts -file .\tes
   </Connector>
   ```
 
-  - certificateKeystoreFile即为证书位置，可以用相对目录
+  - certificateKeystoreFile即为证书位置，可以用相对目录，相对位置为tomcat根目录算起
   - certificateKeystorePassword即为密钥口令
 
 
