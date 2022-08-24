@@ -142,6 +142,92 @@ vim /usr/apache-tomcat-7.0.107/conf/server.xml
 
 
 
+## 本地https证书
+
+### 生成证书
+
+这里选用jdk自带的keytool工具生成进行测试
+
+- 配置证书指令
+
+  ```shell
+  keytool -genkeypair -alias thekeystore -keyalg RSA -storepass changeit -keyalg RSA -keysize 2048 -validity 3650 -keystore ./thekeystore  -deststoretype pkcs12
+  ```
+
+  - -alias testKey：证书项名称 必填
+  - -keyalg RSA：证书签名算法，tomcat建议RSA
+  - -storepass 123456：密钥库密码，也就是等下要生成的test.keystore的访问密码，妥善保管
+  - -validity 3650：证书有效期，3650天，即10年
+  - -keystore ./test.keystore：要生成的文件的位置，./test.keystore表示存储在当前目录下
+
+  运行指令时还需要输入密钥口令，这里选择与密钥库口令一致
+
+  如果要本地模拟域名，则名称与姓氏最好同步这个域名，用于某些机制的检测
+
+  ![image-20220823131445440](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208231314397.png)
+
+  ```shell
+  keytool -genkey -alias thekeystore -keyalg RSA -keysize 2048 -keypass changeit -storepass changeit -keystore ./thekeystore -dname "CN=sso.test.com,OU=localhost,O=localhost,L=localhost,ST=localhost,C=CN" -deststoretype pkcs12
+  ```
+
+- 如果没有带 -deststoretype pkcs12 ，可以根据提示运行指令
+
+  ```shell
+  keytool -importkeystore -srckeystore ./test.keystore -destkeystore ./test.keystore -deststoretype pkcs12
+  ```
+
+  ![image-20220823131629279](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208231316304.png)
+
+  此时证书已经生成成功，名为test.keystore
+
+**导出数字证书**
+
+```shell
+# alias与上面一致
+keytool -export -file .\test.crt -alias thekeystore -keystore .\test.keystore
+```
+
+**数字证书导入到JDK中**
+
+```shell
+keytool -import -keystore D:/soft/Java/jdk8/jre/lib/security/cacerts -file .\test.crt -alias testKey -storepass changeit
+```
+
+
+
+
+
+
+
+### 配置证书
+
+此处tomcat版本为9
+
+- 为了方便，将证书放置于tomcat目录的conf下
+
+- 进入tomcat目录，编辑conf/server.xml文件
+
+  ```xml
+  <!-- 解开443端口 8443 改为443-->
+  <Connector port="443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+  					 maxThreads="150" SSLEnabled="true">
+  		<SSLHostConfig>
+  				<Certificate certificateKeystoreFile="conf/test.keystore"
+                               certificateKeystorePassword="123456"
+  										 type="RSA" />
+  		</SSLHostConfig>
+  </Connector>
+  ```
+
+  - certificateKeystoreFile即为证书位置，可以用相对目录
+  - certificateKeystorePassword即为密钥口令
+
+
+
+
+
+
+
 ## 自动部署
 
   
