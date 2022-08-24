@@ -168,7 +168,7 @@ keytool -genkeypair -alias ssoKey  -keyalg RSA -keysize 2048 -keypass 123456 -st
 
 - **-keystore**	要生成的文件名及位置，./.keystore表示文件名.keystore，并存储在当前目录下
 
-- **-deststoretype pkcs12	**不填的话会有提示，使用密钥库专用格式PKCS12
+- **-deststoretype pkcs12**	不填的话会有提示，使用密钥库专用格式PKCS12
 
 - **-dname**	不填的话，会有指令提示填写如下内容，帮助你完成配置
 
