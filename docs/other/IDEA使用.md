@@ -205,208 +205,33 @@ File->Settings->Build->Builds Tools-->Maven -> Runner
 
 ## 类注释/方法注释模板
 
-### 快捷键生成式注释模板
+### 插件配置
 
-使用快捷键,在任意地方生成一段写好的注释
+之前的注释模板不太规范，配置也比较麻烦，目前使用插件配置
 
-#### 创建
+![image-20220829141610304](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208291416335.png)
 
-打开 `settings` –>`Editor`–>`Live Templates` 显示默认的配置
+有几个好处：
 
-点击`+`号，选择`Live Template`，自动创建名为`user`的组
+1. 有自带中文翻译方法变量名，可能不太准确，但已经比较方便调整
 
-<img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20201210114015291.png" alt="image-20201210114015291" style="zoom:50%;" />
+2. 快捷键，直接在类名方法名使用`ctrl+\`即可自动注释
 
-设置Abbreviation为`cc`(快捷键设定),描述为`Class Comment`(名字可自定义),Applicable设置为`Java :declaration`
+3. 格式规范，比较符合编辑器显示，如所有@字段 不带冒号，所有变量提供英文中文注释
 
-<img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20201210114050314.png" alt="image-20201210114050314" style="zoom:50%;" />
+   ![image-20220829141830042](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208291418073.png)
 
-编辑`Template Text`中的内容,内容自定义即可
+   > 这样的注释在编辑器中移动到方法时会这么显示
+   >
+   > ![image-20220829141940812](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208291419843.png)
 
-```java
-/**
- *
- * 
- * @author  Pix
- * @date    $date$ $time$
- * @version 1.0
- */
-```
+4. 仍然可以继续定制化配置
 
-点击`Edit Variable`,设置变量
-
-<img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20201210114133815.png" alt="image-20201210114133815" style="zoom:50%;" />
-
-#### 使用方法
-
-注：这种快捷键创建模板可以在任何地方生成注释，无需在类和方法前
-
-以上模板配置后，在类头部输入`cc`字母后,按`Tab`键，即可自动生成自定义注释代码
-
-<img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20201210114319595.png" alt="image-20201210114319595" style="zoom: 50%;" />
-
-<img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20201210114337551.png" alt="image-20201210114337551" style="zoom:50%;" />
+   ![image-20220829142018298](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208291420337.png)
 
 
 
-### 创建时生成式类注释模板
 
-#### 类模板
-
-打开 `settings` –>`Editor`–>`File and Code Templates`->`Files`->`Class` 显示默认的配置
-
-<img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20210118144724831.png" alt="image-20210118144724831" style="zoom: 50%;" />
-
-修改右侧代码,添加如下代码块
-
-```java
-/**
-* @program ${PROJECT_NAME}
-*
-* @description ${description}
-*
-* @author Pix
-*
-* @create ${YEAR}-${MONTH}-${DAY} ${HOUR}:${MINUTE}
-**/
-```
-
-修改后`Apply`即可,如图
-
-<img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20210118145303991.png" alt="image-20210118145303991" style="zoom:50%;" />
-
-#### 方法模板
-
-沿用快捷键模板,更贴合方法/接口格式
-
-按照快捷键模板,在user组中再添加一个快捷键,如`mc`,Applicable中可以先勾选Java所有
-
-<img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20210118202753347.png" alt="image-20210118202753347" style="zoom: 67%;" />
-
-模板中输入以下代码
-
-```java
-**
- * @Description: $description$
- * @Param: $params$
- * @return: $returns$
- * @Author: Pix
- * @Date: $date$ $time$
- */
-```
-
-在Edit variables里面添加参数和返回值的自动取值
-
-<img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20210118161223135.png" alt="image-20210118161223135" style="zoom:50%;" />
-
-#### 使用方法
-
-可以看到,方法注释模板的注释前缀并不完全,
-
-所以调用方法注释模板的方式是 输入`/`+`你设定的快捷键`+`tab`
-
-好处是避免误触调出模板,与注释格式更贴合,并且光标会直接切换到description上
-
-<img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20210118161519287.png" alt="image-20210118161519287" style="zoom:67%;" />
-
-
-
-> - 方法模板里注释开头没有/\**而是直接**,原因是生成的注释位于方法外,这样做才能获取方法的参数
-> - 方法模板中的$time$不同于类模板的${DATE},这表示生成注释后光标会跳转到这里
-> - 快捷键的设置会影响到常规快捷代码使用,如设定m,就会在调用带m方法的列表中出现,可以和\*结合,如设成`*m`,这样调用模板的方式就变成/\*m+`tab`
-> - 快捷键的组合方式也可以修改,`tab`改成`enter`什么的,在这里
->
-> <img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20210118163855381.png" alt="image-20210118163855381" style="zoom:50%;" />
-
-#### 另一种方法模板(优化)
-
-可以看到方法参数的注释自动生成的只是参数名数组,写在一起,不是很实用
-
-参考[方法模板](https://segmentfault.com/a/1190000021575635)  [优化注释模板](https://blog.csdn.net/qq_46365857/article/details/110730442)
-
-方法模板修改为
-
-```java
-**
- * @description $description$ $params$
- * @return $return$        
- * @author lizehao
- * @date $date$ $time$
- */
-```
-
-> $description$	$params$	$returns$之间均为\t
-
-$params$的表达式从`methodParameters()`修改为
-
-```groovy
-groovyScript("
-	def result = '';
-    def params = \"${_1}\".replaceAll( '[\\\\[|\\\\]|\\\\s]', '').split(',').toList();
-    if (params.size() > 1) {
-        result +='\\n * @param ' + params[0] + ' \\n';
-        for(i = 1; i < params.size(); i++) {
-            result += ' * @param ' + params[i] +
-                ((i < params.size() - 1) ? ' \\n' : '');
-        };
-    }else if (params.size()==1) {
-        if (params[0] != '') {
-            result+='\\n * @param ' +params[0] + ' ';
-        }
-    }else {
-        result += params[0] + ' ';
-    };
-	return result"
-,methodParameters())
-```
-
-![image-20210316172248726](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20210316172248726.png)
-
-最终效果为
-
-快捷键/\**m+`enter`
-
-<img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20210118204528947.png" alt="image-20210118204528947" style="zoom:50%;" />
-
-> - 对齐出现问题可勾选"根据样式重新格式化"
->
-> <img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20210118183152330.png" alt="image-20210118183152330" style="zoom: 50%;" />
->
-> - 以上代码优化了一点:参数列表及返回值为空时,不显示相关注释(@param和@return)
->
-> - 但存在一点小瑕疵,就是如果参数列表或返回值为空时,虽然不显示相关注释,但会在稍远的地方出现一道红线,提示你输入内容,那便是被隐藏掉的原注释的输入地点
->
->   <img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20210118212213451.png" alt="image-20210118212213451" style="zoom: 50%;" />
->
-> - 处理'@param xxx' tag description is missing问题:
->
->   <img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20210118212426729.png" alt="image-20210118212426729" style="zoom:50%;" />
->
->   `File`-`Settings`-`Editor`-`Inspections`
->
->   搜索框搜索javadoc,在Javadoc取消勾选`Declaration has Javadoc problems`
->
->   <img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/20210110145621679.png" alt="在这里插入图片描述" style="zoom: 50%;" />
-
-### 自定义注释模板不完全变量参考
-
-|     预定义变量      |                           描述信息                           |
-| :-----------------: | :----------------------------------------------------------: |
-|       ${NAME}       |                 the name of the current file                 |
-|   ${PACKAGE_NAME}   |     name of the package in which the new file is created     |
-|       ${USER}       |                current user system login name                |
-|       ${DATE}       |                     current system date                      |
-|       ${TIME}       |                     current system time                      |
-|       ${YEAR}       |                         current year                         |
-|      ${MONTH}       |                        current month                         |
-| ${MONTH_NAME_SHORT} | first 3 letters of the current month name. Example: Jan, Feb, etc. |
-| ${MONTH_NAME_FULL}  | full name of the current month. Example: January, February, etc. |
-|       ${DAY}        |                   current day of the month                   |
-|  ${DAY_NAME_SHORT}  | first 3 letters of the current day name. Example: Mon, Tue, etc. |
-|  ${DAY_NAME_FULL}   | full name of the current day. Example: Monday, Tuesday, etc. |
-|       ${HOUR}       |                         current hour                         |
-|      ${MINUTE}      |                        current minute                        |
-|   ${PROJECT_NAME}   |               the name of the current project                |
 
 
 
@@ -568,7 +393,7 @@ extract superclass 抽取到一个父类，继承它
 
 [参考](https://www.bilibili.com/video/BV1ur4y1P7SV?spm_id_from=333.999.0.0)
 
-##### 行断点
+#### 行断点
 
 左键点击要停住的行的行号
 
@@ -618,3 +443,92 @@ Suspend选择暂停时机：All同行断点；Thread当前线程才会暂停，�
 
 会暂停在属性被写（设置）的代码片段。
 
+
+
+### 源码阅读
+
+#### 搜索
+
+**文件/类搜索**
+
+快捷键：shift + shift（连按两次）
+
+可用于搜索一些非项目，而是依赖中的类
+
+![图片](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208291344809.webp)
+
+**字段搜索**
+
+快捷键：
+
+- 全局：Ctrl + shift + F
+- 当前文件：Ctrl + F
+
+
+
+#### 跳转上次/下次光标位置
+
+用途：查看源码时，会出现多个类来回跳转，这个快捷键方便回溯到特定位置
+
+快捷键：
+
+- 上次：Alt + ←
+- 下次：Alt + → 
+
+
+
+#### 查看实现类/实现方法
+
+快捷键：Ctrl + Alt + B
+
+会跳转光标所在类或者方法的实现，如果有多个可以进行选择
+
+![image-20220829135102185](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208291351284.png)
+
+
+
+#### 查看方法调用树
+
+用途：可以查看指定方法所有的调用者和被调用者
+
+快捷键：Ctrl + Alt + H
+
+![图片](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208291353319.webp)
+
+
+
+#### 查看类关系
+
+用途：查看类的归属关系
+
+快捷键：Ctrl + Alt + U
+
+![image-20220829135455666](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208291354702.png)
+
+#### 查看类继承树
+
+用途：查看类的父类、子类的继承关系
+
+快捷键：Ctrl + H
+
+![image-20220829140411757](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208291404794.png)
+
+#### 查看定义变量的生命位置/调用位置
+
+如果光标在变量声明处，则查看使用该变量的代码；如果光标在使用变量处，则查看变量的声明位置。
+
+快捷键：Ctrl + B 或者Ctrl按住点击变量
+
+![image-20220829140546216](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208291405252.png)
+
+#### 查看代码的提交信息
+
+用途：查看特定行代码的作者以及提交信息
+
+快捷键：在Git管理的代码的行数上右键点击第一个Annotation with Git Blame
+
+![image-20220829140815906](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208291408939.png)
+
+![image-20220829140846633](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208291408667.png)
+
+此时可以看到作者，点击可以查看提交。
