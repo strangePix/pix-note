@@ -166,6 +166,14 @@ File->Settings->Build->Builds Tools-->Maven -> Runner
 
 
 
+### 设置IDEA控制台使用PowerShell
+
+默认terminal使用的是cmd（新版本IDEA2022.1似乎已经改了）。
+
+setting - Tools - Terminal  修改Shell Path，选择powershell.exe即可。
+
+![image-20220831112520994](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208311125717.png)
+
 
 
 
@@ -260,6 +268,8 @@ File->Settings->Build->Builds Tools-->Maven -> Runner
 ## 推荐插件
 
 https://cdk8s.gitbook.io/github/plugins-settings#cha-jian-tui-jian
+
+
 
 ## 其他问题
 
@@ -532,3 +542,90 @@ Suspend选择暂停时机：All同行断点；Thread当前线程才会暂停，�
 ![image-20220829140846633](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208291408667.png)
 
 此时可以看到作者，点击可以查看提交。
+
+
+
+
+
+### Vim
+
+用途：全键盘操作，提高后续开发效率（逼格）
+
+- 既充分利用了 IntelliJ 提供的代码补全，重构，代码浏览等等功能，又可以充分利用 Vim 的多模式，以及 Vim 在编辑器中的高效
+- 利用 `~/.ideavimrc` 来复用 Vim 的工作方式，以及充分利用 Idea 提供的 Action
+
+#### 安装插件
+
+- IdeaVim
+
+![image-20220831145934696](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208311459848.png)
+
+
+
+#### 进入Vim模式
+
+如果你是用过linux的vim编辑，可能会有一点感觉。
+
+- 启用Vim目前没有快捷键，可以通过setting->keymap中搜索VIM Emulator设置
+
+  ![image-20220831161318724](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208311613761.png)
+
+  设置后可以通过快捷键自由切换vim模式。
+
+  ![image-20220831155351455](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208311553489.png)
+
+  表示vim已启动，光标变为小方块。
+
+  ![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208311554718.png)
+
+#### 进入编辑模式
+
+Vim模式下：
+
+- `i`进入编辑模式，输入变为文本内容；
+- `esc`退出编辑模式，输入变为操作；
+
+另外，常规情况下vim定位为文本编辑，vim操作在非编辑区不生效，所以`esc`同时也是由其他区域返回至编辑区的快捷键。
+
+![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208311609690.webp)
+
+
+
+#### 光标移动
+
+`hjkl` 对应 左下上右
+
+> 个人感觉在不适应/非必须的情况下可以继续使用上下左右方向键。
+
+![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208311521485.jpeg)
+
+
+
+#### 复制/粘贴
+
+- `y`	复制当前字母
+- `yy` 	复制当前行
+- `p`	粘贴
+
+> - 部分复制：`v`+上下左右 选择文本  再用`y`复制，后续粘贴
+
+![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208311556300.jpeg)
+
+
+
+
+
+
+
+#### 额外：搜索操作
+
+快捷键：ctrl+shift+a
+
+用途：直接按用途搜索操作，enter执行操作
+
+> 可以执行一些没有快捷键的操作
+
+![image-20220831150434209](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208311504254.png)
+
+
+

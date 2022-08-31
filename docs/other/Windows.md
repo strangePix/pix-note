@@ -35,6 +35,14 @@
 - **sysdm.cpl**
 
   系统属性，用于打开环境变量
+  
+- **control**
+
+  控制面板
+
+- **chrome**
+
+  浏览器
 
 ### 开启管理员运行任务
 
@@ -83,6 +91,17 @@
 ### CMD
 
 ### POWERSHELL
+
+#### 使用系统变量
+
+在系统变量里配置的路径，在powershell中也可以使用特定格式调出：
+
+```powershell
+# 等价于cmd的%xxx%
+$env:xxx
+```
+
+
 
 
 
@@ -207,13 +226,27 @@ sc delete xxx
 
 ### 快速打开环境变量
 
+**方法1**
+
 按键盘上的windows键，输入“环境变量”或者“huanjing”，打开“编辑系统环境变量“。
 
-![在这里插入图片描述](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208091037303.png)
+![image-20220831113112018](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208311131087.png)
 
 
 
+**方法2**
 
+win+r 打开运行  输入 **sysdm.cpl** 回车，会打开“系统属性”，点击高级即可。
+
+![image-20220831113525808](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208311135833.png)
+
+
+
+进一步的，输入 **sysdm.cpl ,3**  （逗号前有空格），会直接打开系统属性的高级选项，不用鼠标切换，再按ctrl+n也可以打开；
+
+更进一步，输入 **%windir%\System32\rundll32.exe sysdm.cpl,EditEnvironmentVariables**   一步到位打开系统变量，爽到飞起就是不好记
+
+> 或者**rundll32.exe sysdm.cpl,EditEnvironmentVariables**
 
 
 
