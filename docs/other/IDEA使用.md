@@ -102,19 +102,25 @@ File -> Settings -> Editor -> General -> Code Folding -> Documentation comments 
 
 右键->Folding->Expand All/Collapse All
 
-快捷键`Ctrl`+`Shift`+`+`/`-`
+快捷键`Ctrl`+`Shift`+`+/-`
 
 
 
 ### xml/java文件注释顶格问题
 
-有时候注释文档的时候生成的注释符号往往会顶在最左，偶尔格式化也不好使
+有时候注释文档的时候生成的注释符号往往会顶在最左，和代码不对齐，偶尔格式化也不好使
 
 方式：
 
 Editor-Code Style-Java/XML，选择Code Generation，取消Line comment at first column和Block comment at first column的选中
 
 <img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/20171016142201895.jpg" alt="img" style="zoom:50%;" />
+
+如果不希望注释紧跟在//注释符号前，留有空格，可以勾选 Add a space at line comment start
+
+![image-20220902100712070](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209021007111.png)
+
+
 
 
 
@@ -321,7 +327,81 @@ https://blog.csdn.net/qq_41740883/article/details/107391472
 
 
 
+## 代码格式化配置
+
+刚开始写的时候，因为并没有什么代码风格是好的，什么风格是坏的，只是按照自己最本能的写法去完成，容易形成不好的代码习惯。
+
+就去看看业内的其他团队是怎么做的，去向他们学习。
+
+### Nacos
+
+https://github.com/alibaba/nacos
+
+在 Nacos 的项目主目录下我们能看到一个名为 Style 的文件夹。
+
+![图片](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209021011643.png)
+
+里面有这一个 CodeStyle 的一个说明 地址
+
+![图片](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209021011390.png)
+
+表明了 Nacos 的代码风格由来，并说明了如何使用这里的配置文件
+
+#### 格式化配置（导入IDEA）
+
+Preferences/Settings --> Editor --> Code Style --> Schema --> Import Schema --> IntelliJ IDEA code style XML
+
+选择文件为源代码下的`style/nacos-code-style-for-idea.xml`文件
+
+
+
+#### 格式检查插件
+
+**安装插件**
+
+- p3c
+- checkstyle
+
+
+
+**使用 xml 文件导入配置**
+
+1. Preferences/Settings --> Other Settings --> Checkstyle 或者 Preferences/Settings --> Tools --> Checkstyle
+2. 在checkstyle插件中设置checkstyle版本至少为8.30,并将扫描作用域设置为All resource(including tests)
+3. 导入源代码下style/NacosCheckStyle.xml文件到checkstyle插件。
+4. 用checkstyle插件扫描你修改的代码。
+
+> 2022.9.2	个人测试当前Nacos的master分支的NacosCheckStyle.xml文件不匹配最新版本的CheckStyle（10.3.2）
+>
+> 可以降低版本或者选用现有的其他代码规范：经测试，8.41版本以下版本支持。
+>
+> ![image-20220902103601477](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209021036520.png)
+
+**使用**
+
+代码CheckStyle下方运行即可。
+
+![image-20220902104405719](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209021044762.png)
+
+
+
+### Apollo
+
+Apollo（阿波罗）是一款可靠的分布式配置管理中心，诞生于携程框架研发部，能够集中化管理应用不同环境、不同集群的配置，配置修改后能够实时推送到应用端，并且具备规范的权限、流程治理等特性，适用于微服务配置管理场景。
+
+![图片](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209021046496.png)
+
+在开源项目 Apollo 中我们也看到同样对于 Code Style 的配置，不过看命名可以发现，这里主要是应用的 Google 的 Java 规范。
+
+
+
+
+
 ## 使用技巧
+
+
+
+
 
 ### 重构代码提高可读性/开发效率
 
