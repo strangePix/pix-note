@@ -21,6 +21,19 @@
 
 ### Linux
 
+- 下载
+
+- 环境变量配置，在
+
+  ```sh
+  # 编辑/etc/profile 或者 新增一个java配置文件  /etc/profile.d/java.sh
+  export JAVA_HOME=/xxx/jdk1.xxx
+  export PATH=$JAVA_HOME/bin:$PATH
+  export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+  ```
+
+  
+
 
 
 

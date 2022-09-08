@@ -250,6 +250,16 @@ win+r 打开运行  输入 **sysdm.cpl** 回车，会打开“系统属性”，
 
 
 
+
+
+## 在Windows上运行Linux程序
+
+https://docs.microsoft.com/zh-cn/windows/wsl/tutorials/gui-apps
+
+可能遇到问题的解决方案：https://blog.csdn.net/shizheng_Li/article/details/120549190
+
+
+
 ## 额外内容补充
 
 
