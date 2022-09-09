@@ -140,9 +140,17 @@ docker run --rm hello-world
 
 ![image-20211220152924484](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202204101903499.png)
 
+### Ubuntu
+
+https://kalacloud.com/blog/how-to-install-and-use-docker-on-ubuntu/
+
+
+
 ### Windows10
 
 待补充
+
+
 
 ### 华为云服务器
 
