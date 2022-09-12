@@ -163,13 +163,9 @@ vim /lib/systemd/system/docker.service
 
 ### Ubuntu
 
-https://kalacloud.com/blog/how-to-install-and-use-docker-on-ubuntu/
+https://www.bilibili.com/read/cv17488009/
 
-> - Warning: apt-key **is** deprecated. Manage keyring files **in** trusted.gpg.d instead (see apt-key(8)).
->
->   解决方案：` curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg`
-
-
+https://mirror.tuna.tsinghua.edu.cn/help/docker-ce/
 
 
 
