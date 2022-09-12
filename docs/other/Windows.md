@@ -86,7 +86,7 @@
 
 
 
-## 控制台
+## 控制台/命令行
 
 ### CMD
 
@@ -101,9 +101,13 @@
 $env:xxx
 ```
 
+### Windows Terminal
 
+安装：https://www.kwchang0831.dev/dev-env/windows-terminal
 
+快捷打开：运行中输入wt https://docs.microsoft.com/zh-cn/windows/terminal/command-line-arguments?tabs=windows
 
+> 2022.9.11 个人评价：好东西啊，比powershell还好用，还可以取代xshell
 
 ## 服务管理
 
@@ -252,11 +256,38 @@ win+r 打开运行  输入 **sysdm.cpl** 回车，会打开“系统属性”，
 
 
 
-## 在Windows上运行Linux程序
+## 在Windows上运行Linux程序——WSL
 
 https://docs.microsoft.com/zh-cn/windows/wsl/tutorials/gui-apps
 
+- 以管理员权限在命令行运行安装指令
+
+  ```powershell
+  wsl --install
+  ```
+
+  安装后重启电脑。
+
+- 如果没有客户端的话，通过这个指令打开
+
+  ```powershell
+  # 默认root没密码
+  wsl -u root 
+  ```
+
+  
+
 可能遇到问题的解决方案：https://blog.csdn.net/shizheng_Li/article/details/120549190
+
+安装CentOS  https://linuxhint.com/install-centos-using-wsl/
+
+装错位置重新装的解决方式 https://blog.csdn.net/jarvan5/article/details/118144722
+
+CentOS没有systemctl 指令也没有service指令的解决办法 https://www.jianshu.com/p/e670ae82e97a
+
+配置SSH https://www.jianshu.com/p/df83a3b96f64   https://blog.csdn.net/jackghq/article/details/54974141
+
+SSH密码链接配置：运行`ssh-keygen -A`
 
 
 

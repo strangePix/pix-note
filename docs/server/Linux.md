@@ -350,6 +350,28 @@ users::20:root,sam
 
 
 
+## 命令行解释器
+
+大部分的Linux发行版的默认命令解释器是Bash，但除此之外，还有别的命令解释器。
+
+
+
+### zsh & oh my zsh
+
+https://zhuanlan.zhihu.com/p/58073103
+
+https://www.cnblogs.com/Likfees/p/15364265.html
+
+https://www.kwchang0831.dev/dev-env/macos/oh-my-zsh
+
+
+
+### Fish-Shell
+
+https://www.kwchang0831.dev/dev-env/ubuntu/fish
+
+
+
 ## 上传下载
 
 

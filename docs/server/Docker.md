@@ -140,9 +140,36 @@ docker run --rm hello-world
 
 ![image-20211220152924484](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202204101903499.png)
 
+
+
+#### 问题处理
+
+##### 服务启动失败，日志显示 `failed to load listeners: no sockets found via socket activation: make sure the service was started by systemd`
+
+![image-20220912135802948](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209121358052.png)
+
+**解决方案**
+
+根据网络上的讨论  https://forums.docker.com/t/failed-to-load-listeners-no-sockets-found-via-socket-activation-make-sure-the-service-was-started-by-systemd/62505
+
+```bash
+# 编辑docker.service文件 将其中的fd://改为unix://
+vim /lib/systemd/system/docker.service
+```
+
+![image-20220912140952705](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209121409658.png)
+
+
+
 ### Ubuntu
 
 https://kalacloud.com/blog/how-to-install-and-use-docker-on-ubuntu/
+
+> - Warning: apt-key **is** deprecated. Manage keyring files **in** trusted.gpg.d instead (see apt-key(8)).
+>
+>   解决方案：` curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg`
+
+
 
 
 
