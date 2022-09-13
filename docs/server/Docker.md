@@ -861,11 +861,13 @@ Portainer 是一款轻量级的应用，它提供了图形化界面，用于方�
   docker run -p 9000:9000 -p 8000:8000 --name portainer \
   --restart=always \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  -v /mydata/portainer/data:/data \
+  -v /soft/portainer/data:/data \
   -d portainer/portainer
   ```
 
 访问端口号为9000
+
+
 
 #### Docker-compose配置
 
