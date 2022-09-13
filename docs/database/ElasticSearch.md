@@ -193,7 +193,16 @@ ElasticSearch是一个基于Apache Lucene开源的分布式、RESTful风格的�
   # 如果是单节点,这么设置避免连接其他集群  discovery.type: single-node
   ```
 
-  修改后改为http调用而非https
+  修改后改为http调用而非https，密码也不需要了，当然不是很安全就是了
+
+  > **容器内没有vim，apt安装提示E: Unable to locate package vim**
+  >
+  > ```bash
+  > apt update
+  > # 卡的话 参考linux 换一个国内镜像源
+  > apt install vim
+  > # 大约需要空间60m  值不值自己考虑了
+  > ```
 
 - 方式二：还没想好，大概是容器启动带环境变量  比如用docker-compose 映射文件
 
@@ -275,7 +284,11 @@ ElasticSearch是一个基于Apache Lucene开源的分布式、RESTful风格的�
   # 安装完成后重启服务
   ```
 
-  > - 有手动安装的方式，不过wget不支持，所以直接用现成的工具
+  > - 有手动安装的方式，外网直接下载可能下不下来
+  >
+  >   ```bash
+  >   # 在容器内执行 待补充
+  >   ```
   >
   > - 增加分词
   >
@@ -305,9 +318,7 @@ https://github.com/1340691923/ElasticView
 
 - 浏览器访问对应ip:8090，初始用户名：admin，初始密码：admin
 
-> 不支持带证书的连接
-
-
+> 不支持带证书的连接，也可能是我自己还没搞明白
 
 
 

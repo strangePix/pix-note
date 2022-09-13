@@ -163,11 +163,71 @@ vim /lib/systemd/system/docker.service
 
 ### Ubuntu
 
-https://www.bilibili.com/read/cv17488009/
-
 https://mirror.tuna.tsinghua.edu.cn/help/docker-ce/
 
+- 清除之前的安装
 
+  ```bash
+  sudo apt-get remove docker docker-engine docker.io containerd runc
+  ```
+
+- 安装依赖
+
+  ```bash
+  sudo apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+  ```
+
+- 信任 Docker 的 GPG 公钥
+
+  ```bash
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  ```
+
+- 添加软件仓库
+
+  ```bash
+  echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/ubuntu \
+    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  ```
+
+- 安装
+
+  ```bash
+  sudo apt-get update
+  sudo apt-get install docker-ce
+  ```
+
+> - **安装失败，提示E: Sub-process /usr/bin/dpkg returned an error code (1)**
+>
+>   参考：https://blog.csdn.net/u013832707/article/details/113104006
+>
+>   https://ddelephant.blog.csdn.net/article/details/118943844
+>
+>   ```bash
+>   cd /var/lib/dpkg/
+>   sudo mv info/ info_bak          # 现将info文件夹更名
+>   sudo mkdir info                 # 再新建一个新的info文件夹
+>   sudo apt-get update             # 更新
+>   sudo apt-get -f install         # 修复
+>   sudo mv info/* info_bak/        # 执行完上一步操作后会在新的info文件夹下生成一些文件，现将这些文件全部移到info_bak文件夹下
+>   sudo rm -rf info                # 把自己新建的info文件夹删掉
+>   sudo mv info_bak info           # 把以前的info文件夹重新改回名
+>   ```
+>
+> - **启动docker失败，显示Job for docker.service failed because the control process exited with error code.**
+>
+>   https://www.ichenfu.com/2021/10/23/wsl2-ubuntu-dockerd-iptables-problem/
+>
+>   ubuntu21以上版本，wsl2出现的问题
+>
+>   ```bash
+>   # 查看错误日志
+>   sudo dockerd --debug
+>   # 把iptables实现切换回iptables-legacy
+>   sudo update-alternatives --config iptables
+>   # 重启docker
+>   ```
 
 ### Windows10
 
@@ -192,7 +252,29 @@ https://mirror.tuna.tsinghua.edu.cn/help/docker-ce/
   systemctl enable docker
   ```
 
-  
+
+
+
+### 配置阿里云镜像加速器
+
+- 登陆阿里云
+
+  ![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/20210122164353.png)
+
+- 找到镜像加速器
+
+  ![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/220210122164635.png)
+
+- 修改docker配置文件
+
+  ```shell
+  vim /etc/docker/daemon.json
+  # 有就修改 没有就添加
+  {"registry-mirrors": ["https://hub-mirror.c.163.com", "https://mirror.baidubce.com","刚申请的加速器地址"]}
+  ```
+
+
+
 
 ## 基础使用
 
@@ -553,25 +635,7 @@ docker network rm < NAME >
 
 ## 补充
 
-### 配置阿里云镜像加速器
-
-- 登陆阿里云
-
-  ![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/20210122164353.png)
-
-- 找到镜像加速器
-
-  ![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/220210122164635.png)
-
-- 修改docker配置文件
-
-  ```shell
-  vim /etc/docker/daemon.json
-  # 有就修改 没有就添加
-  {"registry-mirrors": ["https://hub-mirror.c.163.com", "https://mirror.baidubce.com","刚申请的加速器地址"]}
-  ```
-
-  
+- 
 
 ## Docker Compose
 
