@@ -131,6 +131,10 @@ ElasticSearch是一个基于Apache Lucene开源的分布式、RESTful风格的�
   > sysctl  -p
   > # 目前来看重启后并没有永久更改，可以再执行一次sysctl --system 让配置生效
   > ```
+  >
+  > > 存在重启后配置又被改回去的问题，可以重新运行`sysctl  -p`生效
+  > >
+  > > 问题定位和其他解决方案：http://ssdxiao.github.io/linux/2017/03/20/Sysctl-not-applay-on-boot.html
 
 - 保存密码和令牌，在第一次启动的控制台能看到。
 
