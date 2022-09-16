@@ -118,23 +118,25 @@ ElasticSearch是一个基于Apache Lucene开源的分布式、RESTful风格的�
   docker run -e ES_JAVA_OPTS="-Xms1g -Xmx1g" --name es01 --net elastic -p 9200:9200 -p 9300:9300 -it docker.elastic.co/elasticsearch/elasticsearch:8.4.1
   ```
 
-  > 启动报错：max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]
+  > - 启动报错：max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]
   >
-  > 大概意思就是分配的内存达不到配置的要求，需要修改分配的内存或者配置的内存
+  >   大概意思就是分配的内存达不到配置的要求，需要修改分配的内存或者配置的内存
   >
-  > ```bash
-  > # 临时的更改
-  > sysctl -w vm.max_map_count=262144
-  > # 永久更改 编辑 /etc/sysctl.conf 内容  修改或追加
-  > vm.max_map_count=262144
-  > # 保存后重载配置 再启动es
-  > sysctl  -p
-  > # 目前来看重启后并没有永久更改，可以再执行一次sysctl --system 让配置生效
-  > ```
+  >   ```bash
+  >   # 临时的更改
+  >   sysctl -w vm.max_map_count=262144
+  >   # 永久更改 编辑 /etc/sysctl.conf 内容  修改或追加
+  >   vm.max_map_count=262144
+  >   # 保存后重载配置 再启动es
+  >   sysctl  -p
+  >   # 目前来看重启后并没有永久更改，可以再执行一次sysctl --system 让配置生效
+  >   ```
   >
-  > > 存在重启后配置又被改回去的问题，可以重新运行`sysctl  -p`生效
-  > >
-  > > 问题定位和其他解决方案：http://ssdxiao.github.io/linux/2017/03/20/Sysctl-not-applay-on-boot.html
+  >   > 存在重启后配置又被改回去的问题，可以重新运行`sysctl  -p`生效
+  >   >
+  >   > 问题定位和其他解决方案：http://ssdxiao.github.io/linux/2017/03/20/Sysctl-not-applay-on-boot.html
+  >
+  > - 单机启动：加上一个环境变量` -e "discovery.type=single-node"`
 
 - 保存密码和令牌，在第一次启动的控制台能看到。
 
@@ -365,3 +367,125 @@ https://github.com/1340691923/ElasticView
 
 
 https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/8.4/installation.html
+
+
+
+## 补充理解
+
+
+
+### es的”表“设计
+
+阅读自https://blog.csdn.net/microGP/article/details/125501544
+
+
+
+#### 前提
+
+schema即元数据，作为数据库最重要的组成部分。就如同现实世界中的配方或者图纸，被数据库用来生产和管理数据。
+
+ElasticSearch允许使用者在不定义schema的情况下直接操作数据，ElasticSearch替用户来搞定schema相关的一切操作，对用户透明，用户开箱即用即可。
+
+但这种“开箱即用”也是有代价的，在数据量大时候消耗资源多，性能差。
+
+
+
+#### 开箱即用的背后
+
+其实ElasticSearch的“开箱即用”并不是没有schema，而是ElasticSearch按照你给的数据根据“自己的理解”生成一套schema。
+
+**影响**
+
+- **影响写入速度**：
+
+  对于字段类型，ElasticSearch只能根据字面量来进行推断，这样浪费时间，耽误效率。
+
+- **浪费系统资源：**
+
+  包含但不限于内存、硬盘、CPU以及IO。由于字段类型的判断并不一定是我们需要的，对于不同的数据类型，需要创建的索引是不一样的，进而消耗的资源也是不一样的。对于我们不需要的功能和使用场景，这种资源的浪费显然是需要避免的。
+
+- **影响数据使用效率：**
+
+  要知道每个服务器资源是有限的，当你将有限的资源浪费在不需要的场景中，自然对应的需要使用的场景中的资源数量就会受限，从而引发一系列的不良影响，最终影响到正常的使用效率和使用体验。
+
+所以设计表对于es的意义便是”按需分配“，不去提供大而全，而是以更高的效率提供必要的信息即可。
+
+
+
+#### SQL概念对应
+
+
+
+| SQL      | ElasticSearch | SQL/ElasticSearch  |
+| :------- | :------------ | :----------------- |
+| column   | field         | 列/属性            |
+| row      | document      | 行/文档            |
+| table    | index         | 表/索引            |
+| database | cluster       | 数据库/ ES 集群    |
+| cluster  | cluster       | 多个数据库/ES 集群 |
+
+- ElasticSearch是不严格区分SQL中的database的，没有严格意义上的database级别的数据和资源隔离(有其他方式的隔离，如ilm)。
+
+  如果想要实现此功能可以部署多个ElasticSearch的集群；如果只想进行数据区分，而不需要隔离的话，在一个ElasticSearch集群中使用不同前缀的index来区分即可。
+
+- 在ElasticSearch 7 版本以前在index下有一个type的概念。原本是想用type来代表table，index来对应database。但是后期的效果没有达到预期，反而带来了很多问题，于是在7版本已经开始放弃type这个概念，转而使用上面的这种对应关系。
+
+
+
+#### 名词解释
+
+按照上面的概念对应，现在的es的表设计便是针对es的index设置。分为两部分：setting和mapping。
+
+##### setting
+
+setting是index的整体配置，这些配置从整体上框定了整个index的边界，后续的index就会在这个大框架下展开。
+
+setting的配置会从根本上影响后续index的性能以及扩展性，而且不同的需求和应用场景也会有不同的配置。
+
+**配置案例**
+
+```json
+{
+    "test000":{
+        "settings":{
+            "index":{
+                "codec":"best_compression",
+                "refresh_interval":"5s",
+                "number_of_shards":"16",
+                "translog":{
+                    "flush_threshold_size":"1gb",
+                    "sync_interval":"120s",
+                    "retention":{
+                        "age":"1h"
+                    },
+                    "durability":"async"
+                },
+                "provided_name":"test000",
+                "merge":{
+                    "policy":{
+                        "segments_per_tier":"7",
+                        "max_merge_at_once":"7",
+                        "max_merged_segment":"10gb"
+                    }
+                },
+                "creation_date":"1634659200652",
+                "number_of_replicas":"0",
+                "uuid":"SdDe_0bDQEaT4J7RlXiToQ",
+                "version":{
+                    "created":"6000099"
+                }
+            }
+        }
+    }
+}
+```
+
+- setting中最重要的是index以及merge两个配置大项，一个配置index的整体属性，一个配置index中segments merge的相关参数。
+
+- index中的codec控制着ElasticSearch的压缩算法。
+
+  默认的是lz4，这是一种比较均衡的压缩算法，适合大多数场景。
+
+  但是如果比较在意硬盘耗费量，可以考虑使用best_compression这个配置项，即使用DEFLATE压缩算法。这个压缩算法的压缩比更高，但这会占用更多的CPU资源。修改过后空间占用量可以下降15%～25%。
+
+- index中的refresh_interval控制着数据多久从堆内存刷新到操作系统的Page Cache，只有刷新到Page Cache数据才会被Search到，所以这在很大程度上影响到数据展示的实时性。但是实时性过高也是有代价的。频繁的refresh会导致大量的小segment的生成，search的时候会增加很多IO；更多的segment也会影响到segment merge的触发频率，进而增加系统的IO压力；再加上很多缓存的失效，所以除非必要，这个值还是需要重新配置下的。比如：30s
