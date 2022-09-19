@@ -160,7 +160,7 @@ Elasticsearch 也是使用 Java 编写的，它的内部使用 Lucene 做索引�
   >
   >   > 存在重启后配置又被改回去的问题，可以重新运行`sysctl  -p`生效
   >   >
-  >   > 问题定位和其他解决方案：http://ssdxiao.github.io/linux/2017/03/20/Sysctl-not-applay-on-boot.html
+  >   > 问题定位和其他解决方案：https://blog.csdn.net/huolang_vip/article/details/124045251
   >
   > - 单机启动：加上一个环境变量` -e "discovery.type=single-node"`
 
@@ -422,7 +422,7 @@ https://github.com/1340691923/ElasticView
 
 
 
-## 初步使用
+## 初步使用：插入与搜索
 
 
 
@@ -778,9 +778,422 @@ GET /bank/_search
 
 
 
+## 索引操作
 
 
-## SpringBoot配置
+
+### 创建索引
+
+创建名为customer的索引
+
+```sh
+PUT /customer
+```
+
+#### 自动创建索引
+
+另外，插入文档时，如果使用的索引是不存在的，则会自动创建一个对应index，如：
+
+```sh
+# 创建customer索引，插入id为1的数据
+PUT /customer/_doc/1
+{
+  "name": "John Doe"
+}
+```
+
+好处是自动创建，缺点是缺少对索引类型配置的控制，比如分片，分析器，映射等。
+
+所以合理使用需要：1. 禁止自动创建index 2. 手动创建index，并提供配置参数
+
+
+
+#### 配置禁止自动创建
+
+修改config/elasticsearch.yml配置文件，增加或修改：
+
+```yml
+action.auto_create_index: false
+```
+
+
+
+#### 手动创建索引格式
+
+在增加索引的请求基础之上，传入设置json，比如类型映射，配置参数等。
+
+```sh
+PUT /my_index
+{
+    "settings": { ... any settings ... },
+    "mappings": {
+        "properties": { ... any properties ... }
+    }
+}
+```
+
+- settings：设置分片，副本等配置信息
+
+- mappings：字段映射，类型等
+
+  - properties：由于type在后续版本中会被Deprecated， 所以无需被type嵌套
+
+    > 由于我学的时候type已经过时不用了，所以这句话没看明白。（2022.9.19）
+
+**参考案例**
+
+创建一个user 索引`test-index-users`，其中包含三个属性：name，age，remarks；存储在一个分片一个副本上。
+
+```sh
+PUT /test-index-users
+{
+  "settings": {
+		"number_of_shards": 1,
+		"number_of_replicas": 1
+	},
+  "mappings": {
+    "properties": {
+      "name": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "age": {
+        "type": "long"
+      },
+      "remarks": {
+        "type": "text"
+      }
+    }
+  }
+}
+```
+
+> - 重复插入的返回结果：
+>
+>   ![image-20220919101056470](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209191010696.png)
+>
+> - 在索引确定字段类型后，插入不匹配数据类型的返回结果：
+>
+>   ```sh
+>   # age为long类型，这里传了一个字符串
+>   POST /test-index-users/_doc
+>   {
+>     "name": "test user",
+>     "age": "error_age",
+>     "remarks": "hello eeee"
+>   }
+>   ```
+>
+>   ![image-20220919101259555](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209191012607.png)
+>
+> 
+
+
+
+### 查看索引
+
+查看单个索引配置
+
+```sh
+GET /test-index-users
+# 查看settings
+GET /bank/_settings
+# 查看mapping/类型
+GET /bank/_mapping
+```
+
+![image-20220919101640799](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209191016857.png)
+
+查看所有索引情况
+
+```sh
+GET /_cat/indices?v
+```
+
+![image-20220919101453906](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209191014948.png)
+
+可以看到刚才增加的索引test-index-users的health（状态）是yellow而非green，原因是目前是单点环境，但配置的副本数为1，单机情况要把副本设为0才算健康。
+
+#### 通过kibana可视化查看索引
+
+Stack management - 数据/索引管理
+
+![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209191027712.png)
+
+![image-20220919102853289](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209191028360.png)
+
+
+
+### 修改索引
+
+修改test-index-users索引的副本数量为0
+
+```sh
+PUT /test-index-users/_settings
+{
+  "settings": {
+    "number_of_replicas": 0
+  }
+}
+```
+
+
+
+### 关闭索引
+
+关闭索引，则索引只能显示数据，**不能进行读写**，status变为close。
+
+```sh
+POST /test-index-users/_close
+```
+
+> 关闭索引后，插入数据的报错信息：
+>
+> ![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209191024571.png)
+
+
+
+### 打开索引
+
+打开索引后，就可以重新读写数据到索引了。
+
+```sh
+POST /test-index-users/_open
+```
+
+
+
+### 删除索引
+
+```sh
+DELETE /test-index-users
+```
+
+
+
+## 索引模板
+
+大概类似与索引创建的默认配置，自动/手动创建索引时，使用模板作为基础。
+
+### 类型
+
+- **组件模板**
+  - 可重用的构建块，用于配置映射，设置和别名；
+  - 不会直接应用于一组索引。
+- **索引模板**
+  - 包含组件模板的集合
+  - 也可以直接指定设置，映射和别名。
+
+
+
+### 模板优先级
+
+1. 可组合模板优先于旧模板。如果没有可组合模板匹配给定索引，则旧版模板可能仍匹配并被应用。
+
+2. 如果使用显式设置创建索引并且该索引也与索引模板匹配，则创建索引请求中的设置将优先于索引模板及其组件模板中指定的设置。
+
+3. 如果新数据流或索引与多个索引模板匹配，则使用优先级最高的索引模板。
+
+
+
+### 内置索引模板
+
+Elasticsearch具有内置索引模板，每个索引模板的优先级为100，适用于以下索引模式：
+
+1. `logs-*-*`
+2. `metrics-*-*`
+3. `synthetics-*-*`
+
+所以在涉及内建索引模板时，要避免索引模式冲突。更多可以参考[这里](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html)
+
+
+
+### 创建组件模板：_component_template
+
+```sh
+# 组件模板component_template1
+PUT _component_template/component_template1
+{
+  "template": {
+    "mappings": {
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        }
+      }
+    }
+  }
+}
+# 组件模板runtime_component_template
+PUT _component_template/runtime_component_template
+{
+  "template": {
+    "mappings": {
+      "runtime": { 
+        "day_of_week": {
+          "type": "keyword",
+          "script": {
+            "source": "emit(doc['@timestamp'].value.dayOfWeekEnum.getDisplayName(TextStyle.FULL, Locale.ROOT))"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+
+
+### 创建索引模板：_index_template
+
+使用组件模板的索引模板：composed_of
+
+```sh
+# 索引模板template_1 前缀匹配bar*
+PUT _index_template/template_1
+{
+  "index_patterns": ["bar*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1
+    },
+    "mappings": {
+      "_source": {
+        "enabled": true
+      },
+      "properties": {
+        "host_name": {
+          "type": "keyword"
+        },
+        "created_at": {
+          "type": "date",
+          "format": "EEE MMM dd HH:mm:ss Z yyyy"
+        }
+      }
+    },
+    "aliases": {
+      "mydata": { }
+    }
+  },
+  "priority": 500,
+  "composed_of": ["component_template1", "runtime_component_template"], 
+  "version": 3,
+  "_meta": {
+    "description": "my custom"
+  }
+}
+```
+
+> 创建一个索引能匹配索引模板template_1，使用bar前缀即可。
+>
+> ```sh
+> PUT /bar-test
+> # 查看是否用到模板
+> GET /bar-test/_mapping
+> ```
+>
+> ![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209191102134.png)
+
+
+
+### 模拟索引模板
+
+#### 模拟索引：_simulate_index
+
+用途：多组件模板生成的索引配置，可以通过模拟观察组合后的效果，不用真的创建索引。
+
+这里模拟使用template_1创建索引bar-pdai-test，查看索引效果
+
+```sh
+POST /_index_template/_simulate_index/bar-pdai-test
+```
+
+![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209191105468.png)
+
+
+
+#### 模拟组件模板配置：_simulate
+
+模拟出template_1被组合后的索引配置
+
+```sh
+POST /_index_template/_simulate/template_1
+```
+
+执行结果：
+
+![image-20220919111047708](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209191110776.png)
+
+
+
+#### 模拟索引模板配置：_simulate
+
+模拟与组件模板结合的索引模板
+
+```sh
+# 创建两个组件模板 ct1 ct2
+PUT /_component_template/ct1
+{
+  "template": {
+    "settings": {
+      "index.number_of_shards": 2
+    }
+  }
+}
+PUT /_component_template/ct2
+{
+  "template": {
+    "settings": {
+      "index.number_of_replicas": 0
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        }
+      }
+    }
+  }
+}
+# 模拟索引模板 使用了2个组件模板的基础上增加额外配置
+POST /_index_template/_simulate
+{
+  "index_patterns": ["my*"],
+  "template": {
+    "settings" : {
+        "index.number_of_shards" : 3
+    }
+  },
+  "composed_of": ["ct1", "ct2"]
+}
+```
+
+执行结果：
+
+![image-20220919111928742](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209191119795.png)
+
+
+
+## DSL查询（待补充）
+
+https://www.pdai.tech/md/db/nosql-es/elasticsearch-x-dsl-com.html
+
+### 复合查询
+
+
+
+
+
+## Java Client（待补充）
+
+
+
+## SpringBoot配置（待补充）
 
 
 

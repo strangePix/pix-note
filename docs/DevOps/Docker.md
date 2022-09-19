@@ -512,118 +512,206 @@ docker push username/ubuntu:18.04 # username 为Docker账号用户名
   ```
 
 
-## 常用指令
 
-### 容器操作
+## 镜像操作
 
-- 查看所有容器
+### 搜索镜像
 
-  ```sh
-  docker ps -a
-  ```
+```sh
+docker search java
+```
 
-- 启动/关闭容器
+搜索镜像只能查看是否有镜像，无法得知镜像版本，可以通过docker hub获取
 
-  ```sh
-  #启动容器
-  docker start 容器名
-  #关闭容器
-  docker stop 容器名 
-  # 杀死运行的容器：
-  docker kill $(docker ps -a -q)
-  ```
+#### 通过docker hub获取镜像版本号
 
-- 进入容器
+https://hub.docker.com
 
-  ```sh
-  docker exec -it 容器名 bash
-  docker exec -it 容器名 /bin/sh  # alpine制作
-  ```
+- 搜索需要的镜像
 
-- 删除容器
+  <img src="https://mmbiz.qpic.cn/mmbiz_png/CKvMdchsUwlTaMR6AI8jfpnz14uqicZELPhiapbQbbTZtpLVTjEI1rw8SOVXnCEca9gicGenS9XhAtaGXicQuyLR9w/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片" style="zoom:50%;" />
 
-  ```sh
-  # 必须先关闭容器后才能删除
-  docker rm 容器名
-  ```
+- 查看镜像支持的版本
 
-### 镜像操作
+  <img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209191131880.png" alt="image-20220919113140806" style="zoom:50%;" />
 
-- 查看镜像
+### 下载镜像
 
-  ```sh
-  #查看本地所有镜像
-  docker images
-  ```
+```sh
+docker pull java:8
+```
 
-- 删除镜像
+### 查看镜像
 
-  ```sh
-  #删除镜像
-  docker rmi 镜像ID 
-  #删除所有容器：
-  docker rm $(docker ps -a -q)
-  #强制删除所有镜像
-  docker rmi -f  $(docker images -q)
-  ```
+```sh
+#查看本地所有镜像
+docker images
+```
 
-- 搜索镜像
+### 删除镜像
 
-  ```sh
-  docker search 镜像名
-  ```
+```sh
+#删除镜像 
+docker rmi java:8 
+#强制删除所有镜像
+docker rmi -f  $(docker images)
+# 删除所有没用到的镜像
+docker rmi `docker images | grep none | awk '{print $3}'`
+```
 
-- 下载镜像
+### 打包镜像
 
-  ```sh
-  docker pull 镜像名
-  ```
+```sh
+# -t 表示指定镜像仓库名称/镜像名称:镜像标签 .表示使用当前目录下的Dockerfile文件
+docker build -t mall/mall-admin:1.0-SNAPSHOT .
+```
 
-- 启动镜像
+### 推送镜像
 
-  ```sh
-  docker run 镜像名
-  ```
-
-  
-
-### 其他指令
-
-- 查看容器配置
-
-  ```sh
-  docker inspect 容器名
-  ```
-
-- 查看Docker信息
-
-  ```sh
-  docker info
-  # 查看版本号
-  docker version
-  ```
+```sh
+# 登录Docker Hub
+docker login
+# 给本地镜像打标签为远程仓库名称
+docker tag mall/mall-admin:1.0-SNAPSHOT macrodocker/mall-admin:1.0-SNAPSHOT
+# 推送到远程仓库
+docker push macrodocker/mall-admin:1.0-SNAPSHOT
+```
 
 
 
+## 容器操作
 
-## 网络
+### 创建容器
 
-### 相关操作
+```sh
+docker run -p 80:80 --name nginx \
+-e TZ="Asia/Shanghai" \
+-v /mydata/nginx/html:/usr/share/nginx/html \
+-d nginx:1.17.0
+```
 
-#### 创建网络
+- **-d**	表示后台运行
+- **-p/-port**	指定端口映射，映射规则为：`宿主机端口:容器端口`
+- **--name**	表示指定容器名，后续可以通过名字操作容器
+- **-e**	指定环境变量，这里设置了时区
+- **-v**	将容器上的文件挂载到宿主机上，格式为：`宿主机文件目录:容器文件目录`
+
+### 查看容器
+
+```sh
+# 查看正在运行的容器
+docker ps
+# 查看所有容器，不论是否启动
+docker ps -a
+```
+
+### 启动/关闭容器
+
+```sh
+# 启动容器
+docker start 容器名/容器id
+# 重启容器
+docker restart 容器名/容器id
+# 关闭容器
+docker stop 容器名/容器id
+# 强制停止容器
+docker kill 容器名/容器id
+# 杀死运行的容器
+docker kill $(docker ps -a -q)
+```
+
+### 查询容器信息（pid、ip等）
+
+```sh
+docker inspect 容器名/容器id
+# 查询容器pid
+docker inspect --format "{{.State.Pid}}" 容器名/容器id
+# 查询容器ip
+docker inspect --format '{{ .NetworkSettings.IPAddress }}' 容器名/容器id
+```
+
+### 查询容器资源使用情况
+
+```sh
+docker stats 容器名/容器id
+# 查看所有容器
+docker stats -a
+```
+
+![image-20220919120037936](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209191200000.png)
+
+### 查询容器磁盘使用情况
+
+```sh
+docker system df
+```
+
+![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209191319308.png)
+
+### 进入容器
+
+进入容器的四种方法：https://github.com/berresch/Docker-Enter-Demo
+
+```sh
+docker exec -it 容器名 bash
+docker exec -it 容器名 /bin/sh  # alpine制作
+# 指定账号root进入容器
+docker exec -it --user root $ContainerName /bin/bash
+# 根据pid进入容器
+nsenter --target pid值 --mount --uts --ipc --net --pid
+```
+
+> 部分容器通过nsenter进入提示：nsenter: failed to execute /bin/bash: No such file or directory
+>
+> 解决方案：在nsenter 增加一个参数指定执行的shell 如/bin/bash ，bash，/bin/sh
+>
+> ```sh
+> nsenter --target 598 --mount --uts --ipc --net --pid /bin/sh
+> ```
+
+### 修改容器
+
+```sh
+# 将容器启动方式改为always
+docker container update --restart=always $ContainerName
+```
+
+### 删除容器
+
+```sh
+# 必须先关闭容器后才能删除
+docker rm 容器名
+# 强制删除所有容器
+docker rm -f $(docker ps -a -q)
+```
+
+### 查看容器日志
+
+```sh
+docker logs 容器名
+# 动态查看容器产生的日志
+docker logs -f 容器id 
+```
+
+
+
+
+## 网络操作
+
+### 创建网络
 
 ```sh
 # 创建一个名为 web_net 的网络，子网 172.32.0.0/24 可自定义
 docker network create --subnet=172.32.0.0/24 web_net
 ```
 
-#### 查看网络
+### 查看网络
 
 ```sh
 docker network ls
 ```
 
-#### 删除网络
+### 删除网络
 
 ```sh
 docker network rm < NAME >
@@ -633,9 +721,27 @@ docker network rm < NAME >
 
 
 
+## 其他操作
+
+### 查看Docker信息
+
+```sh
+docker info
+# 查看镜像存放位置
+docker info | grep "Docker Root Dir"
+# 查看版本号
+docker version
+```
+
+
+
+
+
 ## 补充
 
-- 
+
+
+
 
 ## Docker Compose
 
@@ -649,6 +755,13 @@ Docker Compose是一个用于定义和运行多个docker容器应用的工具。
 
   ```shell
   curl -L https://get.daocloud.io/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+  ```
+
+  或者直接安装
+
+  ```sh
+  # ubuntu
+  apt install docker-compose
   ```
 
 - 修改该文件为可执行
@@ -675,19 +788,15 @@ Docker Compose是一个用于定义和运行多个docker容器应用的工具。
 
 ```bash
 # -d表示在后台运行
-docker-compose up -dCopy to clipboardErrorCopied
-```
-
-#### 指定文件启动
-
-```bash
-docker-compose -f docker-compose.yml up -dCopy to clipboardErrorCopied
+docker-compose up -d
+# 指定配置文件启动
+docker-compose -f docker-compose.yml up -d
 ```
 
 #### 停止所有相关容器
 
 ```bash
-docker-compose stopCopy to clipboardErrorCopied
+docker-compose stop
 ```
 
 #### 列出所有容器信息
@@ -698,39 +807,35 @@ docker-compose ps
 
 
 
+### docker-compose.yml常用配置项
 
-
-
-
-### docker-compose.yml常用命令
-
-#### image
+#### image：镜像
 
 指定运行的镜像名称
 
 ```yaml
 # 运行的是mysql5.7的镜像
-image: mysql:5.7Copy to clipboardErrorCopied
+image: mysql:5.7
 ```
 
-#### container_name
+#### container_name：容器名
 
 ```yaml
 # 容器名称为mysql
-container_name: mysqlCopy to clipboardErrorCopied
+container_name: mysql
 ```
 
-#### ports
+#### ports：端口映射
 
 指定宿主机和容器的端口映射（HOST:CONTAINER）
 
 ```yaml
-# 将宿主机的3306端口映射到容器的3306端口
+# 将宿主机的3306端口映射到容器的3306端口，可以配置多个
 ports:
-  - 3306:3306Copy to clipboardErrorCopied
+  - 3306:3306
 ```
 
-#### volumes
+#### volumes：目录挂载
 
 将宿主机的文件或目录挂载到容器中（HOST:CONTAINER）
 
@@ -739,28 +844,28 @@ ports:
 volumes:
   - /mydata/mysql/log:/var/log/mysql
   - /mydata/mysql/data:/var/lib/mysql
-  - /mydata/mysql/conf:/etc/mysqlCopy to clipboardErrorCopied
+  - /mydata/mysql/conf:/etc/mysql
 ```
 
-#### environment
+#### environment：环境变量
 
 ```yaml
 # 设置mysqlroot帐号密码的环境变量
 environment:
-  - MYSQL_ROOT_PASSWORD=rootCopy to clipboardErrorCopied
+  - MYSQL_ROOT_PASSWORD=root
 ```
 
-#### links
+#### links：容器连通
 
 连接其他容器的服务（SERVICE:ALIAS）
 
 ```yaml
 # 可以以database为域名访问服务名称为db的容器
 links:
-  - db:databaseCopy to clipboardErrorCopied
+  - db:database
 ```
 
-#### restart
+#### restart：重启策略
 
 指定容器重启策略
 
