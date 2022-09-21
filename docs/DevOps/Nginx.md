@@ -216,6 +216,27 @@ mkdir /usr/local/nginx/logs
 
 [^5]: yum的一个软件源,里面包含了许多基本源里没有的软件
 
+
+
+#### Docker安装
+
+- 拉取指定版本镜像
+
+  ```sh
+  docker pull nginx:1.23.1
+  ```
+
+- 运行容器
+
+  ```sh
+  docker run --name nginx -p 80:80 -d nginx:1.23.1
+  ```
+
+  - -d 后台运行
+  - -p 端口映射本机80到容器80
+
+
+
 ### Windows
 
 
@@ -917,10 +938,6 @@ $uri
 ## 代理
 
 
-
-### 配置设置
-
-- 
 
 
 

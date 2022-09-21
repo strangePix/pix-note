@@ -254,6 +254,8 @@ Elasticsearch 也是使用 Java 编写的，它的内部使用 Lucene 做索引�
   docker run --name kib-01 -e "I18N_LOCALE=zh-CN" --net elastic -p 5601:5601 docker.elastic.co/kibana/kibana:8.4.1
   ```
 
+  > 可以增加参数 --link es01:elasticsearch 则不需要后续配置步骤
+
 - 根据提示，访问http://127.0.0.1:5601/?code=106393进行配置（code不固定）
 
   ![image-20220909163711219](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209091637330.png)
@@ -351,6 +353,8 @@ https://github.com/1340691923/ElasticView
 - 浏览器访问对应ip:8090，初始用户名：admin，初始密码：admin
 
 > 不支持带证书的连接，也可能是我自己还没搞明白
+
+
 
 
 
@@ -1571,3 +1575,250 @@ setting中最重要的是index以及merge两个配置大项，一个配置index�
 }
 ```
 
+
+
+
+
+
+
+# ELK使用
+
+## 介绍
+
+### Beats
+
+是一个面向**轻量型采集器**的平台，通过集合多种单一用途的采集器，从边缘机器向Logstash、ElasticSearch发送数据，它是由Go语言进行开发的，运行效率方面比较快。
+
+- Filebeat：采集日志文件
+- Metricbeat：采集指标
+- Packetbeat：采集网络数据
+
+不需要处理的话，可以直接发送到es中。
+
+![image-20200924091657242](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209211353322.png)
+
+
+
+### Filebeat
+
+是一个轻量级的日志采集器。提供一种轻量型方法，用于转发和汇总日志与文件：
+
+- 轻量级日志采集器
+- 输送至ElasticSearch或者Logstash，在Kibana中实现可视化
+
+
+
+
+
+## 安装
+
+为快速使用，一下均为Docker安装
+
+### 安装logstash
+
+- 同步es版本号，拉取镜像
+
+  ```sh
+  docker pull docker.elastic.co/logstash/logstash:8.4.1
+  ```
+
+- 创建容器，映射文件配置
+
+  ```sh
+  docker run --name=log8 -p 5044:5044 --net elastic --link es01:elasticsearch docker.elastic.co/logstash/logstash:8.4.1
+  ```
+
+  > 可以增加配置文件映射：
+  >
+  > `-v /soft/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml `
+  >
+  > 不过这样需要在宿主机增加默认的配置文件，否则无法启动
+  >
+  > ```sh
+  > cd /soft/logstash
+  > vim logstash.yml
+  > ```
+  >
+  > 编辑内容为
+  >
+  > ```yaml
+  > http.host: "0.0.0.0"
+  > # 这个配置es的ip地址  根据容器获取 容器那里如果配置了link的话可以不用写ip
+  > xpack.monitoring.elasticsearch.hosts: [ "http://elasticsearch:9200" ]
+  > ```
+
+**安装json_lines插件**
+
+- 进入容器
+
+  ```sh
+  docker exec -it log8 bash
+  ```
+
+- 安装插件
+
+  ```sh
+  bin/logstash-plugin install logstash-codec-json_lines
+  ```
+
+### 安装Filebeat
+
+- 拉取对应版本镜像
+
+  ```sh
+  docker pull docker.elastic.co/beats/filebeat:8.4.2
+  ```
+
+- 启动容器，配置好kibana地址和es地址
+
+  ```sh
+  docker run \
+  --name=fb8 --net elastic --link es01:elasticsearch --link kib8:kibana 
+  docker.elastic.co/beats/filebeat:8.4.2 \
+  setup -E setup.kibana.host=kibana:5601 \
+  -E output.elasticsearch.hosts=["elasticsearch:9200"]
+  ```
+
+  
+
+## 配置
+
+### 收集SpringBoot日志
+
+- 编辑logstash的接收管道
+
+  ```sh
+  # 进入logstash容器
+  docker exec -it log8 bash
+  vim pipeline/logstash.conf
+  ```
+
+  当前默认的文件内容
+
+  ```
+  input {
+    beats {
+      port => 5044
+    }
+  }
+  
+  output {
+    stdout {
+      codec => rubydebug
+    }
+  }
+  ```
+
+  修改为
+
+  ```
+  input {
+    tcp {
+      mode => "server"
+      host => "0.0.0.0"
+      port => 5044
+      codec => json_lines
+      type => "info"
+    }
+  }
+  output {
+    elasticsearch {
+      hosts => ["elasticsearch:9200"]
+      action => "index"
+      codec => json
+      index => "test-analyse-%{type}"
+      template_name => "test-analyse"
+    }
+  }
+  ```
+
+  > 如果es不允许自动创建索引，则需要手动创建一个`test-analyse-info`索引，当然也可以自行修改
+
+- SpringBoot增加在es依赖的基础上增加logstash依赖
+
+  ```xml
+  <dependency>
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
+      <version>7.2</version>
+  </dependency>
+  ```
+
+- 编辑日志配置，将日志按指定格式提交到logstash节点（这里使用logback的配置文件logback-spring.xml）
+
+  ```xml
+  <?xml version="1.0" encoding="UTF-8"?>
+  <configuration>
+      <!--引用默认日志配置-->
+      <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+      <!--使用默认的控制台日志输出实现-->
+      <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+      <!--应用名称-->
+      <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="testAnalyse"/>
+      <!--LogStash访问host-->
+      <springProperty name="LOG_STASH_HOST" scope="context" source="logstash.host" defaultValue="localhost"/>
+      
+      <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+      <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
+      
+      
+      <property name="CONSOLE_LOG_PATTERN_NO_COLOR"
+          value="%d{yyyy-MM-dd HH:mm:ss.SSS} ${PID} [%thread] %-5level %logger:%line %m%n{LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+      
+      <!-- 控制台日志 -->
+      <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+          <!--处理字符不兼容问题，目前无用-->
+          <withJansi>true</withJansi>
+          <encoder>
+              <pattern>%blue(%d{yyyy-MM-dd HH:mm:ss}) %highlight(%-5level) %cyan([%thread]) %X{traceId} %magenta(%class.%M\(%file:%line\)) %msg%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}</pattern>
+              <charset>UTF-8</charset>
+          </encoder>
+      </appender>
+      
+      <!--INFO日志输出到LogStash-->
+      <appender name="LOG_STASH_INFO" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+          <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+              <level>DEBUG</level>
+          </filter>
+          <destination>${LOG_STASH_HOST}:5044</destination>
+          <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+              <providers>
+                  <timestamp>
+                      <timeZone>Asia/Shanghai</timeZone>
+                  </timestamp>
+                  <!--自定义日志输出格式-->
+                  <pattern>
+                      <pattern>
+                          {
+                          "project": "test-analyse",
+                          "level": "%level",
+                          "service": "${APP_NAME:-}",
+                          "pid": "${PID:-}",
+                          "thread": "%thread",
+                          "class": "%logger",
+                          "message": "%message",
+                          "stack_trace": "%exception{20}"
+                          }
+                      </pattern>
+                  </pattern>
+              </providers>
+          </encoder>
+          <!--当有多个LogStash服务时，设置访问策略为轮询-->
+          <connectionStrategy>
+              <roundRobin>
+                  <connectionTTL>5 minutes</connectionTTL>
+              </roundRobin>
+          </connectionStrategy>
+      </appender>
+      
+      <root level="INFO">
+          <appender-ref ref="CONSOLE"/>
+          <appender-ref ref="LOG_STASH_INFO"/>
+      </root>
+      
+  </configuration>
+  ```
+
+  此时启动的spring应用，已经可以将日志推送到es中
+
+  ![image-20220921170824001](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209211708136.png)
