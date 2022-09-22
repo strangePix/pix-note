@@ -1666,22 +1666,18 @@ setting中最重要的是index以及merge两个配置大项，一个配置index�
 - 拉取对应版本镜像
 
   ```sh
-  docker pull docker.elastic.co/beats/filebeat:8.4.2
+  docker pull docker.elastic.co/beats/filebeat:8.4.1
   ```
 
 - 启动容器，配置好kibana地址和es地址
 
   ```sh
-  docker run \
-  --name=fb8 --net elastic --link es01:elasticsearch --link kib8:kibana 
-  docker.elastic.co/beats/filebeat:8.4.2 \
-  setup -E setup.kibana.host=kibana:5601 \
-  -E output.elasticsearch.hosts=["elasticsearch:9200"]
+  docker run --name=fb8 --net elastic --link es01:elasticsearch --link kib8:kibana docker.elastic.co/beats/filebeat:8.4.1  setup -E setup.kibana.host=kibana:5601  -E output.elasticsearch.hosts=["elasticsearch:9200"]
   ```
-
+  
   
 
-## 配置
+## 使用配置
 
 ### 收集SpringBoot日志
 
@@ -1822,3 +1818,8 @@ setting中最重要的是index以及merge两个配置大项，一个配置index�
   此时启动的spring应用，已经可以将日志推送到es中
 
   ![image-20220921170824001](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209211708136.png)
+
+### 收集nginx日志
+
+
+
