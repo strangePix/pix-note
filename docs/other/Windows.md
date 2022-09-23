@@ -291,6 +291,12 @@ SSH密码链接配置：运行`ssh-keygen -A`
 
 
 
+### WSL文件系统映射为本地磁盘
+
+https://blog.csdn.net/x356982611/article/details/80077085
+
+
+
 ## 额外内容补充
 
 

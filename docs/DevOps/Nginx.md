@@ -220,6 +220,8 @@ mkdir /usr/local/nginx/logs
 
 #### Docker安装
 
+https://www.nginx-cn.net/blog/deploying-nginx-nginx-plus-docker/
+
 - 拉取指定版本镜像
 
   ```sh
@@ -234,12 +236,21 @@ mkdir /usr/local/nginx/logs
 
   - -d 后台运行
   - -p 端口映射本机80到容器80
-
-
+  
+  > 为了方便修改配置和管理网页文件，一般会为容器配置挂载文件，避免进入容器上传文件
+  >
+  > ```sh
+  > docker run --name nginx --mount type=bind,source=/soft/nginx/conf.d,target=/usr/share/nginx/conf.d,readonly --mount type=bind,source=/soft/nginx/nginx.conf,target=/etc/nginx/nginx.conf,readonly --mount type=bind,source=/soft/nginx/html,target=/usr/share/nginx/html,readonly --mount type=bind,source=/soft/nginx/log,target=/var/log/nginx  -p 80:80 -d nginx:1.23.1
+  > ```
+  >
+  > - 用-v映射也行，-v的话如果没有对应文件会自动创建，bind的话没有会报错；
+  > - 使用readonly标识标识这个映射文件在容器内只读，只能在容器外修改。
 
 ### Windows
 
 
+
+## 构建nginx上传服务器
 
 
 
