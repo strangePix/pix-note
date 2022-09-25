@@ -109,6 +109,86 @@ $env:xxx
 
 > 2022.9.11 个人评价：好东西啊，比powershell还好用，还可以取代xshell
 
+
+
+#### WT配置SSH连接
+
+https://learn.microsoft.com/zh-cn/windows/terminal/tutorials/ssh
+
+用途：之前用的XSHELL连接远程服务器，目前已经用WT打开WSL连接本地linux，那么考虑云服务器也用WT打开。
+
+新版windows自带SSH客户端，所以只需要通过配置或者直接调用，将其打开即可。
+
+##### 直接通过指令
+
+第一种方式，直接使用powershell，运行指令
+
+```powershell
+ssh user@host -p port
+```
+
+即可登录。
+
+##### 配置文件启动
+
+- 第二种方式，进入WT的设置界面，点击`打开JSON文件`
+
+  ![image-20220925155115132](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209251551233.png)
+
+- 找到profiles.list，添加如下配置
+
+  ```json
+  {
+    "name": "user@machine ssh profile",
+    "commandline": "ssh user@machine"
+  }
+  ```
+
+  或者
+
+  ```json
+  {
+      "name": "user@machine ssh profile",
+      "commandline": "C:\\Windows\\System32\\OpenSSH\\ssh.exe user@machine",
+  }
+  ```
+
+  > - 默认SSH连接端口22，如果改了端口，需要指定端口添加参数`-p 3306`
+  >
+  > - 第一次连接会出现
+  >
+  >   ![image-20220925162755527](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209251627586.png)
+  >
+  >   yes即可。
+  >
+  > - 其实还有一些其他配置项，比如每个终端有一个唯一ID（GUID），不过保存后系统会自动为我们设置，就不操心了
+
+##### 配置免密登录
+
+https://learn.microsoft.com/zh-cn/windows-server/administration/openssh/openssh_keymanagement?source=recommendations
+
+- 在win本地创建密钥对
+
+  ```powershell
+  ssh-keygen -t rsa
+  ```
+
+  获取密钥对存放位置  默认`C:\Users\xxx\.ssh\`
+
+  ![image-20220925170028421](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209251700472.png)
+
+- 公钥id_rsa.pub上传至对应linux服务器，powershell可以这么上传
+
+  ```powershell
+  scp C:\Users\xxx\.ssh\id_rsa.pub user@host:~/.ssh/authorized_keys
+  ```
+
+  > - 指定端口号：添加参数`-P 8849`，放在scp之后即可
+
+- 上传成功后，再次打开就不需要重复输入密码了
+
+
+
 ## 服务管理
 
 ### 相关指令
@@ -291,11 +371,81 @@ SSH密码链接配置：运行`ssh-keygen -A`
 
 
 
+### WSL功能与手机模拟器冲突
+
+- 开启WSL后，再使用手机模拟器时会提示未开启VT，类似这个，不同模拟器提示不一样
+
+![image-20220925171953164](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209251719218.png)
+
+- 但实际上开启了VT也会提示这个，如果想要使用模拟器，需要关闭windows的虚拟机功能，方式是打开控制面板的`打开或关闭Windows功能`
+
+  ![image-20220925172006711](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209251720821.png)
+
+- 找到`虚拟机平台`，此时为打开状态，将其取消，然后按提示重启电脑，即可使用模拟器。
+
+  ![image-20220925172116606](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209251721661.png)
+
+- 但相应的，此时WSL就不能用了，要用的话需要把这个功能开启才行。也就是说模拟器与WSL是冲突的。
+
+
+
+### 配置免密登录其他账号
+
+目的：我个人使用时创建的WSL默认非管理员账号，每次打开要操作root时，需要切换用户，现在想直接打开就登录非当前windows用户
+
+**方式一：改为SSH登录**
+
+改为SSH登录的方式，然后使用SSH的密钥配置登录即可，参考[配置免密登录](#####配置免密登录)
+
+**方式二：启动指令添加参数**
+
+- 查看配置文件，可以看到启动的命令行指令为
+
+  ```sh
+  C:\WINDOWS\system32\wsl.exe -d Ubuntu-22.04
+  ```
+
+- 添加指定用户参数
+
+  ```sh
+  C:\WINDOWS\system32\wsl.exe -d Ubuntu-22.04 -u root
+  ```
+
+  个人测试直接就免密了
+
+
+
 ### WSL文件系统映射为本地磁盘
 
 https://blog.csdn.net/x356982611/article/details/80077085
 
+- 首先是默认安装的ubuntu系统对应的目录为
 
+  ```sh
+  C:\Users\用户名\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu对应版本号和一些字符\LocalState\ext4.vhdx
+  ```
+
+  比如我安装的22.04LTS
+
+  路径就是`C:\Users\alienware\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc\LocalState\ext4.vhdx`
+
+  不过那个文件打不开，提示正在使用
+
+  ![image-20220925193220498](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209251932552.png)
+
+- WSL2会在安装后自动配一个映射硬盘比如这样
+
+  对应路径为
+
+  ```sh
+  \\wsl.localhost\Ubuntu-22.04
+  ```
+
+  ![image-20220925193014524](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209251930613.png)
+
+- 同时补充，windows文件系统在linux中同样也有映射，路径为`/mnt`
+
+  ![image-20220925193448079](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202209251934133.png)
 
 ## 额外内容补充
 
