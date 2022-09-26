@@ -199,6 +199,24 @@ Redis是一个高性能的分布式内存数据库，在国内外个大互联网
 
 
 
+##### Docker安装
+
+- 拉取镜像
+
+  ```sh
+  docker pull redis:latest
+  ```
+
+- 创建容器
+
+  ```sh
+  docker run -itd --name redis -p 6379:6379 redis --requirepass "password"
+  ```
+
+> 也可以映射一个配置文件，方便复杂配置。可以在官方配置的基础上进行修改，[参考配置](https://download.redis.io/redis-stable/redis.conf)
+
+
+
 ### 配置及持久化
 
 ```shell
