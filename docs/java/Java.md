@@ -92,7 +92,7 @@
 
 
 
-#### 抽象类
+#### 抽象类、抽象方法
 
 - 抽象类和抽象方法都使用 abstract 关键字进行声明。
 
@@ -139,6 +139,23 @@
 
 
 
+#### 重写与重载
+
+**重写**
+
+- 指子类实现了一个与父类在方法声明上完全相同的一个方法；
+- 为了满足里式替换原则，重写有两个限制：
+  - 子类方法的访问权限必须大于等于父类方法；
+  - 子类方法的返回类型必须是父类方法返回类型或为其子类型；
+- 使用 @Override 注解，可以让编译器帮忙检查是否满足上面的两个限制条件，但非必须。
+
+**重载**
+
+- 存在于同一个类中，指一个方法与已经存在的方法名称上相同，但是参数类型、个数、顺序至少有一个不同；
+- 返回值不同，其它都相同不算是重载。
+
+
+
 #### super作用
 
 - **访问父类构造函数**
@@ -164,8 +181,6 @@
   ```
 
   
-
-
 
 ## 关键字
 
@@ -291,6 +306,26 @@ import static com.xxx.ClassName.*;
 
 
 
+#### 静态代码的执行顺序
+
+- 静态变量和静态代码块整体优先于实例变量与普通语句块；
+- 静态变量和静态代码块之间的顺序取决于在代码中的顺序；
+- 存在继承关系代码的静态语句执行顺序：
+  - 静态代码优先执行，父类代码优先执行
+  - 静态代码执行完成后，父类代码优先执行（实例变量、普通代码块、构造函数），然后是子类代码
+
+
+
+### private/protected/public 访问权限/访问修饰符
+
+Java 中有三个访问权限修饰符: private、protected 以及 public。
+
+- 如果不加访问修饰符，表示包级可见（default）；
+- 可以对类或类中的成员(字段以及方法)加上访问修饰符；
+- protected 表示在继承体系中成员对于子类可见，但是这个访问修饰符对于类没有意义。
+
+
+
 
 
 ## Java基础-数据类型
@@ -305,16 +340,16 @@ import static com.xxx.ClassName.*;
 - 一种字符类型：`char`
 - 一种布尔类型：`boolean`
 
-| 基本类型  | 位数 | 字节 | 默认值  | 取值范围                                   |
-| :-------- | :--- | :--- | :------ | ------------------------------------------ |
-| `byte`    | 8    | 1    | 0       | -128 ~ 127                                 |
-| `short`   | 16   | 2    | 0       | -32768 ~ 32767                             |
-| `int`     | 32   | 4    | 0       | -2147483648 ~ 2147483647                   |
-| `long`    | 64   | 8    | 0L      | -9223372036854775808 ~ 9223372036854775807 |
-| `char`    | 16   | 2    | 'u0000' | 0 ~ 65535                                  |
-| `float`   | 32   | 4    | 0f      | 1.4E-45 ~ 3.4028235E38                     |
-| `double`  | 64   | 8    | 0d      | 4.9E-324 ~ 1.7976931348623157E308          |
-| `boolean` | 1    |      | false   | true、false                                |
+| 基本类型 | 位数 | 字节 | 默认值  | 取值范围                                   |
+| :------- | :--- | :--- | :------ | ------------------------------------------ |
+| byte     | 8    | 1    | 0       | -128 ~ 127                                 |
+| short    | 16   | 2    | 0       | -32768 ~ 32767                             |
+| int      | 32   | 4    | 0       | -2147483648 ~ 2147483647                   |
+| long     | 64   | 8    | 0L      | -9223372036854775808 ~ 9223372036854775807 |
+| char     | 16   | 2    | 'u0000' | 0 ~ 65535                                  |
+| float    | 32   | 4    | 0f      | 1.4E-45 ~ 3.4028235E38                     |
+| double   | 64   | 8    | 0d      | 4.9E-324 ~ 1.7976931348623157E308          |
+| boolean  | 1    |      | false   | true、false                                |
 
 > - boolean的位数逻辑上是1位，实际依赖于JVM厂商实现，考虑计算机高效存储因素。
 
@@ -382,11 +417,11 @@ import static com.xxx.ClassName.*;
 
 
 
-#### 包装类型的缓存机制/缓存池
+#### 包装类型的缓存机制——缓存池
 
 Java 基本数据类型的包装类型的大部分都用到了缓存机制来提升性能。
 
-- 通过new方式每次都会创建新的对象，而通过valueOf()会使用缓存池中的对象。
+- 通过new方式每次都会创建新的对象，而通过`valueOf()`会使用缓存池中的对象。
 
   > valueOf() 方法的实现比较简单，就是先判断值是否在缓存池中，如果在的话就直接返回缓存池的内容。
   >
@@ -402,7 +437,7 @@ Java 基本数据类型的包装类型的大部分都用到了缓存机制来提
   - `Byte`,`Short`,`Integer`,`Long`： **[-128,127]**  （包含了全部byte值）
   - `Character` ： **[0,127]**，对应**[\u0000,\u007F]**
   - `Boolean`： **True**和**False**
-- 如果超出对应范围仍然会去创建新的对象，缓存的范围区间的大小只是在性能和资源之间的权衡。
+- 如果超出缓存池范围仍然会去创建新的对象，缓存的范围区间的大小只是在性能和资源之间的权衡。
 - 两种浮点数类型的包装类 `Float`,`Double` 并没有实现缓存机制。
 
 
@@ -466,222 +501,6 @@ int n = i.intValue();
 
 
 
-
-
-
-
-
-
-
-### String 字符串
-
-
-
-#### String的不可变性
-
-##### 为什么是不可变的
-
-Java 中的 String 不可变是因为 Java 的设计者认为字符串使用非常频繁，将字符串设置为不可变可以允许多个客户端之间共享相同的字符串。
-
-
-
-##### 不可变性的实现
-
-`String` 类中使用 `final` 关键字修饰字符数组来保存字符串。
-
-```java
-public final class String implements java.io.Serializable, Comparable<String>, CharSequence {
-    private final char value[];
-	//...
-}
-```
-
-- 保存字符串的数组被 `final` 修饰且为私有的，并且`String` 类没有提供/暴露修改这个字符串的方法。
-
-  意味着value数组在初始化之后不能再修改为其他数组引用，也不能修改该数组的内容。
-
-- `String` 类被 `final` 修饰导致其不能被继承，进而避免了子类破坏 `String` 的内容。
-
-##### 不可变的好处
-
-[参考](https://www.programcreek.com/2013/04/why-string-is-immutable-in-java/)
-
-1. **可以缓存hash值**
-
-   因为 String 的 hash 值经常被使用，例如 String 用做 HashMap 的 key值。
-
-   不可变的特性可以使得 hash 值也不可变，因此只需要进行一次计算。
-
-2. **字符串常量池的需要**
-
-   如果一个 String 对象已经被创建过了，那么就会从 String Pool 中取得引用。
-
-   只有 String 是不可变的，才可能使用 String Pool。
-
-3. **安全性**
-
-   String 经常作为参数，String 不可变性可以保证参数不可变。
-
-   例如在作为网络连接参数的情况下如果 String 是可变的，那么在网络连接过程中，String 被改变，改变 String 对象的那一方以为现在连接的是其它主机，而实际情况却不一定是。
-
-4. **线程安全**
-
-   String 不可变性天生具备线程安全，可以在多个线程中安全地使用。
-
-
-
-
-
-
-
-#### 字符串常量池
-
-**字符串常量池** 是 JVM 为了提升性能和减少内存消耗针对字符串（String 类）专门开辟的一块区域，主要目的是为了避免字符串的重复创建。
-
-
-
-##### String.intern()方法：返回常量池引用
-
-**作用**
-
-`String.intern()` 是一个 native（本地）方法，其作用是将指定的字符串对象的引用保存在字符串常量池中，从而保证**相同内容的字符串变量引用同一的内存对象**。
-
-
-
-**处理方式**
-
-分为两种情况：
-
-- 如果字符串常量池中保存了对应的字符串对象的引用，就直接返回该引用。
-- 如果字符串常量池中没有保存对应的字符串对象的引用，那就在常量池中创建一个指向该字符串对象的引用并返回。
-
-示例：
-
-```java
-// 在堆中创建字符串对象”Java“
-// 将字符串对象”Java“的引用保存在字符串常量池中
-String s1 = "Java";
-// 直接返回字符串常量池中字符串对象”Java“对应的引用
-String s2 = s1.intern();
-// 在堆中在单独创建一个字符串对象
-String s3 = new String("Java");
-// 直接返回字符串常量池中字符串对象”Java“对应的引用
-String s4 = s3.intern();
-// s1 和 s2 指向的是堆中的同一个对象
-System.out.println(s1 == s2); // true
-// s3 和 s4 指向的是堆中不同的对象
-System.out.println(s3 == s4); // false
-// s1 和 s4 指向的是堆中的同一个对象
-System.out.println(s1 == s4); //true
-```
-
-> intern方法返回这个对象的字符串常量池的引用，有就直接返回，没有就加入常量池再返回。
->
-> 与调用方法的对象本身没有必然关联，不一定是同一个对象。
-
-
-
-##### （HotSpot中）字符串常量池的存放位置
-
-**运行时常量池与字符串常量池的关系**
-
-- 运行时常量池 在虚拟机规范中是方法区的一部分，在加载类和结构到虚拟机后，就会创建对应的运行时常量池。
-- 字符串常量池是这个过程中存放常量字符串的位置。
-
-**方法区、永久代、元空间、堆区的区别**
-
-- 字符串常量池属于运行时常量池，属于方法区，是一种逻辑上的概念
-- 堆区、永久代、元空间是实际的位置
-- 不同虚拟机对规范实现不同，如对方法区的实现。只有HotSpot有永久代的概念。
-- HotSpot也在发展，逐渐考虑去永久代，对于不同版本JDK，用到永久代的地方会不太一样。
-
-**再看HotSpot中字符串常量池的存放**
-
-- **jdk1.6及之前**
-  - 此时的方法区由永久代实现
-  - 运行时常量池（含字符串常量池），静态变量存放在永久代上
-- **jdk1.7**
-  - 逐步“去永久代”，此时方法区由永久代和堆共同实现
-  - 永久代存放 类型信息、字段、方法、常量；堆存放 字符串常量池、静态变量
-- **jdk1.8及之后**
-  - 取消永久代，方法区由元空间和堆共同实现
-  - 本地内存的元空间存放 类型信息、字段、方法、常量；堆存放字符串常量池、静态变量
-
-
-
-#### 问题收集
-
-##### 能在 Switch 中使用 String 吗?
-
-从 Java 7 开始，可以在 switch case 中使用字符串，但这仅仅是一个语法糖。
-
-内部实现在 switch 中使用字符串的 hash code。
-
-
-
-#####  String 的底层实现由 `char[]` 改为`byte[]`
-
-参考：https://openjdk.java.net/jeps/254 
-
-在 Java 9 之后，`String` 、`StringBuilder` 与 `StringBuffer` 的实现改用 `byte` 数组存储字符串。
-
-```java
-public final class String implements java.io.Serializable,Comparable<String>, CharSequence {
-// @Stable 注解表示变量最多被修改一次，称为“稳定的”。
-@Stable
-private final byte[] value;
-}
-
-abstract class AbstractStringBuilder implements Appendable, CharSequence {
-byte[] value;
-
-}
-```
-
-新版的 String 其实支持两个编码方案： Latin-1 和 UTF-16。
-
-如果字符串中包含的汉字没有超过 Latin-1 可表示范围内的字符，那就会使用 Latin-1 作为编码方案。Latin-1 编码方案下，`byte` 占一个字节(8 位)，`char` 占用 2 个字节（16），`byte` 相较 `char` 节省一半的内存空间。
-
-JDK 官方就说了绝大部分字符串对象只包含 Latin-1 可表示的字符。
-
-如果字符串中包含的汉字超过 Latin-1 可表示范围内的字符，`byte` 和 `char` 所占用的空间是一样的。
-
-
-
-##### 字符串类型的选择：String/StringBuffer/StringBuilder
-
-- **可变性**
-  - String不可变
-  - StringBuffer与StringBuilder可变
-- **线程安全**
-  - String不可变，所以线程安全
-  - StringBuilder线程不安全
-  - StringBuffer线程安全，内部使用synchronized进行同步
-
-
-
-##### 字符串拼接用 '+' 还是 StringBuilder?
-
-Java 语言本身并不支持运算符重载，“+”和“+=”是专门为 String 类重载过的运算符，也是 Java 中仅有的两个重载过的元素符。
-
-执行代码：
-
-```java
-String str1 = "he";
-String str2 = "llo";
-String str3 = "world";
-String str4 = str1 + str2 + str3;
-```
-
-观察字节码：
-
-![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20220422161637929.png)
-
-说明：字符串对象通过“+”的字符串拼接方式，实际上是**通过 `StringBuilder` 调用 `append()` 方法实现**的，拼接完成之后调用 `toString()` 得到一个 `String` 对象 。
-
-所以导致一个问题：循环内频繁使用“+”进行字符串的拼接的话，**编译器不会创建单个 `StringBuilder` 以复用，会导致创建过多的 `StringBuilder` 对象**。
-
-而手动在循环外先创建`StringBuilder`对象，就可以避免这个问题。
 
 
 
@@ -837,6 +656,1150 @@ String接收bytes的构造器转成String，再Long.parseLong
 += 隐式的将加操作的结果类型**强制转换**为持有结果的类型。
 
 如果两个整型相加，如 byte、short 或者 int，首先会将它们提升到 int 类型，然后在执行加法操作。
+
+
+
+## String 字符串
+
+
+
+### String的不可变性
+
+#### 为什么是不可变的
+
+Java 中的 String 不可变是因为 Java 的设计者认为字符串使用非常频繁，将字符串设置为不可变可以允许多个客户端之间共享相同的字符串。
+
+
+
+#### 不可变性的实现
+
+`String` 类中使用 `final` 关键字修饰字符数组来保存字符串。
+
+```java
+public final class String implements java.io.Serializable, Comparable<String>, CharSequence {
+    private final char value[];
+	//...
+}
+```
+
+- 保存字符串的数组被 `final` 修饰且为私有的，并且`String` 类没有提供/暴露修改这个字符串的方法。
+
+  意味着value数组在初始化之后不能再修改为其他数组引用，也不能修改该数组的内容。
+
+- `String` 类被 `final` 修饰导致其不能被继承，进而避免了子类破坏 `String` 的内容。
+
+#### 不可变的好处
+
+[参考](https://www.programcreek.com/2013/04/why-string-is-immutable-in-java/)
+
+1. **可以缓存hash值**
+
+   因为 String 的 hash 值经常被使用，例如 String 用做 HashMap 的 key值。
+
+   不可变的特性可以使得 hash 值也不可变，因此只需要进行一次计算。
+
+2. **字符串常量池的需要**
+
+   如果一个 String 对象已经被创建过了，那么就会从 String Pool 中取得引用。
+
+   只有 String 是不可变的，才可能使用 String Pool。
+
+3. **安全性**
+
+   String 经常作为参数，String 不可变性可以保证参数不可变。
+
+   例如在作为网络连接参数的情况下如果 String 是可变的，那么在网络连接过程中，String 被改变，改变 String 对象的那一方以为现在连接的是其它主机，而实际情况却不一定是。
+
+4. **线程安全**
+
+   String 不可变性天生具备线程安全，可以在多个线程中安全地使用。
+
+
+
+### 字符串常量池
+
+**字符串常量池** 是 JVM 为了提升性能和减少内存消耗针对字符串（String 类）专门开辟的一块区域，主要目的是为了避免字符串的重复创建。
+
+
+
+#### String.intern()方法：返回常量池引用
+
+**作用**
+
+`String.intern()` 是一个 native（本地）方法，其作用是将指定的字符串对象的引用保存在字符串常量池中，从而保证**相同内容的字符串变量引用同一的内存对象**。
+
+
+
+**处理方式**
+
+分为两种情况：
+
+- 如果字符串常量池中保存了对应的字符串对象的引用，就直接返回该引用。
+- 如果字符串常量池中没有保存对应的字符串对象的引用，那就在常量池中创建一个指向该字符串对象的引用并返回。
+
+示例：
+
+```java
+// 在堆中创建字符串对象”Java“
+// 将字符串对象”Java“的引用保存在字符串常量池中
+String s1 = "Java";
+// 直接返回字符串常量池中字符串对象”Java“对应的引用
+String s2 = s1.intern();
+// 在堆中在单独创建一个字符串对象
+String s3 = new String("Java");
+// 直接返回字符串常量池中字符串对象”Java“对应的引用
+String s4 = s3.intern();
+// s1 和 s2 指向的是堆中的同一个对象
+System.out.println(s1 == s2); // true
+// s3 和 s4 指向的是堆中不同的对象
+System.out.println(s3 == s4); // false
+// s1 和 s4 指向的是堆中的同一个对象
+System.out.println(s1 == s4); //true
+```
+
+> intern方法返回这个对象的字符串常量池的引用，有就直接返回，没有就加入常量池再返回。
+>
+> 与调用方法的对象本身没有必然关联，不一定是同一个对象。
+
+
+
+#### （HotSpot中）字符串常量池的存放位置
+
+**运行时常量池与字符串常量池的关系**
+
+- 运行时常量池 在虚拟机规范中是方法区的一部分，在加载类和结构到虚拟机后，就会创建对应的运行时常量池。
+- 字符串常量池是这个过程中存放常量字符串的位置。
+
+**方法区、永久代、元空间、堆区的区别**
+
+- 字符串常量池属于运行时常量池，属于方法区，是一种逻辑上的概念
+- 堆区、永久代、元空间是实际的位置
+- 不同虚拟机对规范实现不同，如对方法区的实现。只有HotSpot有永久代的概念。
+- HotSpot也在发展，逐渐考虑去永久代，对于不同版本JDK，用到永久代的地方会不太一样。
+
+**再看HotSpot中字符串常量池的存放**
+
+- **jdk1.6及之前**
+  - 此时的方法区由永久代实现
+  - 运行时常量池（含字符串常量池），静态变量存放在永久代上
+- **jdk1.7**
+  - 逐步“去永久代”，此时方法区由永久代和堆共同实现
+  - 永久代存放 类型信息、字段、方法、常量；堆存放 字符串常量池、静态变量
+- **jdk1.8及之后**
+  - 取消永久代，方法区由元空间和堆共同实现
+  - 本地内存的元空间存放 类型信息、字段、方法、常量；堆存放字符串常量池、静态变量
+
+
+
+### 问题收集
+
+#### 能在 Switch 中使用 String 吗?
+
+从 Java 7 开始，可以在 switch case 中使用字符串，但这仅仅是一个语法糖。
+
+内部实现在 switch 中使用字符串的 hash code。
+
+
+
+####  String 的底层实现由 `char[]` 改为`byte[]`
+
+参考：https://openjdk.java.net/jeps/254 
+
+在 Java 9 之后，`String` 、`StringBuilder` 与 `StringBuffer` 的实现改用 `byte` 数组存储字符串。
+
+```java
+public final class String implements java.io.Serializable,Comparable<String>, CharSequence {
+// @Stable 注解表示变量最多被修改一次，称为“稳定的”。
+@Stable
+private final byte[] value;
+}
+
+abstract class AbstractStringBuilder implements Appendable, CharSequence {
+byte[] value;
+
+}
+```
+
+新版的 String 其实支持两个编码方案： Latin-1 和 UTF-16。
+
+如果字符串中包含的汉字没有超过 Latin-1 可表示范围内的字符，那就会使用 Latin-1 作为编码方案。Latin-1 编码方案下，`byte` 占一个字节(8 位)，`char` 占用 2 个字节（16），`byte` 相较 `char` 节省一半的内存空间。
+
+JDK 官方就说了绝大部分字符串对象只包含 Latin-1 可表示的字符。
+
+如果字符串中包含的汉字超过 Latin-1 可表示范围内的字符，`byte` 和 `char` 所占用的空间是一样的。
+
+
+
+#### 字符串类型的选择：String/StringBuffer/StringBuilder
+
+- **可变性**
+  - String不可变
+  - StringBuffer与StringBuilder可变
+- **线程安全**
+  - String不可变，所以线程安全
+  - StringBuilder线程不安全
+  - StringBuffer线程安全，内部使用synchronized进行同步
+
+
+
+#### 字符串拼接用 '+' 还是 StringBuilder?
+
+Java 语言本身并不支持运算符重载，“+”和“+=”是专门为 String 类重载过的运算符，也是 Java 中仅有的两个重载过的元素符。
+
+执行代码：
+
+```java
+String str1 = "he";
+String str2 = "llo";
+String str3 = "world";
+String str4 = str1 + str2 + str3;
+```
+
+观察字节码：
+
+![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20220422161637929.png)
+
+说明：字符串对象通过“+”的字符串拼接方式，实际上是**通过 `StringBuilder` 调用 `append()` 方法实现**的，拼接完成之后调用 `toString()` 得到一个 `String` 对象 。
+
+所以导致一个问题：循环内频繁使用“+”进行字符串的拼接的话，**编译器不会创建单个 `StringBuilder` 以复用，会导致创建过多的 `StringBuilder` 对象**。
+
+而手动在循环外先创建`StringBuilder`对象，就可以避免这个问题。
+
+
+
+
+
+## Java基础-泛型
+
+**Java 泛型（Generics）** 是 JDK 5 中引入的一个新特性。
+
+
+
+### 为什么引入泛型/泛型的作用
+
+引入泛型的意义在于：
+
+- **代码复用**：适用于所种数据类型**执行相同代码**
+
+  如加法的实现，如果写法一致，但使用的数据类型有多种（int\short\double），通过泛型就可以复用一个方add法。
+
+- **不需要强制类型转换**：泛型中的类型在使用时指定（**类型安全**，编译器会**检查类型**）
+
+  如`List<T>`集合，取出的对象都是Object类型，无法约束，使用时需要手动强制转换类型，容易出现`ClassCastException`异常。
+
+  ```java
+  List list = new ArrayList();
+  list.add("xxString");
+  list.add(100d);
+  list.add(new Person());
+  ```
+
+  引入泛型，它将提供类型的约束，提供编译前的检查。
+
+  ```java
+  //	限制集合只能存放String类型元素
+  List<String> list = new ArrayList<String>();
+  ```
+
+- 增强代码的可读性以及稳定性
+
+
+
+### 本质
+
+泛型的本质是为了参数化类型（**在不创建新的类型的情况下，通过泛型指定的不同类型来控制形参具体限制的类型**）。
+
+也就是说在泛型使用过程中，操作的数据类型被指定为一个参数，这种参数类型可以用在类、接口和方法中，分别被称为泛型类、泛型接口、泛型方法。
+
+
+
+### 基本使用
+
+#### 泛型类
+
+- 基础泛型
+
+  ```java
+  class Point<T>{         // 此处可以随便写标识符号，T是type的简称  
+      private T var ;     // var的类型由T指定，即：由外部指定  
+      public T getVar(){  // 返回值的类型由外部决定  
+          return var ;  
+      }  
+      public void setVar(T var){  // 设置的类型也由外部决定  
+          this.var = var ;  
+      }  
+  }  
+  public class GenericsDemo06{  
+      public static void main(String args[]){  
+          Point<String> p = new Point<String>() ;     // 里面的var类型为String类型  
+          p.setVar("it") ;                            // 设置字符串  
+          System.out.println(p.getVar().length()) ;   // 取得字符串的长度  
+      }  
+  }
+  ```
+
+- 多元泛型（泛型包含多个参数）
+
+  ```java
+  class Notepad<K,V>{       // 此处指定了两个泛型类型  
+      private K key ;     // 此变量的类型由外部决定  
+      private V value ;   // 此变量的类型由外部决定  
+      public K getKey(){  
+          return this.key ;  
+      }  
+      public V getValue(){  
+          return this.value ;  
+      }  
+      public void setKey(K key){  
+          this.key = key ;  
+      }  
+      public void setValue(V value){  
+          this.value = value ;  
+      }  
+  } 
+  public class GenericsDemo09{  
+      public static void main(String args[]){  
+          Notepad<String,Integer> t = null ;        // 定义两个泛型类型的对象  
+          t = new Notepad<String,Integer>() ;       // 里面的key为String，value为Integer  
+          t.setKey("汤姆") ;        // 设置第一个内容  
+          t.setValue(20) ;            // 设置第二个内容  
+          System.out.print("姓名；" + t.getKey()) ;      // 取得信息  
+          System.out.print("，年龄；" + t.getValue()) ;       // 取得信息  
+    
+      }  
+  }
+  ```
+
+
+
+#### 泛型接口
+
+- 基础泛型
+
+  ```java
+  interface Info<T>{        // 在接口上定义泛型  
+      public T getVar() ; // 定义抽象方法，抽象方法的返回值就是泛型类型  
+  }  
+  class InfoImpl<T> implements Info<T>{   // 定义泛型接口的子类  
+      private T var ;             // 定义属性  
+      public InfoImpl(T var){     // 通过构造方法设置属性内容  
+          this.setVar(var) ;    
+      }  
+      public void setVar(T var){  
+          this.var = var ;  
+      }  
+      public T getVar(){  
+          return this.var ;  
+      }  
+  } 
+  public class GenericsDemo24{  
+      public static void main(String arsg[]){  
+          Info<String> i = null;        // 声明接口对象  
+          i = new InfoImpl<String>("汤姆") ;  // 通过子类实例化对象  
+          System.out.println("内容：" + i.getVar()) ;  
+      }  
+  }  
+  ```
+
+
+
+#### 泛型方法
+
+[参考](https://www.cnblogs.com/iyangyuan/archive/2013/04/09/3011274.html)
+
+##### 创建语法格式
+
+![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208141540180.png)
+
+- 定义泛型方法时，必须在返回值前边加一个`<T>`，来声明这是一个泛型方法，持有一个泛型`T`，然后才可以用泛型T作为方法的返回值。
+- `Class<T>`的作用就是指明泛型的具体类型，而`Class<T>`类型的变量c，可以用来创建泛型类的对象
+
+##### 调用语法格式
+
+![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208141541662.png)
+
+##### 为什么使用泛型方法
+
+因为泛型类要在实例化的时候就指明类型，如果想换一种类型，不得不重新new一次，可能不够灵活；
+
+而泛型方法可以在调用的时候指明类型，更加灵活。
+
+
+
+#### 泛型数组
+
+这里创建一个数组，它的元素是泛型集合：
+
+```java
+//编译错误，非法创建 
+List<String>[] list11 = new ArrayList<String>[10]; 
+//编译错误，提示元素应为List<String>提供的却是ArrayList<?>，需要强转类型
+List<String>[] list12 = new ArrayList<?>[10];  
+//OK，但是会有未检测的类型转换警告:ArrayList<?>转List<String>
+List<String>[] list13 = (List<String>[]) new ArrayList<?>[10]; 
+//编译错误，非法创建 
+List<?>[] list14 = new ArrayList<String>[10]; 
+//OK 
+List<?>[] list15 = new ArrayList<?>[10]; 
+//OK，但是会有未检测的类型转换警告:ArrayList转List<String>
+List<String>[] list6 = new ArrayList[10]; 
+```
+
+所以直接使用又不想报错只有？通配符，实用性较差，一般与不定参数结合使用（补丁参数被视为最后一个参数的同类型数组）:
+
+```java
+public class Test {
+    public static void main(String args[]){
+        Integer[] i = fun1(1,2,3,4,5,6) ;   // 返回泛型数组
+        fun2(fun1(i)) ;
+    }
+    @SafeVarargs
+    public static <T> T[] fun1(T... arg){  // 接收可变参数
+        return arg ;            // 返回泛型数组
+    }
+    public static <T> void fun2(T[] param){   // 输出
+        System.out.print("接收泛型数组：") ;
+        for(T t:param){
+            System.out.print(t + ",") ;
+        }
+    }
+}
+```
+
+
+
+### 泛型的上下限/通配符
+
+
+
+#### 通配符的作用
+
+泛型类型是固定的，某些场景不灵活，通配符允许类型参数变化，解决泛型无法协变的问题。
+
+
+
+#### 常用通配符T、E、K、V、？
+
+本质上都是通配符，没有区别，只不过是编码时的一种约定俗成的东西，换成任何字母都可以。
+
+一般情况是这么约定的：
+
+| 通配符 | 含义                                |
+| ------ | ----------------------------------- |
+| ？     | 不确定的java类型                    |
+| T      | Type，表示具体的java类型            |
+| K/V    | Key/Value，表示java键值对中的键与值 |
+| E      | Element，表示元素                   |
+
+
+
+#### 无界/无限制 通配符<?>
+
+对于**不确定**或者**不关心实际要操作的类型**，可以使用无限制通配符（尖括号里一个问号，即 <?> ），表示可以持有任何类型。
+
+无界通配符可以接收任何类型的泛型类型数据，用于实现不依赖于具体类型参数的简单方法，可以捕获参数类型，交由泛型方法进行处理。
+
+
+
+#### 上界通配符 < ? extends E>
+
+声明了类型的上界，表示参数化的类型可能是所指定的类型，或者是此类型的子类。
+
+可以实现泛型的向上转型，即**传入的类型实参必须是指定类型的子类型**，编译时擦除到类型E，用E类型代替类型参数。
+
+这样有两个好处：
+
+- 如果传入的类型不是 E 或者 E 的子类，编译不成功
+- 泛型中可以使用 E 的方法，无需强转成 E 就能用
+
+
+
+#### 下界通配符 < ? super E>
+
+声明了类型的下界，表示参数化的类型可能是指定的类型，或者是此类型的父类。
+
+可以实现泛型的向下转型，即**传入的类型实参必须是指定类型的父类型**，用 super 进行声明，表示参数化的类型可能是类型E，或者是E的父类型，直至 Object。
+
+```java
+class Info<T>{
+    private T var ;        // 定义泛型变量
+    public void setVar(T var){
+        this.var = var ;
+    }
+    public T getVar(){
+        return this.var ;
+    }
+    public String toString(){    // 直接打印
+        return this.var.toString() ;
+    }
+}
+public class GenericsDemo21{
+    public static void main(String args[]){
+        Info<String> i1 = new Info<String>() ;        // 声明String的泛型对象
+        Info<Object> i2 = new Info<Object>() ;        // 声明Object的泛型对象
+        i1.setVar("hello") ;
+        i2.setVar(new Object()) ;
+        fun(i1) ;
+        fun(i2) ;
+    }
+    public static void fun(Info<? super String> temp){    // 只能接收String或Object类型的泛型，String类的父类只有Object类
+        System.out.print(temp + ", ") ;
+    }
+}
+```
+
+> 可以使用\<T extends A> 但没有\<T super A>，只有\<? super A>
+
+
+
+#### 多重限定& 泛型多继承
+
+使用 & 符号设定多重边界（Multi Bounds)，让对应类型成为多个类型的共有子类型
+
+```java
+public <T extends ClassA & InterfaceB> void test(T t);
+```
+
+> 这里的继承并不是真正意义的多继承，Class顶多一个，接口可以有多个，否则还是会报错。
+>
+> ![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/20201230221859264.png)
+
+
+
+
+
+#### 通配符的使用原则*
+
+为了获得最大限度的灵活性，要在表示 生产者或者消费者 的输入参数上使用通配符，
+
+使用的规则就是：**生产者有上限，消费者有下限** 
+
+> 生产者：方法调用者
+>
+> 消费者：作为方法参数
+
+1. 如果参数化类型表示一个 T 的生产者，使用 < ? extends T>，调用T包含的方法; 
+2. 如果它表示一个 T 的消费者，就使用 < ? super T>，调用的方法使用T作为参数；
+3. 如果既是生产又是消费，那使用通配符就没什么意义了，因为你需要的是精确的参数类型。
+
+
+
+#### 参考使用案例
+
+```java
+private  <E extends Comparable<? super E>> E max(List<? extends E> e1) {
+    if (e1 == null){
+        return null;
+    }
+    //迭代器返回的元素属于 E 的某个子类型
+    Iterator<? extends E> iterator = e1.iterator();
+    E result = iterator.next();
+    while (iterator.hasNext()){
+        E next = iterator.next();
+        if (next.compareTo(result) > 0){
+            result = next;
+        }
+    }
+    return result;
+}
+```
+
+- `<E extends Comparable<? super E>>`指明要使用E泛型，并规定了E的范围：
+
+  - E extends Comparable说明E类型实现了Comparable接口，Comparable作为生产者要提供比较的方法
+
+    不使用这个extends，会无法调用compareTo方法
+
+  - Comparable的泛型是`<? super E>`，说明比较的类型是E的消费者，用于给Comparable提供比较的实现。
+
+    不使用这个泛型，会在`next.compareTo(result)`方法的调用提示没有类型检查，即这里检查了compareTo的方法参数类型是不是`<? super E>`
+
+- 方法参数`List< ? extends E>`表示要操作的数据是 E 的子类的列表，指定上限。
+
+
+
+
+
+### 泛型擦除机制/伪泛型
+
+
+
+#### 概念
+
+编译器会在编译期间会动态地将泛型` T `擦除为 `Object `或将 `T extends xxx` 擦除为其限定类型 `xxx `。
+
+**使用泛型的时候加上的类型参数，会被编译器在编译的时候去掉**。
+
+泛型本质上其实还是编译器的行为，为了保证引入泛型机制但不创建新的类型，减少虚拟机的运行开销，编译器通过擦除将泛型类转化为一般类。
+
+
+
+#### 为什么是伪泛型
+
+Java泛型这个特性是从JDK 1.5才开始加入的，因此为了兼容之前的版本，Java泛型的实现采取了“**伪泛型**”的策略。
+
+即Java在语法上支持泛型，但是在编译阶段会进行所谓的“**类型擦除**”（Type Erasure），
+
+将所有的泛型表示（尖括号中的内容）都替换为具体的类型（其对应的原生态类型），就像完全没有泛型一样。
+
+> ```java
+> public void print(List<String> list)  { }
+> public void print(List<Integer> list) { }
+> ```
+>
+> 这样的方法重载在编译时会报错：
+>
+> ![image-20220513005902239](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20220513005902239.png)
+>
+> 也就是通过编译和类型擦除后，两个方法参数会变得一样，系统理解为写了两个一样的方法而报错。
+
+
+
+#### 泛型擦除带来的一些奇怪特性
+
+很多泛型的奇怪特性都与这个类型擦除的存在有关，包括：
+
+- **泛型类并没有自己独有的Class类对象**
+
+  并不存在`List<String>.class`或是`List<?>.class`，而只有`List.class`。
+
+- **静态变量是被泛型类的所有实例所共享的**
+
+  ```java
+  public class MyClass<T>{
+      public static String COMMON_STR = "Hello World";
+  }
+  ```
+
+  对于声明为MyClass的类，访问其中的静态变量的方法仍然是 MyClass.COMMON_STR。不管是通过`new MyClass()`还是`new MyClass<?>`创建的对象，都是共享一个静态变量。
+
+- **泛型的类型参数不能用在Java异常处理的多条件catch语句中**
+
+  因为异常处理是由JVM在运行时刻来进行的。
+
+  由于类型信息被擦除，JVM是无法区分两个异常类型MyException和MyException<?>的。
+
+  对于JVM来说，它们都是 MyException类型的。也就无法执行与异常对应的catch语句。
+
+
+
+#### 泛型的类型擦除原则/擦除过程
+
+- 消除类型参数声明，即删除`<>`及其包围的部分；
+
+- 根据类型参数的上下界推断并替换所有的类型参数为原生态类型（**找到用来替换类型参数的具体类**）
+
+  - **擦除定义中的类型参数 - 无限制类型擦除**
+
+    当类定义中的类型参数没有任何限制时，在类型擦除中直接被替换为Object，即没有上下界通配符或者有无限制通配符的情况。
+
+    形如`<T>`和`<?>`的类型参数都被替换为Object。
+
+  - **擦除定义中的类型参数 - 有限制类型擦除**
+
+    当类定义中的类型参数存在限制（上下界）时，在类型擦除中替换为类型参数的最左边限定类型（即父类）。
+
+    形如`<T extends Number>`和`<? extends Number>`的类型参数被替换为`Number`，`<? super Number>`被替换为Object。
+
+- 为了保证类型安全，必要时插入强制类型转换代码
+
+- 自动产生[**桥接方法（bridge method）**](###泛型的多态/桥接方法)以保证擦除类型后的代码仍然具有泛型的**多态性**
+
+
+
+
+#### 原始类型
+
+**原始类型** 就是擦除去了泛型信息，最后在字节码中的类型变量的真正类型。
+
+无论何时定义一个泛型，相应的原始类型都会被自动提供，类型变量擦除，并使用其限定类型（无限定的变量用Object）替换。
+
+- 如果类型没有限定，用Object替换；
+- 如果类型变量有限定，那么原始类型就用第一个边界的类型变量类替换。
+
+**泛型方法的原始类型**
+
+在调用泛型方法时，可以指定泛型，也可以不指定泛型：
+
+- 在不指定泛型的情况下，泛型变量的类型为该方法中的几种类型的同一父类的最小级，直到Object
+- 在指定泛型的情况下，该方法的几种类型必须是该泛型的实例的类型或者其子类
+
+```java
+public class Test {  
+    public static void main(String[] args) {  
+
+        /**不指定泛型的时候*/  
+        int i = Test.add(1, 2); //这两个参数都是Integer，所以T为Integer类型  
+        Number f = Test.add(1, 1.2); //这两个参数一个是Integer，一个是Float，所以取同一父类的最小级，为Number  
+        Object o = Test.add(1, "asd"); //这两个参数一个是Integer，一个是String，所以取同一父类的最小级，为Object  
+
+        /**指定泛型的时候*/  
+        int a = Test.<Integer>add(1, 2); //指定了Integer，所以只能为Integer类型或者其子类  
+        int b = Test.<Integer>add(1, 2.2); //编译错误，指定了Integer，不能为Float  
+        Number c = Test.<Number>add(1, 2.2); //指定为Number，所以可以为Integer和Float  
+    }  
+
+    //这是一个简单的泛型方法  
+    public static <T> T add(T x,T y){  
+        return y;  
+    }  
+}
+
+```
+
+其实没有泛型的类型可以理解为默认泛型为Object。
+
+```java
+//	ArrayList理解为ArrayList<Object>，支持add(Object n)
+public static void main(String[] args) {  
+    ArrayList list = new ArrayList();  
+    list.add(1);  
+    list.add("121");  
+    list.add(new Date());  
+}  
+```
+
+
+
+#### 既然泛型会被擦除，那为什么还用泛型？
+
+- 使用泛型可在编译期间进行**类型检测**。 
+- 使用 Object 类型需要手动添加**强制类型转换**，降低代码可读性，提高出错概率。 
+- 泛型可以使用**自限定类型**如 `T extends Comparable `。 
+
+
+
+#### 泛型不会改变返回的Class类型
+
+每个类都有一个 class 属性，泛型化不会改变 class 属性的返回值，例如：
+
+```java
+public static void main(String[] args) {
+    List<String> ls = new ArrayList<String>();
+    List<Integer> li = new ArrayList<Integer>();
+    System.out.println(ls.getClass() == li.getClass());
+}
+```
+
+代码返回值为 true，原因很简单，List\<String>和 List\<Integer> 擦除后的类型都是 List。
+
+
+
+#### 泛型局限性
+
+- **只能声明不能实例化`T`类型变量**
+
+- **泛型参数不能是基本类型。**
+
+  因为基本类型不是`Object`子类，需要用包装类代替。
+
+- **不能实例化泛型数组，不能实例化泛型参数的数组**
+
+  这样是不能通过编译的：
+
+  ```java
+  List<String>[] list = new List<String>[];
+  ```
+
+  **可以声明带有泛型的数组，但不能初始化**，因为执行类型擦除后，List\<String>[]与List\<Object>[]就一样了，编译器拒绝如此声明。
+
+- **泛型无法使用`instance of`和`getClass()`判断类型**
+
+  泛型被擦除了，不能通过编译
+
+  ```java
+  List<String> list = new ArrayList<String>();
+  System.out.println(list instanceof List<String>);
+  ```
+
+  错误信息如下：
+
+  ```bash
+  Cannot perform instanceof check against parameterized type List. Use the form List<?> instead since further generic type information will be erased at runtime
+  ```
+
+- **不能实现同一泛型接口的两种变体**
+
+  类型擦除后多个父类的[桥方法](桥方法)会发生冲突。
+
+- **不能使用`static`修饰泛型变量**
+
+
+
+### 泛型的编译期检查
+
+>  根据泛型擦除，泛型集合`List<Integer>`的实际元素是Object类型，那如何保证泛型集合插入的对象类型一定是Integer呢？
+
+Java编译器是通过先检查代码中泛型的类型，然后再进行类型擦除，再进行编译。
+
+
+
+#### 泛型检查的时机
+
+```java
+ArrayList<String> list = new ArrayList<String>();  
+list.add("123");  
+list.add(123);//编译错误  
+```
+
+这里的编译错误，说明泛型变量的检查，是在编译时进行的。
+
+
+
+#### 泛型检查的条件
+
+引用没有泛型时，并不会触发类型检查：
+
+```java
+ArrayList list2 = new ArrayList<String>();  
+list2.add("1"); //编译通过  
+list2.add(1); //编译通过  
+Object object = list2.get(0); //返回类型就是Object  
+```
+
+引用有泛型而对象没有时，会触发类型检查：
+
+```java
+ArrayList<String> list1 = new ArrayList();  
+list1.add("1"); //编译通过  
+list1.add(1); //编译错误  
+String str1 = list1.get(0); //返回类型就是String  
+```
+
+说明：
+
+类型检查是**针对引用**的，通过引用调用泛型方法，就会对这个引用调用的方法进行类型检测，而**无关它真正引用的对象**。
+
+
+
+#### 泛型检查不考虑继承关系
+
+像下面形式的引用传递是不允许的：
+
+```java
+ArrayList<String> list1 = new ArrayList<Object>(); //编译错误  
+ArrayList<Object> list2 = new ArrayList<String>(); //编译错误
+```
+
+因为存在以下风险：
+
+- 情况一：向下转泛型
+
+  ```java
+  ArrayList<String> list1 = new ArrayList<Object>(); //编译错误  
+  ```
+
+  假设这种编译进行通过，此时调用list1的get方法默认获取的都是String类型。但实际上的对象是可能已经存放了Object类型的元素，再引用给list1，此时取出这些元素就会产生类型转换异常，因为并不是String对象。为了避免这种极易出现的错误，Java不允许进行这样的引用传递。
+
+- 情况二：向上转泛型
+
+  ```java
+  ArrayList<Object> list2 = new ArrayList<String>(); //编译错误
+  ```
+
+  这种情况至少是不会出现类型转换异常，但失去了使用泛型的意义，实际上还是进行了强转。
+
+  通过这种转换反而使元素的类型更加不明确了，同时进行转换后的元素也无法确认其真实对象的类型。
+
+
+
+### 泛型的多态/桥接方法
+
+> 类型擦除会造成多态的冲突，而JVM解决方法就是桥接方法。
+
+#### 多态矛盾
+
+子类继承父类的时候，对泛型进行了范围的缩小，此时可能导致部分重写方法的参数类型与父类方法并不一致：
+
+```java
+class Pair<T> {  
+
+    private T value;  
+
+    public T getValue() {  
+        return value;  
+    }  
+
+    public void setValue(T value) {  
+        this.value = value;  
+    }  
+}
+//	子类  泛型改为Date类型
+class DateInter extends Pair<Date> {  
+
+    @Override  
+    public void setValue(Date value) {  
+        super.setValue(value);  
+    }  
+
+    @Override  
+    public Date getValue() {  
+        return super.getValue();  
+    }  
+}
+```
+
+此时，子类DateInter存在一个重写的setValue方法，参数类型为Date，但它对应的父类方法参数类型T在编译后为Object类型，这不应该视为重写，而是重载。（重写不改变参数类型）
+
+同时，子类也并没有继承一个参数为Object类型的setValue方法：
+
+```java
+public static void main(String[] args) throws ClassNotFoundException {  
+        DateInter dateInter = new DateInter();  
+        dateInter.setValue(new Date());                  
+        dateInter.setValue(new Object()); //编译错误  
+}
+```
+
+
+
+#### 桥接方法（bridge method）
+
+理想中的本意肯定是父类的泛型替换为Date类型，再由子类进行重写。但父类的泛型根据类型擦除原则，只能擦为Object类型。
+
+> 并且继承父类的可能存在多种类型，不能根据一个子类就将泛型改写为一个具体的类型。
+
+此时保持子类能够重写父类的方法的解决方式便是桥接方法，用于继承泛型类时保证多态。
+
+> 桥方法为编译器自动生成，非手写。
+
+```java
+class Node<T> {
+    public T data;
+    public Node(T data) { this.data = data; }
+    public void setData(T data) {
+        System.out.println("Node.setData");
+        this.data = data;
+    }
+    public T getData();
+}
+
+class MyNode extends Node<Integer> {
+    public MyNode(Integer data) { super(data); }
+	//	桥接方法
+   	public void setData(Object data) {
+        setData((Integer) data);
+    }
+    public Object getData(){
+        return getData();
+    }
+
+    @Override
+    public void setData(Integer data) {
+        System.out.println("MyNode.setData");
+        super.setData(data);
+    }
+    public Integer getData(){
+        return (Integer)getData();
+    }
+    
+}
+```
+
+根据编译的结果，桥接方法重写了父类的Object类型的方法，也就是真正的重写，
+
+而这个方法会调用我们自己重写的方法（如setData），并将Object参数强转为对应的类型。
+
+> **子类中的方法`Object getData()`和`Integer getData()`是同时存在的，他们的方法签名是一样的，虚拟机怎么区分这两个方法？**
+>
+> 如果是自己编写这种方法，这样的代码是无法通过编译器的检查的，但是虚拟机却是允许这样做的。
+>
+> 因为虚拟机通过参数类型和返回类型能确定一个方法，而编译器为了实现泛型的多态，禁止开发者手动操作，而允许自己做这个事情，来提供给虚拟器进行区别。
+
+
+
+### 泛型数组
+
+
+
+#### 泛型数组不能用具体的泛型类型进行初始化
+
+```java
+List<String>[] lsa = new List<String>[10]; // 编译错误 提示创建泛型数组
+List<String>[] lsa = (List<String>[]) new List[10];	// 未检转换 警告
+Object[] oa = lsa;
+List<Integer> li = new ArrayList<Integer>();
+li.add(3);
+oa[1] = li; // 运行通过，但实际违规
+String s = lsa[1].get(0); // ClassCastException: java.lang.Integer cannot be cast to java.lang.String
+```
+
+由于类型擦除，所以oa[1]插入元素通过编译并没有报错（接收一个List类型对象），但在取出元素的时候，调用的是返回String的方法却取出一个Integer，在编译时无法确认，在运行时报错。
+
+如果支持泛型数组的声明，形如`List<String>[] lsa = new List<String>[10]; `，创建时不再提示类型转换警告，但依然能够通过向上转型`Object[]`进行Integer类型的插入（泛型擦除）进而产生ClassCastException，与泛型初衷相违背（消灭类型转换错误）。
+
+或者使用通配符：
+
+```java
+List<?>[] lsa = new List<?>[10];
+// ...
+Integer s = (Integer) lsa[1].get(0); 
+```
+
+此时取出元素需要进行显示类型转换，符合预期逻辑。
+
+> 数组泛型与集合泛型的在这里的区别就在于：
+>
+> - 数组泛型可以在不进行手动强转的情况下，转为无类型限制的数组：
+>
+>   ```java
+>   List<String>[] lsa = (List<String>[]) new List[10];	
+>   Object[] oa = lsa;	// 这一步没有强转，没有警告 
+>   ```
+>
+>   进而在无编译检查的情况下插入不符合的类型，产生异常。
+>
+> - 集合泛型虽然底层依然也是转为Object，但不能手动转换：
+>
+>   ```java
+>   List<String> lsa = new ArrayList<>();
+>   List<Object> oa = lsa;	//	编译错误，类型对不上
+>   ```
+>
+>   甚至不能强转，也就不会发生在未检查的情况下发生的错误类型插入。
+
+**总结**
+
+Java 的泛型数组初始化时数组类型不能是具体的泛型类型，只能是通配符的形式。
+
+因为具体类型会导致未检查的情况下**存入任意类型对象**，并在取出时会发生类型转换异常，会与泛型的设计思想冲突，
+
+而通配符形式本来就需要手动强转，符合预期。
+
+```java
+List<String>[] list11 = new ArrayList<String>[10]; //编译错误，非法创建 
+List<String>[] list12 = new ArrayList<?>[10]; //编译错误，需要强转类型 
+List<String>[] list13 = (List<String>[]) new ArrayList<?>[10]; //OK，但是会有警告 
+List<?>[] list14 = new ArrayList<String>[10]; //编译错误，非法创建 
+List<?>[] list15 = new ArrayList<?>[10]; //OK 
+List<String>[] list6 = new ArrayList[10]; //OK，但是会有警告
+```
+
+
+
+#### 如何正确的初始化泛型数组实例
+
+> 无论我们通过`new ArrayList[10]` 的形式还是通过泛型通配符的形式初始化泛型数组实例都是存在警告的，也就是说仅仅语法合格，运行时潜在的风险需要我们自己来承担，因此那些方式初始化泛型数组都不是最优雅的方式。
+
+答案是通过反射。
+
+```java
+public class ArrayWithTypeToken<T> {
+    private T[] array;
+
+    public ArrayWithTypeToken(Class<T> type, int size) {
+        array = (T[]) Array.newInstance(type, size);
+    }
+
+    public void put(int index, T item) {
+        array[index] = item;
+    }
+
+    public T get(int index) {
+        return array[index];
+    }
+
+    public T[] create() {
+        return array;
+    }
+}
+//
+ArrayWithTypeToken<Integer> arrayToken = new ArrayWithTypeToken<Integer>(Integer.class, 100);
+Integer[] array = arrayToken.create();
+```
+
+因为泛型类型 `T`在运行时才能被确定下来，我们能创建泛型数组也必然是在 Java 运行时想办法，而运行时能起作用的技术最好的就是反射了。
+
+
+
+### 获取泛型的参数类型
+
+通过反射。
+
+`java.lang.reflect.Type`是Java中所有类型的公共高级接口，代表了Java中的所有类型。
+
+Type体系中类型的包括：
+
+- 数组类型(GenericArrayType)
+- 参数化类型(ParameterizedType)
+- 类型变量(TypeVariable)
+- 通配符类型(WildcardType)
+- 原始类型(Class)
+- 基本类型(Class)
+
+以上这些类型都实现了Type接口。
+
+```java
+public class GenericType<T> {
+    private T data;
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+
+    public static void main(String[] args) {
+        GenericType<String> genericType = new GenericType<String>() {};
+        Type superclass = genericType.getClass().getGenericSuperclass();
+        //getActualTypeArguments 返回确切的泛型参数, 如Map<String, Integer>返回[String, Integer]
+        Type type = ((ParameterizedType) superclass).getActualTypeArguments()[0]; 
+        System.out.println(type);//class java.lang.String
+    }
+}
+```
+
+对应获取了类型的API，即ParameterizedType接口的方法：
+
+```java
+public interface ParameterizedType extends Type {
+    // 返回确切的泛型参数, 如Map<String, Integer>返回[String, Integer]
+    Type[] getActualTypeArguments();
+    
+    //返回当前class或interface声明的类型, 如List<?>返回List
+    Type getRawType();
+    
+    //返回所属类型. 如,当前类型为O<T>.I<S>, 则返回O<T>. 顶级类型将返回null 
+    Type getOwnerType();
+}
+```
+
+
+
+### 补充问题
+
+#### 基本类型不能作为泛型类型
+
+为当类型擦除后，泛型的原始类型变为Object，但是Object类型不是基本数据类型的超类，只能是引用数据类型的超类。
+
+#### 泛型类型不能实例化
+
+```java
+class A<T>{
+    public T get(){
+        return new T();	//编译错误 类型形参 'T' 不能直接实例化
+    }
+}
+```
+
+因为在 Java 编译期没法确定泛型参数化类型，也就找不到对应的类字节码文件，无法进行实例化。
+
+此外由于`T` 被擦除为 `Object`，如果可以 `new T()` 则就变成了 `new Object()`，完全丢失了类型。 
+
+如果确实需要实例化一个泛型，可以通过反射实现：
+
+```java
+static <T> T newTclass (Class < T > clazz) throws InstantiationException, IllegalAccessException {
+    T obj = clazz.newInstance();
+    return obj;
+}
+```
+
+
+
+
 
 
 
@@ -1008,13 +1971,13 @@ public class MateAnnotationDemo {
 
 ### 动态语言与静态语言
 
-##### 动态语言
+#### 动态语言
 
 是一类在运行时可以改变其结构的语言：例如新的函数，对象，甚至代码可以被引进，已有的函数可以被删除或是其它结构上的变化。通俗点说就是在运行时代码可以根据某些条件改变自身结构
 
 主要的动态语言有：Object-c、C#、JavaScript、PHP、Python等
 
-##### 静态语言
+#### 静态语言
 
 运行时结构不可变的语言就是静态语言。例如Java、C、C++
 
@@ -4685,946 +5648,6 @@ JDK代理是不需要第三方库支持，只需要JDK环境就可以进行代�
 - 被代理的对象必须要实现接口
 
 CGLib必须依赖于CGLib的类库，但是它不需要类来实现任何接口，代理的是指定的类生成一个子类。
-
-
-
-## Java基础-泛型
-
-### 为什么引入泛型/泛型的作用
-
-引入泛型的意义在于：
-
-- 适用于所种数据类型**执行相同代码**（代码复用）
-
-  如加法add的实现，如果写法一致，但使用的数据类型有多种（int\short\double），通过泛型就可以复用一个方法。
-
-- 泛型中的类型在使用时指定，**不需要强制类型转换**（**类型安全**，编译器会**检查类型**）
-
-  如`List<T>`集合，取出的对象都是Object类型，无法约束，使用时需要手动强制转换类型，容易出现`ClassCastException`异常。
-
-  引入泛型，它将提供类型的约束，提供编译前的检查。
-
-**可以增强代码的可读性以及稳定性**。
-
-
-
-### 本质
-
-**Java 泛型（Generics）** 是 JDK 5 中引入的一个新特性。
-
-> 泛型的本质是为了参数化类型（**在不创建新的类型的情况下，通过泛型指定的不同类型来控制形参具体限制的类型**）。
->
-> 也就是说在泛型使用过程中，操作的数据类型被指定为一个参数，这种参数类型可以用在类、接口和方法中，分别被称为泛型类、泛型接口、泛型方法。
-
-
-
-### 基本使用
-
-#### 泛型类
-
-- 基础泛型
-
-  ```java
-  class Point<T>{         // 此处可以随便写标识符号，T是type的简称  
-      private T var ;     // var的类型由T指定，即：由外部指定  
-      public T getVar(){  // 返回值的类型由外部决定  
-          return var ;  
-      }  
-      public void setVar(T var){  // 设置的类型也由外部决定  
-          this.var = var ;  
-      }  
-  }  
-  public class GenericsDemo06{  
-      public static void main(String args[]){  
-          Point<String> p = new Point<String>() ;     // 里面的var类型为String类型  
-          p.setVar("it") ;                            // 设置字符串  
-          System.out.println(p.getVar().length()) ;   // 取得字符串的长度  
-      }  
-  }
-  ```
-
-- 多元泛型（泛型包含多个参数）
-
-  ```java
-  class Notepad<K,V>{       // 此处指定了两个泛型类型  
-      private K key ;     // 此变量的类型由外部决定  
-      private V value ;   // 此变量的类型由外部决定  
-      public K getKey(){  
-          return this.key ;  
-      }  
-      public V getValue(){  
-          return this.value ;  
-      }  
-      public void setKey(K key){  
-          this.key = key ;  
-      }  
-      public void setValue(V value){  
-          this.value = value ;  
-      }  
-  } 
-  public class GenericsDemo09{  
-      public static void main(String args[]){  
-          Notepad<String,Integer> t = null ;        // 定义两个泛型类型的对象  
-          t = new Notepad<String,Integer>() ;       // 里面的key为String，value为Integer  
-          t.setKey("汤姆") ;        // 设置第一个内容  
-          t.setValue(20) ;            // 设置第二个内容  
-          System.out.print("姓名；" + t.getKey()) ;      // 取得信息  
-          System.out.print("，年龄；" + t.getValue()) ;       // 取得信息  
-    
-      }  
-  }
-  ```
-
-
-
-#### 泛型接口
-
-- 基础泛型
-
-  ```java
-  interface Info<T>{        // 在接口上定义泛型  
-      public T getVar() ; // 定义抽象方法，抽象方法的返回值就是泛型类型  
-  }  
-  class InfoImpl<T> implements Info<T>{   // 定义泛型接口的子类  
-      private T var ;             // 定义属性  
-      public InfoImpl(T var){     // 通过构造方法设置属性内容  
-          this.setVar(var) ;    
-      }  
-      public void setVar(T var){  
-          this.var = var ;  
-      }  
-      public T getVar(){  
-          return this.var ;  
-      }  
-  } 
-  public class GenericsDemo24{  
-      public static void main(String arsg[]){  
-          Info<String> i = null;        // 声明接口对象  
-          i = new InfoImpl<String>("汤姆") ;  // 通过子类实例化对象  
-          System.out.println("内容：" + i.getVar()) ;  
-      }  
-  }  
-  ```
-
-
-
-#### 泛型方法
-
-[参考](https://www.cnblogs.com/iyangyuan/archive/2013/04/09/3011274.html)
-
-##### 创建语法格式
-
-![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208141540180.png)
-
-- 定义泛型方法时，必须在返回值前边加一个`<T>`，来声明这是一个泛型方法，持有一个泛型`T`，然后才可以用泛型T作为方法的返回值。
-- `Class<T>`的作用就是指明泛型的具体类型，而`Class<T>`类型的变量c，可以用来创建泛型类的对象
-
-##### 调用语法格式
-
-![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208141541662.png)
-
-##### 为什么使用泛型方法
-
-因为泛型类要在实例化的时候就指明类型，如果想换一种类型，不得不重新new一次，可能不够灵活；
-
-而泛型方法可以在调用的时候指明类型，更加灵活。
-
-
-
-#### 泛型数组
-
-这里创建一个数组，它的元素是泛型集合：
-
-```java
-//编译错误，非法创建 
-List<String>[] list11 = new ArrayList<String>[10]; 
-//编译错误，提示元素应为List<String>提供的却是ArrayList<?>，需要强转类型
-List<String>[] list12 = new ArrayList<?>[10];  
-//OK，但是会有未检测的类型转换警告:ArrayList<?>转List<String>
-List<String>[] list13 = (List<String>[]) new ArrayList<?>[10]; 
-//编译错误，非法创建 
-List<?>[] list14 = new ArrayList<String>[10]; 
-//OK 
-List<?>[] list15 = new ArrayList<?>[10]; 
-//OK，但是会有未检测的类型转换警告:ArrayList转List<String>
-List<String>[] list6 = new ArrayList[10]; 
-```
-
-
-
-### 特性
-
-Java 泛型（Generic）的引入加强了参数类型的安全性，减少了类型的转换，但有一点需要注意：
-
-**Java 的泛型在编译器有效，在运行期被删除**
-
-也就是说所有泛型参数类型在编译后都会被清除掉。
-
-```java
-public void print(List<String> list)  { }
-public void print(List<Integer> list) { }
-```
-
-这样的方法重载在编译时会报错：
-
-![image-20220513005902239](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20220513005902239.png)
-
-也就是通过编译后无法区别两个方法，系统无法判断两个方法的参数是不一样的。
-
-> 很多泛型的奇怪特性都与这个类型擦除的存在有关，包括：
->
-> - **泛型类并没有自己独有的Class类对象**
->
->   并不存在`List<String>.class`或是`List<?>.class`，而只有`List.class`。
->
-> - **静态变量是被泛型类的所有实例所共享的**
->
->   对于声明为MyClass的类，访问其中的静态变量的方法仍然是 MyClass.myStaticVar。不管是通过`new MyClass()`还是`new MyClass<?>`创建的对象，都是共享一个静态变量。
->
-> - **泛型的类型参数不能用在Java异常处理的catch语句中**
->
->   因为异常处理是由JVM在运行时刻来进行的。
->
->   由于类型信息被擦除，JVM是无法区分两个异常类型MyException和MyException<?>的。
->
->   对于JVM来说，它们都是 MyException类型的。也就无法执行与异常对应的catch语句。
-
- Java 编译后的字节码中已经没有泛型的任何信息，在编译后所有的泛型类型都会做相应的转化，转化如下：
-
-- `List<String> `，`List<T>`擦除后的类型为 `List`。
-- `List<String>[]`，`List<T>[] `擦除后的类型为 `List[]`。
-- `List<? extends E>`、`List<? super E>`擦除后的类型为 `List<E>`。
-- `List<T extends Serialzable & Cloneable>`擦除后类型为 `List<Serialzable>`。
-
-> **为什么这么做？**
->
-> 避免 JVM 的大换血。如果 JVM 将泛型类型延续到运行期，那么到运行期时 JVM 就需要进行大量的重构工作了，提高了运行期的效率。
-> 为了版本兼容。 在编译期擦除可以更好地支持原生类型（Raw Type）。
-
-
-
-
-
-### 泛型擦除机制/伪泛型
-
-
-
-#### 概念
-
-编译器会在编译期间会动态地将泛型` T `擦除为 `Object `或将 `T extends xxx` 擦除为其限定类型 `xxx `。
-
-**使用泛型的时候加上的类型参数，会被编译器在编译的时候去掉**。
-
-泛型本质上其实还是编译器的行为，为了保证引入泛型机制但不创建新的类型，减少虚拟机的运行开销，编译器通过擦除将泛型类转化为一般类。
-
-
-
-#### 为什么是伪泛型
-
-Java泛型这个特性是从JDK 1.5才开始加入的，因此为了兼容之前的版本，Java泛型的实现采取了“**伪泛型**”的策略。
-
-即Java在语法上支持泛型，但是在编译阶段会进行所谓的“**类型擦除**”（Type Erasure），将所有的泛型表示（尖括号中的内容）都替换为具体的类型（其对应的原生态类型），就像完全没有泛型一样。
-
-
-
-
-
-#### 泛型的类型擦除原则/擦除过程
-
-- 消除类型参数声明，即删除`<>`及其包围的部分（**把代码中的类型参数都替换成具体的类**）
-
-- 根据类型参数的上下界推断并替换所有的类型参数为原生态类型（**找到用来替换类型参数的具体类**）
-
-  - **擦除定义中的类型参数 - 无限制类型擦除**
-
-    当类定义中的类型参数没有任何限制时，在类型擦除中直接被替换为Object。
-
-    形如`<T>`和`<?>`的类型参数都被替换为Object。
-
-  - **擦除定义中的类型参数 - 有限制类型擦除**
-
-    当类定义中的类型参数存在限制（上下界）时，在类型擦除中替换为类型参数的上界或者下界。
-
-    形如`<T extends Number>`和`<? extends Number>`的类型参数被替换为`Number`，`<? super Number>`被替换为Object。
-
-- 为了保证类型安全，必要时插入强制类型转换代码
-
-- 自动产生**桥接方法（bridge method）**以保证擦除类型后的代码仍然具有泛型的“多态性”
-
-  这是由于擦除了类型之后的类可能缺少某些必须的方法。比如考虑下面的代码：
-
-  ```java
-  class MyString implements Comparable<String> {
-      public int compareTo(String str) {        
-          return 0;    
-      }
-  } 
-  ```
-
-  当类型信息被擦除之后，上述类的声明变成了class MyString implements Comparable。但是这样的话，类MyString就会有编译错误，因为没有实现接口Comparable声明的String compareTo(Object)方法。这个时候就由编译器来动态生成这个方法。
-
-
-
-
-
-#### 原始类型
-
-**原始类型** 就是擦除去了泛型信息，最后在字节码中的类型变量的真正类型。
-
-无论何时定义一个泛型，相应的原始类型都会被自动提供，类型变量擦除，并使用其限定类型（无限定的变量用Object）替换。
-
-- 如果类型没有限定，用Object替换；
-- 如果类型变量有限定，那么原始类型就用第一个边界的类型变量类替换。
-
-##### 泛型方法的原始类型
-
-在调用泛型方法时，可以指定泛型，也可以不指定泛型：
-
-- 在不指定泛型的情况下，泛型变量的类型为该方法中的几种类型的同一父类的最小级，直到Object
-- 在指定泛型的情况下，该方法的几种类型必须是该泛型的实例的类型或者其子类
-
-```java
-public class Test {  
-    public static void main(String[] args) {  
-
-        /**不指定泛型的时候*/  
-        int i = Test.add(1, 2); //这两个参数都是Integer，所以T为Integer类型  
-        Number f = Test.add(1, 1.2); //这两个参数一个是Integer，一个是Float，所以取同一父类的最小级，为Number  
-        Object o = Test.add(1, "asd"); //这两个参数一个是Integer，一个是String，所以取同一父类的最小级，为Object  
-
-        /**指定泛型的时候*/  
-        int a = Test.<Integer>add(1, 2); //指定了Integer，所以只能为Integer类型或者其子类  
-        int b = Test.<Integer>add(1, 2.2); //编译错误，指定了Integer，不能为Float  
-        Number c = Test.<Number>add(1, 2.2); //指定为Number，所以可以为Integer和Float  
-    }  
-
-    //这是一个简单的泛型方法  
-    public static <T> T add(T x,T y){  
-        return y;  
-    }  
-}
-
-```
-
-其实没有泛型的类型可以理解为默认泛型为Object。
-
-```java
-//	ArrayList理解为ArrayList<Object>，支持add(Object n)
-public static void main(String[] args) {  
-    ArrayList list = new ArrayList();  
-    list.add(1);  
-    list.add("121");  
-    list.add(new Date());  
-}  
-```
-
-
-
-#### 既然编译器要把泛型擦除，那为什么还要用泛型呢？用 Object 代替不行吗？
-
-- 使用泛型可在编译期间进行**类型检测**。 
-- 使用 Object 类型需要手动添加**强制类型转换**，降低代码可读性，提高出错概率。 
-- 泛型可以使用**自限定类型**如 `T extends Comparable `。 
-
-
-
-
-
-
-
-
-
-#### 泛型不会改变返回的Class类型
-
-每个类都有一个 class 属性，泛型化不会改变 class 属性的返回值，例如：
-
-```java
-public static void main(String[] args) {
-    List<String> ls = new ArrayList<String>();
-    List<Integer> li = new ArrayList<Integer>();
-    System.out.println(ls.getClass() == li.getClass());
-}
-```
-
-代码返回值为 true，原因很简单，List\<String>和 List\<Integer> 擦除后的类型都是 List。
-
-
-
-
-
-
-
-### 泛型的编译期检查
-
->  根据泛型擦除，泛型集合`List<Integer>`的实际元素是Object类型，那如何保证泛型集合插入的对象类型一定是Integer呢？
-
-Java编译器是通过先检查代码中泛型的类型，然后再进行类型擦除，再进行编译。
-
-#### 泛型检查的时机
-
-```java
-ArrayList<String> list = new ArrayList<String>();  
-list.add("123");  
-list.add(123);//编译错误  
-```
-
-这里的编译错误，说明泛型变量的检查，是在编译前进行的。
-
-#### 泛型检查的条件
-
-引用没有泛型时，并不会触发类型检查：
-
-```java
-ArrayList list2 = new ArrayList<String>();  
-list2.add("1"); //编译通过  
-list2.add(1); //编译通过  
-Object object = list2.get(0); //返回类型就是Object  
-```
-
-引用有泛型而对象没有时，会触发类型检查：
-
-```java
-ArrayList<String> list1 = new ArrayList();  
-list1.add("1"); //编译通过  
-list1.add(1); //编译错误  
-String str1 = list1.get(0); //返回类型就是String  
-```
-
-说明：
-
-**类型检查是针对引用的，通过引用调用泛型方法，就会对这个引用调用的方法进行类型检测，而无关它真正引用的对象**。
-
-#### 泛型检查不考虑继承关系
-
-像下面形式的引用传递是不允许的：
-
-```java
-ArrayList<String> list1 = new ArrayList<Object>(); //编译错误  
-ArrayList<Object> list2 = new ArrayList<String>(); //编译错误
-```
-
-因为存在以下风险：
-
-- 情况一：向下转泛型
-
-  ```java
-  ArrayList<String> list1 = new ArrayList<Object>(); //编译错误  
-  ```
-
-  假设这种编译进行通过，此时调用list1的get方法默认获取的都是String类型。但实际上的对象是可能已经存放了Object类型的元素，再引用给list1，此时取出这些元素就会产生类型转换异常，因为并不是String对象。为了避免这种极易出现的错误，Java不允许进行这样的引用传递。
-
-- 情况二：向上转泛型
-
-  ```java
-  ArrayList<Object> list2 = new ArrayList<String>(); //编译错误
-  ```
-
-  这种情况至少是不会出现类型转换异常，但失去了使用泛型的意义，通过这种转换反而使元素的类型更加不明确了，同时进行转换后的元素也无法确认其真实对象的类型。
-
-
-
-
-
-### 泛型的上下限/通配符
-
-
-
-#### 通配符的作用
-
-泛型类型是固定的，某些场景不灵活，通配符允许类型参数变化，解决泛型无法协变的问题。
-
-
-
-#### 常用通配符T、E、K、V、？
-
-本质上都是通配符，没有区别，只不过是编码时的一种约定俗成的东西，换成任何字母都可以。
-
-一般情况是这么约定的：
-
-| 通配符 | 含义                                |
-| ------ | ----------------------------------- |
-| ？     | 不确定的java类型                    |
-| T      | Type，表示具体的java类型            |
-| K/V    | Key/Value，表示java键值对中的键与值 |
-| E      | Element，表示元素                   |
-
-
-
-#### 无界通配符<?>
-
-对于**不确定**或者**不关心实际要操作的类型**，可以使用无限制通配符（尖括号里一个问号，即 <?> ），表示可以持有任何类型。
-
-无界通配符可以接收任何类型的泛型类型数据，用于实现不依赖于具体类型参数的简单方法，可以捕获参数类型，交由泛型方法进行处理。
-
-
-
-#### 上界通配符 < ? extends E>
-
-可以实现泛型的向上转型即**传入的类型实参必须是指定类型的子类型**。编译时擦除到类型E，即用E类型代替类型参数。
-
-在类型参数中使用 extends 表示这个泛型中的参数必须是 E 或者 E 的子类。
-
-```java
-class Info<T extends Number>{    // 此处泛型只能是数字类型
-    private T var ;        // 定义泛型变量
-    public void setVar(T var){
-        this.var = var ;
-    }
-    public T getVar(){
-        return this.var ;
-    }
-    public String toString(){    // 直接打印
-        return this.var.toString() ;
-    }
-}
-public class demo1{
-    public static void main(String args[]){
-        Info<Integer> i1 = new Info<Integer>() ;        // 声明Integer的泛型对象
-    }
-}
-// 如果有多个类型参数上限，用逗号分开
-private <K extends A, E extends B> E test(K arg1, E arg2){
-    E result = arg2;
-    arg2.compareTo(arg1);
-    //.....
-    return result;
-}
-```
-
-这样有两个好处：
-
-- 如果传入的类型不是 E 或者 E 的子类，编译不成功
-- 泛型中可以使用 E 的方法，无需强转成 E 才能用
-
-
-
-#### 下界通配符 < ? super E>
-
-可以实现泛型的向下转型即**传入的类型实参必须是指定类型的父类型**。
-
-用 super 进行声明，表示参数化的类型可能是类型E，或者是E的父类型，直至 Object。
-
-在类型参数中使用 super 表示这个泛型中的参数必须是 E 或者 E 的父类。
-
-```java
-class Info<T>{
-    private T var ;        // 定义泛型变量
-    public void setVar(T var){
-        this.var = var ;
-    }
-    public T getVar(){
-        return this.var ;
-    }
-    public String toString(){    // 直接打印
-        return this.var.toString() ;
-    }
-}
-public class GenericsDemo21{
-    public static void main(String args[]){
-        Info<String> i1 = new Info<String>() ;        // 声明String的泛型对象
-        Info<Object> i2 = new Info<Object>() ;        // 声明Object的泛型对象
-        i1.setVar("hello") ;
-        i2.setVar(new Object()) ;
-        fun(i1) ;
-        fun(i2) ;
-    }
-    public static void fun(Info<? super String> temp){    // 只能接收String或Object类型的泛型，String类的父类只有Object类
-        System.out.print(temp + ", ") ;
-    }
-}
-```
-
-> 可以使用\<T extends A> 但没有\<T super A>，只有\<? super A>
-
-
-
-#### 多重限定& 泛型多继承
-
-使用 & 符号设定多重边界（Multi Bounds)，让对应类型成为多个类型的共有子类型
-
-```java
-public <T extends ClassA & InterfaceB> void test(T t);
-```
-
-> 这里的继承并不是真正意义的多继承，Class顶多一个，接口可以有多个，否则还是会报错。
->
-> ![img](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/20201230221859264.png)
-
-
-
-
-
-#### 通配符的使用原则
-
-参考《Effictive Java》
-
-为了获得最大限度的灵活性，要在表示 生产者或者消费者 的输入参数上使用通配符，
-
-使用的规则就是：生产者有上限、消费者有下限 
-
-1. 如果参数化类型表示一个 T 的生产者，使用 < ? extends T>; 
-2. 如果它表示一个 T 的消费者，就使用 < ? super T>；
-3. 如果既是生产又是消费，那使用通配符就没什么意义了，因为你需要的是精确的参数类型。
-
-
-
-#### 参考使用案例
-
-```java
-private  <E extends Comparable<? super E>> E max(List<? extends E> e1) {
-    if (e1 == null){
-        return null;
-    }
-    //迭代器返回的元素属于 E 的某个子类型
-    Iterator<? extends E> iterator = e1.iterator();
-    E result = iterator.next();
-    while (iterator.hasNext()){
-        E next = iterator.next();
-        if (next.compareTo(result) > 0){
-            result = next;
-        }
-    }
-    return result;
-}
-```
-
-- `<E extends Comparable<? super E>>`指明要使用E泛型，并规定了E的范围：
-
-  - E extends Comparable说明E类型实现了Comparable接口，Comparable作为生产者要提供比较的方法
-
-    不使用这个extends，会无法调用compareTo方法
-
-  - Comparable的泛型是`<? super E>`，说明比较的类型是E的消费者，用于给Comparable提供比较的实现。
-
-    不使用这个泛型，会在`next.compareTo(result)`方法的调用提示没有类型检查，即这里检查了compareTo的方法参数类型是不是`<? super E>`
-
-- 方法参数`List< ? extends E>`表示要操作的数据是 E 的子类的列表，指定上限。
-
-
-
-
-
-### 泛型的限制
-
-泛型的限制由泛型擦除机制导致，擦除为`Object`后无法进行类型判断
-
-- **只能声明不能实例化`T`类型变量**
-
-- **泛型参数不能是基本类型。**
-
-  因为基本类型不是`Object`子类，需要用包装类代替。
-
-- **不能实例化泛型数组，不能实例化泛型参数的数组**
-
-  这样是不能通过编译的：
-
-  ```java
-  List<String>[] list = new List<String>[];
-  ```
-
-  **可以声明带有泛型的数组，但不能初始化**，因为执行类型擦除后，List\<String>[]与List\<Object>[]就一样了，编译器拒绝如此声明。
-
-- **泛型无法使用`instance of`和`getClass()`判断类型**
-
-  泛型被擦除了，不能通过编译
-
-  ```java
-  List<String> list = new ArrayList<String>();
-  System.out.println(list instanceof List<String>);
-  ```
-
-  错误信息如下：
-
-  ```bash
-  Cannot perform instanceof check against parameterized type List. Use the form List<?> instead since further generic type information will be erased at runtime
-  ```
-
-- **不能实现同一泛型接口的两种变体**
-
-  类型擦除后多个父类的[桥方法](桥方法)会发生冲突。
-
-- **不能使用`static`修饰泛型变量**
-
-
-
-### 泛型的多态/桥接方法
-
-> 类型擦除会造成多态的冲突，而JVM解决方法就是桥接方法。
-
-#### 多态矛盾
-
-子类继承父类的时候，对泛型进行了范围的缩小，此时可能导致部分重写方法的参数类型与父类方法并不一致：
-
-```java
-class Pair<T> {  
-
-    private T value;  
-
-    public T getValue() {  
-        return value;  
-    }  
-
-    public void setValue(T value) {  
-        this.value = value;  
-    }  
-}
-//	子类  泛型改为Date类型
-class DateInter extends Pair<Date> {  
-
-    @Override  
-    public void setValue(Date value) {  
-        super.setValue(value);  
-    }  
-
-    @Override  
-    public Date getValue() {  
-        return super.getValue();  
-    }  
-}
-```
-
-此时，子类DateInter存在一个重写的setValue方法，参数类型为Date，但它对应的父类方法参数类型T在编译后为Object类型，这不应该视为重写，而是重载。（重写不改变参数类型）
-
-同时，子类也并没有继承一个参数为Object类型的setValue方法：
-
-```java
-public static void main(String[] args) throws ClassNotFoundException {  
-        DateInter dateInter = new DateInter();  
-        dateInter.setValue(new Date());                  
-        dateInter.setValue(new Object()); //编译错误  
-}
-```
-
-
-
-#### JVM的解决方式
-
-理想中的本意肯定是父类的泛型替换为Date类型，再由子类进行重写。但父类的泛型根据类型擦除原则，只能擦为Object类型。
-
-> 并且继承父类的可能存在多种类型，不能根据一个子类就将泛型改写为一个具体的类型。
-
-此时保持子类能够重写父类的方法的解决方式便是桥接方法。
-
-
-
-#### 桥接方法（bridge method）
-
-用于继承泛型类时保证多态。
-
-> 桥方法为编译器自动生成，非手写。
-
-```java
-class Node<T> {
-    public T data;
-    public Node(T data) { this.data = data; }
-    public void setData(T data) {
-        System.out.println("Node.setData");
-        this.data = data;
-    }
-    public T getData();
-}
-
-class MyNode extends Node<Integer> {
-    public MyNode(Integer data) { super(data); }
-	//	桥接方法
-   	public void setData(Object data) {
-        setData((Integer) data);
-    }
-    public Object getData(){
-        return getData();
-    }
-
-    @Override
-    public void setData(Integer data) {
-        System.out.println("MyNode.setData");
-        super.setData(data);
-    }
-    public Integer getData(){
-        return (Integer)getData();
-    }
-    
-}
-```
-
-根据编译的结果，桥接方法重写了父类的Object类型的方法，也就是真正的重写，
-
-而这个方法会调用我们自己重写的方法（如setData），并将Object参数强转为对应的类型。
-
-> **子类中的方法`Object getData()`和`Integer getData()`是同时存在的，他们的方法签名是一样的，虚拟机怎么区分这两个方法？**
->
-> 如果是自己编写这种方法，这样的代码是无法通过编译器的检查的，但是虚拟机却是允许这样做的。
->
-> 因为虚拟机通过参数类型和返回类型能确定一个方法，而编译器为了实现泛型的多态，禁止开发者手动操作，而允许自己做这个事情，来提供给虚拟器进行区别。
-
-
-
-### 类型系统
-
-在Java中，大家比较熟悉的是通过继承机制而产生的类型体系结构。比如String继承自Object。根据Liskov替换原则，子类是可以替换父类的。
-
-当需要Object类的引用的时候，如果传入一个String对象是没有任何问题的。但是反过来的话，即用父类的引用替换子类引用的时候，就需要进行强制类型转换。对于数组也适用，如String[]代替Object[]。
-
-编译器并不能保证运行时这种转换一定是合法的，但是泛型的引入，一定程度上对这个系统产生了一定影响，比如List\<String>是不能替换掉List\<Object>的。
-
-引入泛型后类型系统增加了两个维度：
-
-- 类型参数自身的继承体系结构，如List\<String> 和 List\<Object> ，其中String继承Object
-- 泛型类或接口自身的继承体系结构，如List继承Collection接口
-
-存在如下规则：
-
-1. 相同类型参数的泛型类的关系取决于泛型类自身的继承体系结构。
-
-   即List\<String>继承自Collection\<String>，可以用来替换Collection\<String>。
-
-2. 当泛型类的类型声明中使用了通配符的时候， 其子类型可以在两个维度上分别展开。
-
-   如Collection<? extends Number>，它的子类
-
-   既可以是List<? extends Number>和Set<? extends Number>等；
-
-   也可以是Collection\<Double>和 Collection\<Integer>等；
-
-   进而ArrayList\<Long>和 HashSet\<Double>等。
-
-3. 如果泛型类中包含多个类型参数，则对于每个类型参数分别应用上面的规则。
-
-
-
-### 泛型数组
-
-
-
-#### 泛型数组不能用具体的泛型类型进行初始化
-
-```java
-List<String>[] lsa = new List<String>[10]; // 编译错误 提示创建泛型数组
-List<String>[] lsa = (List<String>[]) new List[10];	// 未检转换 警告
-Object[] oa = lsa;
-List<Integer> li = new ArrayList<Integer>();
-li.add(3);
-oa[1] = li; // 运行通过，但实际违规
-String s = lsa[1].get(0); // ClassCastException: java.lang.Integer cannot be cast to java.lang.String
-```
-
-由于类型擦除，所以oa[1]插入元素通过编译并没有报错（接收一个List类型对象），但在取出元素的时候，调用的是返回String的方法却取出一个Integer，在编译时无法确认，在运行时报错。
-
-如果支持泛型数组的声明，形如`List<String>[] lsa = new List<String>[10]; `，创建时不再提示类型转换警告，但依然能够通过向上转型`Object[]`进行Integer类型的插入（泛型擦除）进而产生ClassCastException，与泛型初衷相违背（消灭类型转换错误）。
-
-或者使用通配符：
-
-```java
-List<?>[] lsa = new List<?>[10];
-// ...
-Integer s = (Integer) lsa[1].get(0); 
-```
-
-此时取出元素需要进行显示类型转换，符合预期逻辑。
-
-> 数组泛型与集合泛型的在这里的区别就在于：
->
-> - 数组泛型可以在不进行手动强转的情况下，转为无类型限制的数组：
->
->   ```java
->   List<String>[] lsa = (List<String>[]) new List[10];	
->   Object[] oa = lsa;	// 这一步没有强转，没有警告 
->   ```
->
->   进而在无编译检查的情况下插入不符合的类型，产生异常。
->
-> - 集合泛型虽然底层依然也是转为Object，但不能手动转换：
->
->   ```java
->   List<String> lsa = new ArrayList<>();
->   List<Object> oa = lsa;	//	编译错误，类型对不上
->   ```
->
->   甚至不能强转，也就不会发生在未检查的情况下发生的错误类型插入。
-
-**总结**
-
-Java 的泛型数组初始化时数组类型不能是具体的泛型类型，只能是通配符的形式。
-
-因为具体类型会导致未检查的情况下**存入任意类型对象**，并在取出时会发生类型转换异常，会与泛型的设计思想冲突，
-
-而通配符形式本来就需要手动强转，符合预期。
-
-```java
-List<String>[] list11 = new ArrayList<String>[10]; //编译错误，非法创建 
-List<String>[] list12 = new ArrayList<?>[10]; //编译错误，需要强转类型 
-List<String>[] list13 = (List<String>[]) new ArrayList<?>[10]; //OK，但是会有警告 
-List<?>[] list14 = new ArrayList<String>[10]; //编译错误，非法创建 
-List<?>[] list15 = new ArrayList<?>[10]; //OK 
-List<String>[] list6 = new ArrayList[10]; //OK，但是会有警告
-```
-
-
-
-#### 如何正确的初始化泛型数组实例
-
-> 无论我们通过`new ArrayList[10]` 的形式还是通过泛型通配符的形式初始化泛型数组实例都是存在警告的，也就是说仅仅语法合格，运行时潜在的风险需要我们自己来承担，因此那些方式初始化泛型数组都不是最优雅的方式。
-
-答案是通过反射。
-
-```java
-public class ArrayWithTypeToken<T> {
-    private T[] array;
-
-    public ArrayWithTypeToken(Class<T> type, int size) {
-        array = (T[]) Array.newInstance(type, size);
-    }
-
-    public void put(int index, T item) {
-        array[index] = item;
-    }
-
-    public T get(int index) {
-        return array[index];
-    }
-
-    public T[] create() {
-        return array;
-    }
-}
-//
-ArrayWithTypeToken<Integer> arrayToken = new ArrayWithTypeToken<Integer>(Integer.class, 100);
-Integer[] array = arrayToken.create();
-```
-
-因为泛型类型 `T`在运行时才能被确定下来，我们能创建泛型数组也必然是在 Java 运行时想办法，而运行时能起作用的技术最好的就是反射了。
-
-
-
-### 补充问题
-
-#### 基本类型不能作为泛型类型
-
-为当类型擦除后，泛型的原始类型变为Object，但是Object类型不是基本数据类型的超类，只能是引用数据类型的超类。
-
-#### 泛型类型不能实例化
-
-```java
-class A<T>{
-    public T get(){
-        return new T();	//编译错误 类型形参 'T' 不能直接实例化
-    }
-}
-```
-
-因为在 Java 编译期没法确定泛型参数化类型，也就找不到对应的类字节码文件，无法进行实例化。
-
-此外由于`T` 被擦除为 `Object`，如果可以 `new T()` 则就变成了 `new Object()`，完全丢失了类型。 
-
-如果确实需要实例化一个泛型，可以通过反射实现：
-
-```java
-static <T> T newTclass (Class < T > clazz) throws InstantiationException, IllegalAccessException {
-    T obj = clazz.newInstance();
-    return obj;
-}
-```
-
-
 
 
 
