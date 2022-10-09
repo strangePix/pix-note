@@ -1385,47 +1385,6 @@ public static void main(String[] args) {
 
 
 
-#### 泛型局限性
-
-- **只能声明不能实例化`T`类型变量**
-
-- **泛型参数不能是基本类型。**
-
-  因为基本类型不是`Object`子类，需要用包装类代替。
-
-- **不能实例化泛型数组，不能实例化泛型参数的数组**
-
-  这样是不能通过编译的：
-
-  ```java
-  List<String>[] list = new List<String>[];
-  ```
-
-  **可以声明带有泛型的数组，但不能初始化**，因为执行类型擦除后，List\<String>[]与List\<Object>[]就一样了，编译器拒绝如此声明。
-
-- **泛型无法使用`instance of`和`getClass()`判断类型**
-
-  泛型被擦除了，不能通过编译
-
-  ```java
-  List<String> list = new ArrayList<String>();
-  System.out.println(list instanceof List<String>);
-  ```
-
-  错误信息如下：
-
-  ```bash
-  Cannot perform instanceof check against parameterized type List. Use the form List<?> instead since further generic type information will be erased at runtime
-  ```
-
-- **不能实现同一泛型接口的两种变体**
-
-  类型擦除后多个父类的[桥方法](桥方法)会发生冲突。
-
-- **不能使用`static`修饰泛型变量**
-
-
-
 ### 泛型的编译期检查
 
 >  根据泛型擦除，泛型集合`List<Integer>`的实际元素是Object类型，那如何保证泛型集合插入的对象类型一定是Integer呢？
@@ -1615,7 +1574,7 @@ class MyNode extends Node<Integer> {
 #### 泛型数组不能用具体的泛型类型进行初始化
 
 ```java
-List<String>[] lsa = new List<String>[10]; // 编译错误 提示创建泛型数组
+List<String>[] lsa = new List<String>[10]; // 编译错误 提示Generic Array Creation创建泛型数组
 List<String>[] lsa = (List<String>[]) new List[10];	// 未检转换 警告
 Object[] oa = lsa;
 List<Integer> li = new ArrayList<Integer>();
@@ -1628,35 +1587,7 @@ String s = lsa[1].get(0); // ClassCastException: java.lang.Integer cannot be cas
 
 如果支持泛型数组的声明，形如`List<String>[] lsa = new List<String>[10]; `，创建时不再提示类型转换警告，但依然能够通过向上转型`Object[]`进行Integer类型的插入（泛型擦除）进而产生ClassCastException，与泛型初衷相违背（消灭类型转换错误）。
 
-或者使用通配符：
 
-```java
-List<?>[] lsa = new List<?>[10];
-// ...
-Integer s = (Integer) lsa[1].get(0); 
-```
-
-此时取出元素需要进行显示类型转换，符合预期逻辑。
-
-> 数组泛型与集合泛型的在这里的区别就在于：
->
-> - 数组泛型可以在不进行手动强转的情况下，转为无类型限制的数组：
->
->   ```java
->   List<String>[] lsa = (List<String>[]) new List[10];	
->   Object[] oa = lsa;	// 这一步没有强转，没有警告 
->   ```
->
->   进而在无编译检查的情况下插入不符合的类型，产生异常。
->
-> - 集合泛型虽然底层依然也是转为Object，但不能手动转换：
->
->   ```java
->   List<String> lsa = new ArrayList<>();
->   List<Object> oa = lsa;	//	编译错误，类型对不上
->   ```
->
->   甚至不能强转，也就不会发生在未检查的情况下发生的错误类型插入。
 
 **总结**
 
@@ -1677,38 +1608,84 @@ List<String>[] list6 = new ArrayList[10]; //OK，但是会有警告
 
 
 
+
+
+#### 数组泛型与集合泛型的区别
+
+数组泛型与集合泛型的在这里的区别就在于：
+
+**数组是支持协变（Covariant）的，而泛型是不可变（Invariant）的**。
+
+当两者在一起的时候，就会出现问题。
+
+> **协变**：指子类型关系在类型变换的作用下保持原样。
+> **逆变**：指子类型关系在类型变换的作用下发生逆转。
+> **不可变**：指子类型关系在类型变换的作用下， 既没有协变的效果，也没有逆变的效果。
+>
+> 具体到Java：
+>
+> 假设Java中有两个类Animal和Cat，它们之间的关系是Cat是Animal的子类，通过它们构造出的数组分别是Cat[]和Animal[]，如果这两个数组间的关系与原始的两个类相同，那么我们就说数组具有协变性。
+>
+> ```java
+> Animal[] animals = new Cat[10] //这种写法是可以通过编译的
+> ```
+>
+> 泛型是不可变的可以体现在如下代码：
+>
+> ```java
+> HashSet<Object> set = new HashSet<String>();   //无法通过编译，即使Object是String的父类
+> ```
+
+- 数组泛型可以在不进行手动强转的情况下，转为无类型限制的数组：
+
+  ```java
+  List<String>[] lsa = (List<String>[]) new List[10];	
+  Object[] oa = lsa;	// 这一步没有强转，没有警告 
+  ```
+
+  进而在无编译检查的情况下插入不符合的类型，产生异常。
+
+- 集合泛型虽然底层依然也是转为Object，但不能手动转换：
+
+  ```java
+  List<String> lsa = new ArrayList<>();
+  List<Object> oa = lsa;	//	编译错误，类型对不上
+  ```
+
+  甚至不能强转，也就不会发生在未检查的情况下发生的错误类型插入。
+
+
+
+
+
 #### 如何正确的初始化泛型数组实例
 
-> 无论我们通过`new ArrayList[10]` 的形式还是通过泛型通配符的形式初始化泛型数组实例都是存在警告的，也就是说仅仅语法合格，运行时潜在的风险需要我们自己来承担，因此那些方式初始化泛型数组都不是最优雅的方式。
+- 使用泛型通配符
 
-答案是通过反射。
+  ```java
+  LinkedList<String>[] arr = (LinkedList<String>[])new LinkedList<?>[5];
+  ```
 
-```java
-public class ArrayWithTypeToken<T> {
-    private T[] array;
+- 通过反射
 
-    public ArrayWithTypeToken(Class<T> type, int size) {
-        array = (T[]) Array.newInstance(type, size);
-    }
+  ```java
+  public class ArrayWithTypeToken<T> {
+      private T[] array;
+  
+      public ArrayWithTypeToken(Class<T> type, int size) {
+          array = (T[]) Array.newInstance(type, size);	//	 这里还是有警告的，因为Array.newInstance返回Object
+      }
+  
+      public T[] create() {
+          return array;
+      }
+  }
+  //
+  ArrayWithTypeToken<Integer> arrayToken = new ArrayWithTypeToken<Integer>(Integer.class, 100);
+  Integer[] array = arrayToken.create();
+  ```
 
-    public void put(int index, T item) {
-        array[index] = item;
-    }
-
-    public T get(int index) {
-        return array[index];
-    }
-
-    public T[] create() {
-        return array;
-    }
-}
-//
-ArrayWithTypeToken<Integer> arrayToken = new ArrayWithTypeToken<Integer>(Integer.class, 100);
-Integer[] array = arrayToken.create();
-```
-
-因为泛型类型 `T`在运行时才能被确定下来，我们能创建泛型数组也必然是在 Java 运行时想办法，而运行时能起作用的技术最好的就是反射了。
+  因为泛型类型 `T`在运行时才能被确定下来，我们能创建泛型数组也必然是在 Java 运行时想办法，而运行时能起作用的技术最好的就是反射了。
 
 
 
@@ -1730,26 +1707,27 @@ Type体系中类型的包括：
 以上这些类型都实现了Type接口。
 
 ```java
-public class GenericType<T> {
+@Data
+public class TestType<T extends Number> {
+    
     private T data;
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
-    }
-
+    
     public static void main(String[] args) {
-        GenericType<String> genericType = new GenericType<String>() {};
-        Type superclass = genericType.getClass().getGenericSuperclass();
-        //getActualTypeArguments 返回确切的泛型参数, 如Map<String, Integer>返回[String, Integer]
-        Type type = ((ParameterizedType) superclass).getActualTypeArguments()[0]; 
-        System.out.println(type);//class java.lang.String
+        TestChildType<Integer> test = new TestChildType<>();
+        ParameterizedType genericSuperclass = (ParameterizedType) test.getClass().getGenericSuperclass();
+        System.out.println(genericSuperclass.getActualTypeArguments()[0]);	//	X
     }
+    
+}
+
+class TestChildType<X extends Number> extends TestType<X>{
+
 }
 ```
+
+- getGenericSuperclass方法后强转ParameterizedType是不一定成功的，前提是有继承关系。需要提前用`instanceof`判断，在没有实现接口和没有继承关系的情况下，getGenericSuperclass获取到的是Object类，进而强转ParameterizedType失败。
+- getGenericInterfaces方法获取实现接口的泛型，返回的是数组（多实现）。
+- 如果泛型是非具体的比如`<X>`或者`<X extends Number>`，则返回的结果为X而非具体类。
 
 对应获取了类型的API，即ParameterizedType接口的方法：
 
@@ -1768,21 +1746,24 @@ public interface ParameterizedType extends Type {
 
 
 
-### 补充问题
+### 泛型局限性
 
 #### 基本类型不能作为泛型类型
 
-为当类型擦除后，泛型的原始类型变为Object，但是Object类型不是基本数据类型的超类，只能是引用数据类型的超类。
+- 为当类型擦除后，泛型的原始类型变为Object，但是Object类型不是基本数据类型的超类；
+- 想用基本数据类型泛型，需要用包装类代替。
 
-#### 泛型类型不能实例化
+#### T泛型类型只能声明，不能实例化
 
 ```java
-class A<T>{
+class Test<T>{
     public T get(){
         return new T();	//编译错误 类型形参 'T' 不能直接实例化
     }
 }
 ```
+
+![image-20221009091346139](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202210090913176.png)
 
 因为在 Java 编译期没法确定泛型参数化类型，也就找不到对应的类字节码文件，无法进行实例化。
 
@@ -1798,6 +1779,41 @@ static <T> T newTclass (Class < T > clazz) throws InstantiationException, Illega
 ```
 
 
+
+#### 不能实例化泛型数组，不能实例化泛型参数的数组
+
+这样是不能通过编译的：
+
+```java
+List<String>[] list = new List<String>[]{};
+```
+
+![image-20221009091832839](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202210090918718.png)
+
+**可以声明带有泛型的数组，但不能初始化**，因为执行类型擦除后，List\<String>[]与List\<Object>[]就一样了，编译器拒绝如此声明。
+
+
+
+#### 泛型无法使用`instance of`和`getClass()`判断类型
+
+泛型被擦除了，不能通过编译
+
+```java
+List<String> list = new ArrayList<String>();
+System.out.println(list instanceof List<String>);
+```
+
+错误信息如下：
+
+```bash
+Cannot perform instanceof check against parameterized type List. Use the form List<?> instead since further generic type information will be erased at runtime
+```
+
+#### 不能实现同一泛型接口的两种变体
+
+类型擦除后多个父类的[桥方法](桥方法)会发生冲突。
+
+#### 不能使用`static`修饰泛型变量
 
 
 
@@ -1822,6 +1838,31 @@ static <T> T newTclass (Class < T > clazz) throws InstantiationException, Illega
 
 
 
+### 作用/用途
+
+- 生成文档，通过代码里标识的元数据生成javadoc文档。
+- 编译检查，通过代码里标识的元数据让编译器在编译期间进行检查验证。
+- 编译时动态处理，编译时通过代码里标识的元数据动态处理，例如动态生成代码。
+- 运行时动态处理，运行时通过代码里标识的元数据动态处理，例如使用反射注入实例。
+
+
+
+### 分类
+
+- **Java自带的标准注解（内置注解）**
+
+  包括`@Override`、`@Deprecated`和`@SuppressWarnings`，分别用于标明重写某个方法、标明某个类或方法过时、标明要忽略的警告，用这些注解标明后编译器就会进行检查。
+
+- **元注解**
+
+  元注解是用于定义注解的注解，包括`@Retention`、`@Target`、`@Inherited`、`@Documented`，`@Retention`用于标明注解被保留的阶段，`@Target`用于标明注解使用的范围，`@Inherited`用于标明注解可继承，`@Documented`用于标明是否生成javadoc文档。
+
+- **自定义注解**
+
+  可以根据自己的需求定义注解，并可用元注解对自定义注解进行注解。
+
+
+
 ### 本质
 
 注解本质是一个继承了`Annotation` 的特殊接口：
@@ -1841,75 +1882,190 @@ public interface Override extends Annotation{
 
 注解只有被解析之后才会生效，常见的解析方法有两种：
 
-- **编译期直接扫描** ：编译器在编译 Java 代码的时候扫描对应的注解并处理，比如某个方法使用`@Override` 注解，编译器在编译的时候就会检测当前的方法是否重写了父类对应的方法。
-- **运行期通过反射处理** ：像框架中自带的注解(比如 Spring 框架的 `@Value` 、`@Component`)都是通过反射来进行处理的。
+- **编译期直接扫描** 
+
+  编译器在编译 Java 代码的时候扫描对应的注解并处理，比如某个方法使用`@Override` 注解，编译器在编译的时候就会检测当前的方法是否重写了父类对应的方法。
+
+- **运行期通过反射处理** 
+
+  像框架中自带的注解（比如 Spring 框架的 `@Value` 、`@Component`）都是通过反射来进行处理的。
 
 
 
 ### 内置注解
 
-- @Override：定义在 `java.lang.Override`中，此注释只适用于修饰方法，表示一个方法声明打算重写超类中的另一个方法声明
+Java 1.5开始自带的标准注解。
 
-- @Deprecated：定义在`java.lang.Deprecated`中，此注释可以用于修饰方法，属性，类，表示不鼓励程序员使用这样的元素，通常是因为它很危险，或者存在更好的选择
+- **@Override**
 
-- @SuppressWarnings：定义在
+  定义在 `java.lang.Override`中，此注释只适用于**修饰方法**，编译时有效。
 
+  告诉编译器被修饰的方法是**重写**的父类的中的相同签名的方法。
+
+  编译器会对此做出检查，若发现父类中不存在这个方法或是存在的方法签名不同，则会报错。
+
+  ```java
+  @Target(ElementType.METHOD)
+  @Retention(RetentionPolicy.SOURCE)
+  public @interface Override {
+  }
   ```
-  java.lang.SuppressWarnings
+
+  
+
+- **@Deprecated**
+
+  定义在`java.lang.Deprecated`中，被文档化，能够保留到运行时，能够修饰构造方法、属性、局部变量、方法、包、参数、类型。
+
+  告诉编译器被修饰的程序元素已被**废弃**，不再建议用户使用。
+
+  一般会在对应代码注释里指明替代的类/方法。
+
+  ```java
+  @Documented
+  @Retention(RetentionPolicy.RUNTIME)
+  @Target(value={CONSTRUCTOR, FIELD, LOCAL_VARIABLE, METHOD, PACKAGE, PARAMETER, TYPE})
+  public @interface Deprecated {
+  }
   ```
 
-  中，用来抑制编译时的警告信息，与前面的两个注释不同，你需要额外添加一个参数才能正确使用，这些参数都是已经定义好了的，我们选择性的使用就好了。
+  
 
-  - @SuppressWarnings("all")
-  - @SuppressWarnings("unchecked")
-  - @SuppressWarnings(value={"unchecked", "deprecation"})
+- **@SuppressWarnings**
+
+  定义在`java.lang.SuppressWarnings`中，只能存活在源码时，取值为String[]，其注解目标为类型、属性、方法、参数、构造器、局部变量。
+  
+  用来**抑制编译时的警告信息**。
+
+  ```java
+  @Target({TYPE, FIELD, METHOD, PARAMETER, CONSTRUCTOR, LOCAL_VARIABLE})
+  @Retention(RetentionPolicy.SOURCE)
+  public @interface SuppressWarnings {
+      String[] value();
+  }
+  ```
+  
+  与前面的两个注释不同，需要额外添加一个参数才能正确使用，这些参数都是已经定义好的。
+  
+  - 抑制所有类型警告：@SuppressWarnings("all")
+  - 抑制单类型警告：@SuppressWarnings("unchecked")
+  - 抑制多类型警告：@SuppressWarnings(value={"unchecked", "deprecation"})
   - ...
+  
+  > **抑制警告关键字**
+  > 可以看到，除了all，括号里的单词实际指明了要抑制的具体编译器异常，包括这些：
+  >
+  > | **关键字**               | **用途**                                                     |
+  > | ------------------------ | ------------------------------------------------------------ |
+  > | all                      | to suppress all warnings（抑制所有警告）                     |
+  > | boxing                   | to suppress warnings relative to boxing/unboxing operations（抑制装箱、拆箱操作时候的警告） |
+  > | cast                     | to suppress warnings relative to cast operations（抑制映射相关的警告） |
+  > | dep-ann                  | to suppress warnings relative to deprecated annotation（抑制启用注释的警告） |
+  > | deprecation              | to suppress warnings relative to deprecation（抑制过期方法警告） |
+  > | fallthrough              | to suppress warnings relative to missing breaks in switch statements（抑制确在switch中缺失breaks的警告） |
+  > | finally                  | to suppress warnings relative to finally block that don’t return（抑制finally模块没有返回的警告） |
+  > | hiding                   | to suppress warnings relative to locals that hide variable（抑制与隐藏变数的区域变数相关的警告） |
+  > | incomplete-switch        | to suppress warnings relative to missing entries in a switch statement (enum case)（忽略没有完整的switch语句） |
+  > | nls                      | to suppress warnings relative to non-nls string literals（忽略非nls格式的字符） |
+  > | null                     | to suppress warnings relative to null analysis (忽略对null的操作) |
+  > | rawtypes                 | to suppress warnings relative to un-specific types when using generics on class params（使用generics时忽略没有指定相应的类型） |
+  > | restriction              | to suppress warnings relative to usage of discouraged or forbidden references（抑制与使用不建议或禁止参照相关的警告） |
+  > | serial                   | to suppress warnings relative to missing serialVersionUID field for a serializable class (忽略在serializable类中没有声明serialVersionUID变量) |
+  > | static-access            | o suppress warnings relative to incorrect static access（抑制不正确的静态访问方式警告） |
+  > | synthetic-access         | to suppress warnings relative to unoptimized access from inner classes（抑制子类没有按最优方法访问内部类的警告） |
+  > | unchecked                | to suppress warnings relative to unchecked operations（抑制没有进行类型检查操作的警告） |
+  > | unqualified-field-access | to suppress warnings relative to field access unqualified（抑制没有权限访问的域的警告） |
+  > | unused                   | to suppress warnings relative to unused code（抑制没被使用过的代码的警告） |
 
 
 
 ### 元注解
 
-元注解的作用就是负责注解其它注解，Java定义了4个标准的meta-annotation类型，他们被用来提供对其它annotation类型作说明。
+元注解的作用就是负责注解其它注解，在JDK 1.5中定义了4个标准的元注解，在JDK 1.8中提供了两个元注解。
 
-这些类型和它们所支持的类在 `java.lang.annotation`包可以找到 `@Target` 、`@Retention`、`@Documented`、`@Inherited`
+这些类型和它们所支持的类在 `java.lang.annotation`包可以找到。
 
-- @Target：用于描述注解的使用范围，即：被描述的注解可以在什么地方使用
+- **@Target**
 
-  - ElementType.METHOD 表示可以加在方法上
+  用于描述注解的使用范围，即：被描述的注解可以在什么地方使用。
 
-  - ElementType.TYPE 表示可以加在类上
+  使用范围的取值在`ElementType`枚举中
 
-- @Retention：表示需要什么保存该注释信息，用于描述注解的生命周期
+  ```java
+  public enum ElementType {
+   
+      TYPE, // 类、接口、枚举类
+   
+      FIELD, // 成员变量（包括：枚举常量）
+   
+      METHOD, // 成员方法
+   
+      PARAMETER, // 方法参数
+   
+      CONSTRUCTOR, // 构造方法
+   
+      LOCAL_VARIABLE, // 局部变量
+   
+      ANNOTATION_TYPE, // 注解类
+   
+      PACKAGE, // 可用于修饰：包
+   
+      TYPE_PARAMETER, // 类型参数，JDK 1.8 新增
+   
+      TYPE_USE // 使用类型的任何地方，JDK 1.8 新增
+   
+  }
+  ```
 
-  - RetentionPolicy.RUNTIME 运行时有效
-  - RetentionPolicy.SOURCE
-  - RetentionPolicy.CLASS
+- **@Retention**
 
-  - 级别范围：Source < Class < Runtime
+  表示注解保留的时间范围，用于描述注解的生命周期。（即：被描述的注解在它所修饰的类中可以被保留到何时）
 
-- @Document：说明该注解被包含在java doc中
+  时间范围的取值在`RetentionPolicy`枚举中
 
-- @Inherited：说明子类可以集成父类中的注解
+  ```java
+  public enum RetentionPolicy {
+   
+      SOURCE,    // 源文件保留
+      CLASS,       // 编译期保留，默认值
+      RUNTIME   // 运行期保留，可通过反射去获取注解信息
+  }
+  ```
 
-如
+  级别范围：Source < Class < Runtime
 
-```java
-@MyAnnotation
-public class MateAnnotationDemo {
+  Source级别的注解不会编译到class文件中，而Class级别的注解在运行时不能通过反射获取。
 
-}
+- **@Documented**
 
-/**
- * 定义一个注解
- */
-@Target(value={ElementType.METHOD, ElementType.TYPE})  // target表示我们注解应用的范围，在方法上，和类上有效
-@Retention(RetentionPolicy.RUNTIME)   // Retention：表示我们的注解在什么时候还有效，运行时候有效
-@Documented   // 表示说我们的注解是否生成在java doc中
-@Inherited   // 表示子类可以继承父类的注解
-@interface MyAnnotation {
+  描述在使用 javadoc 工具为类生成帮助文档时会保留其注解信息。
 
-}
-```
+- **@Inherited**
+
+  说明该注解具有可继承性。
+
+  如果一个类被这个注解修饰的注解所修饰，则其子类将自动具有该注解。
+
+- **@Repeatable (Java8)**
+
+  重复注解，允许在同一申明类型(类，属性，或方法)的多次使用同一个注解。
+
+  ```java
+  @Repeatable(Authorities.class)
+  public @interface Authority {
+       String role();
+  }
+  
+  public class RepeatAnnotationUseNewVersion {
+      @Authority(role="Admin")
+      @Authority(role="Manager")
+      public void doSomeThing(){ }
+  }
+  ```
+
+- **@Native (Java8)**
+
+  使用 @Native 注解修饰成员变量，则表示这个变量可以被本地代码引用，常常被代码生成工具使用。
 
 
 
@@ -1917,53 +2073,72 @@ public class MateAnnotationDemo {
 
 使用 `@interface`自定义注解时，自动继承了 `java.lang.annotation.Annotation`接口
 
-- @interface 用来声明一个注解，格式：public @interface 注解名 {定义内容
-- 其中的每个方法实际上是申明了一个配置参数
-- 方法的名称就是参数的类型
-- 返回值类型就是参数的类型（返回值只能是基本数据类型，Class，String，enum）
-- 通过default来申明参数的默认值
-- 如果只有一个参数成员，一般参数名为 value
-- 注解元素必须要有值，我们定义元素时，经常使用空字符串或者0作为默认值
+- @interface 用来声明一个注解，格式：public @interface 注解名 {定义内容}
+- 其中的每个方法实际上是申明了一个配置参数。
+  - 方法的名称就是参数名；
+  - 返回值类型就是参数的类型（返回值只能是基本数据类型，Class，String，enum）；
+  - default来申明参数的默认值
+  - 如果只有一个参数成员，默认参数名为 value
 
 示例
 
 ```java
-/**
- * 自定义注解
- *
- * @author: 陌溪
- * @create: 2020-03-28-22:57
- */
-public class MateAnnotationDemo {
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface MyMethodAnnotation {
 
-    // 注解可以显示赋值，如果没有默认值，我们就必须给注解赋值
-    @MyAnnotation(schools = {"大学"})
-    public void test(){
+    public String title() default "";
 
+    public String description() default "";
+
+}
+
+public class TestMethodAnnotation {
+
+    @MyMethodAnnotation(title = "toStringMethod", description = "override toString method")
+    public String toString() {
+        return "Override toString method";
     }
 
 }
-
-/**
- * 定义一个注解
- */
-@Target(value={ElementType.METHOD, ElementType.TYPE})  // target表示我们注解应用的范围，在方法上，和类上有效
-@Retention(RetentionPolicy.RUNTIME)   // Retention：表示我们的注解在什么时候还有效，运行时候有效
-@Documented   // 表示说我们的注解是否生成在java doc中
-@Inherited   // 表示子类可以继承父类的注解
-@interface MyAnnotation {
-
-    // 注解的参数：参数类型 + 参数名()
-    String name() default "";
-
-    int age() default 0;
-
-    // 如果默认值为-1，代表不存在
-    int id() default -1;
-
-    String[] schools();
-}
 ```
+
+
+
+### 反射获取注解内容
+
+- 反射包java.lang.reflect下的AnnotatedElement接口提供这些方法，AnnotatedElement 接口是所有程序元素（Class、Method和Constructor）的父接口；
+- 只有注解被定义为RUNTIME后，该注解才能是运行时可见，才会被虚拟机读取。
+
+AnnotatedElement的API：
+
+- `boolean isAnnotationPresent(Class<?extends Annotation> annotationClass)`
+
+  判断该程序元素上是否包含指定类型的注解，存在则返回true，否则返回false。
+
+- `<T extends Annotation> T getAnnotation(Class<T> annotationClass)`
+
+  返回该程序元素上存在的、指定类型的注解，如果该类型注解不存在，则返回null。
+
+- `Annotation[] getAnnotations()`
+
+  返回该程序元素上存在的所有注解。
+
+- `<T extends Annotation> T[] getAnnotationsByType(Class<T> annotationClass)`
+
+  返回该程序元素上存在的、指定类型的注解数组。
+
+  > 与 `getAnnotation`的区别在于，`getAnnotationsByType`会检测注解对应的重复注解容器。若程序元素为类，当前类上找不到注解，且该注解为可继承的，则会去父类上检测对应的注解。
+
+- `<T extends Annotation> T getDeclaredAnnotation(Class<T> annotationClass)`
+
+  返回直接存在于此元素上的所有注解。
+
+  忽略继承的注释，没有直接写在元素上的注解视为null。
+
+- `<T extends Annotation> T[] getDeclaredAnnotationsByType(Class<T> annotationClass)`
+
+- `Annotation[] getDeclaredAnnotations()`
 
 
 
