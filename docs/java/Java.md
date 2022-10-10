@@ -1826,15 +1826,12 @@ Cannot perform instanceof check against parameterized type List. Use the form Li
 ### 注解概念
 
 - Annotation是JDK5.0开始引入的新技术
-- Annotation的作用
-  - 不是程序本身，可以对程序做出解释（这一点和注释没有什么区别）
-  - 可以被其它程序，比如编译器读取
 - Annotation的格式
   - 注解以 `@注释名` 在代码中存在的，还可以添加一些参数值
   - 例如：`@SuppressWarnings(value = "unchecked")`
 - Annotation在那里使用？
   - 可以附加在package、class、method、field等上面，相当于给他们添加了额外的辅助信息
-  - 通过反射机制变成实现对这些元数据的控制
+  - 通过反射机制编程实现对这些元数据的控制
 
 
 
@@ -1863,119 +1860,95 @@ Cannot perform instanceof check against parameterized type List. Use the form Li
 
 
 
-### 本质
-
-注解本质是一个继承了`Annotation` 的特殊接口：
-
-```java
-// 这里是一个@Override注解
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.SOURCE)
-public @interface Override {
-
-}
-
-public interface Override extends Annotation{
-
-}
-```
-
-注解只有被解析之后才会生效，常见的解析方法有两种：
-
-- **编译期直接扫描** 
-
-  编译器在编译 Java 代码的时候扫描对应的注解并处理，比如某个方法使用`@Override` 注解，编译器在编译的时候就会检测当前的方法是否重写了父类对应的方法。
-
-- **运行期通过反射处理** 
-
-  像框架中自带的注解（比如 Spring 框架的 `@Value` 、`@Component`）都是通过反射来进行处理的。
-
 
 
 ### 内置注解
 
 Java 1.5开始自带的标准注解。
 
-- **@Override**
+#### @Override
 
-  定义在 `java.lang.Override`中，此注释只适用于**修饰方法**，编译时有效。
+定义在 `java.lang.Override`中，此注释只适用于**修饰方法**，编译时有效。
 
-  告诉编译器被修饰的方法是**重写**的父类的中的相同签名的方法。
+告诉编译器被修饰的方法是**重写**的父类的中的相同签名的方法。
 
-  编译器会对此做出检查，若发现父类中不存在这个方法或是存在的方法签名不同，则会报错。
+编译器会对此做出检查，若发现父类中不存在这个方法或是存在的方法签名不同，则会报错。
 
-  ```java
-  @Target(ElementType.METHOD)
-  @Retention(RetentionPolicy.SOURCE)
-  public @interface Override {
-  }
-  ```
+```java
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.SOURCE)
+public @interface Override {
+}
+```
 
-  
 
-- **@Deprecated**
 
-  定义在`java.lang.Deprecated`中，被文档化，能够保留到运行时，能够修饰构造方法、属性、局部变量、方法、包、参数、类型。
+#### @Deprecated
 
-  告诉编译器被修饰的程序元素已被**废弃**，不再建议用户使用。
+定义在`java.lang.Deprecated`中，被文档化，能够保留到运行时，能够修饰构造方法、属性、局部变量、方法、包、参数、类型。
 
-  一般会在对应代码注释里指明替代的类/方法。
+告诉编译器被修饰的程序元素已被**废弃**，不再建议用户使用。
 
-  ```java
-  @Documented
-  @Retention(RetentionPolicy.RUNTIME)
-  @Target(value={CONSTRUCTOR, FIELD, LOCAL_VARIABLE, METHOD, PACKAGE, PARAMETER, TYPE})
-  public @interface Deprecated {
-  }
-  ```
+一般会在对应代码注释里指明替代的类/方法。
 
-  
+```java
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(value={CONSTRUCTOR, FIELD, LOCAL_VARIABLE, METHOD, PACKAGE, PARAMETER, TYPE})
+public @interface Deprecated {
+}
+```
 
-- **@SuppressWarnings**
 
-  定义在`java.lang.SuppressWarnings`中，只能存活在源码时，取值为String[]，其注解目标为类型、属性、方法、参数、构造器、局部变量。
-  
-  用来**抑制编译时的警告信息**。
 
-  ```java
-  @Target({TYPE, FIELD, METHOD, PARAMETER, CONSTRUCTOR, LOCAL_VARIABLE})
-  @Retention(RetentionPolicy.SOURCE)
-  public @interface SuppressWarnings {
-      String[] value();
-  }
-  ```
-  
-  与前面的两个注释不同，需要额外添加一个参数才能正确使用，这些参数都是已经定义好的。
-  
-  - 抑制所有类型警告：@SuppressWarnings("all")
-  - 抑制单类型警告：@SuppressWarnings("unchecked")
-  - 抑制多类型警告：@SuppressWarnings(value={"unchecked", "deprecation"})
-  - ...
-  
-  > **抑制警告关键字**
-  > 可以看到，除了all，括号里的单词实际指明了要抑制的具体编译器异常，包括这些：
-  >
-  > | **关键字**               | **用途**                                                     |
-  > | ------------------------ | ------------------------------------------------------------ |
-  > | all                      | to suppress all warnings（抑制所有警告）                     |
-  > | boxing                   | to suppress warnings relative to boxing/unboxing operations（抑制装箱、拆箱操作时候的警告） |
-  > | cast                     | to suppress warnings relative to cast operations（抑制映射相关的警告） |
-  > | dep-ann                  | to suppress warnings relative to deprecated annotation（抑制启用注释的警告） |
-  > | deprecation              | to suppress warnings relative to deprecation（抑制过期方法警告） |
-  > | fallthrough              | to suppress warnings relative to missing breaks in switch statements（抑制确在switch中缺失breaks的警告） |
-  > | finally                  | to suppress warnings relative to finally block that don’t return（抑制finally模块没有返回的警告） |
-  > | hiding                   | to suppress warnings relative to locals that hide variable（抑制与隐藏变数的区域变数相关的警告） |
-  > | incomplete-switch        | to suppress warnings relative to missing entries in a switch statement (enum case)（忽略没有完整的switch语句） |
-  > | nls                      | to suppress warnings relative to non-nls string literals（忽略非nls格式的字符） |
-  > | null                     | to suppress warnings relative to null analysis (忽略对null的操作) |
-  > | rawtypes                 | to suppress warnings relative to un-specific types when using generics on class params（使用generics时忽略没有指定相应的类型） |
-  > | restriction              | to suppress warnings relative to usage of discouraged or forbidden references（抑制与使用不建议或禁止参照相关的警告） |
-  > | serial                   | to suppress warnings relative to missing serialVersionUID field for a serializable class (忽略在serializable类中没有声明serialVersionUID变量) |
-  > | static-access            | o suppress warnings relative to incorrect static access（抑制不正确的静态访问方式警告） |
-  > | synthetic-access         | to suppress warnings relative to unoptimized access from inner classes（抑制子类没有按最优方法访问内部类的警告） |
-  > | unchecked                | to suppress warnings relative to unchecked operations（抑制没有进行类型检查操作的警告） |
-  > | unqualified-field-access | to suppress warnings relative to field access unqualified（抑制没有权限访问的域的警告） |
-  > | unused                   | to suppress warnings relative to unused code（抑制没被使用过的代码的警告） |
+#### @SuppressWarnings
+
+定义在`java.lang.SuppressWarnings`中，只能存活在源码时，取值为String[]，其注解目标为类型、属性、方法、参数、构造器、局部变量。
+
+用来**抑制编译时的警告信息**。
+
+```java
+@Target({TYPE, FIELD, METHOD, PARAMETER, CONSTRUCTOR, LOCAL_VARIABLE})
+@Retention(RetentionPolicy.SOURCE)
+public @interface SuppressWarnings {
+    String[] value();
+}
+```
+
+与前面的两个注释不同，需要额外添加一个参数才能正确使用，这些参数都是已经定义好的。
+
+- 抑制所有类型警告：@SuppressWarnings("all")
+- 抑制单类型警告：@SuppressWarnings("unchecked")
+- 抑制多类型警告：@SuppressWarnings(value={"unchecked", "deprecation"})
+- ...
+
+
+
+##### 抑制警告关键字
+
+可以看到，除了all，括号里的单词实际指明了要抑制的具体编译器异常，包括这些：
+
+| **关键字**               | **用途**                                                     |
+| ------------------------ | ------------------------------------------------------------ |
+| all                      | to suppress all warnings（抑制所有警告）                     |
+| boxing                   | to suppress warnings relative to boxing/unboxing operations（抑制装箱、拆箱操作时候的警告） |
+| cast                     | to suppress warnings relative to cast operations（抑制映射相关的警告） |
+| dep-ann                  | to suppress warnings relative to deprecated annotation（抑制启用注释的警告） |
+| deprecation              | to suppress warnings relative to deprecation（抑制过期方法警告） |
+| fallthrough              | to suppress warnings relative to missing breaks in switch statements（抑制确在switch中缺失breaks的警告） |
+| finally                  | to suppress warnings relative to finally block that don’t return（抑制finally模块没有返回的警告） |
+| hiding                   | to suppress warnings relative to locals that hide variable（抑制与隐藏变数的区域变数相关的警告） |
+| incomplete-switch        | to suppress warnings relative to missing entries in a switch statement (enum case)（忽略没有完整的switch语句） |
+| nls                      | to suppress warnings relative to non-nls string literals（忽略非nls格式的字符） |
+| null                     | to suppress warnings relative to null analysis (忽略对null的操作) |
+| rawtypes                 | to suppress warnings relative to un-specific types when using generics on class params（使用generics时忽略没有指定相应的类型） |
+| restriction              | to suppress warnings relative to usage of discouraged or forbidden references（抑制与使用不建议或禁止参照相关的警告） |
+| serial                   | to suppress warnings relative to missing serialVersionUID field for a serializable class (忽略在serializable类中没有声明serialVersionUID变量) |
+| static-access            | o suppress warnings relative to incorrect static access（抑制不正确的静态访问方式警告） |
+| synthetic-access         | to suppress warnings relative to unoptimized access from inner classes（抑制子类没有按最优方法访问内部类的警告） |
+| unchecked                | to suppress warnings relative to unchecked operations（抑制没有进行类型检查操作的警告） |
+| unqualified-field-access | to suppress warnings relative to field access unqualified（抑制没有权限访问的域的警告） |
+| unused                   | to suppress warnings relative to unused code（抑制没被使用过的代码的警告） |
 
 
 
@@ -1985,87 +1958,87 @@ Java 1.5开始自带的标准注解。
 
 这些类型和它们所支持的类在 `java.lang.annotation`包可以找到。
 
-- **@Target**
+#### @Target
 
-  用于描述注解的使用范围，即：被描述的注解可以在什么地方使用。
+用于描述注解的使用范围，即：被描述的注解可以在什么地方使用。
 
-  使用范围的取值在`ElementType`枚举中
+使用范围的取值在`ElementType`枚举中
 
-  ```java
-  public enum ElementType {
-   
-      TYPE, // 类、接口、枚举类
-   
-      FIELD, // 成员变量（包括：枚举常量）
-   
-      METHOD, // 成员方法
-   
-      PARAMETER, // 方法参数
-   
-      CONSTRUCTOR, // 构造方法
-   
-      LOCAL_VARIABLE, // 局部变量
-   
-      ANNOTATION_TYPE, // 注解类
-   
-      PACKAGE, // 可用于修饰：包
-   
-      TYPE_PARAMETER, // 类型参数，JDK 1.8 新增
-   
-      TYPE_USE // 使用类型的任何地方，JDK 1.8 新增
-   
-  }
-  ```
+```java
+public enum ElementType {
+ 
+    TYPE, // 类、接口、枚举类
+ 
+    FIELD, // 成员变量（包括：枚举常量）
+ 
+    METHOD, // 成员方法
+ 
+    PARAMETER, // 方法参数
+ 
+    CONSTRUCTOR, // 构造方法
+ 
+    LOCAL_VARIABLE, // 局部变量
+ 
+    ANNOTATION_TYPE, // 注解类
+ 
+    PACKAGE, // 可用于修饰：包
+ 
+    TYPE_PARAMETER, // 类型参数，JDK 1.8 新增
+ 
+    TYPE_USE // 使用类型的任何地方，JDK 1.8 新增
+ 
+}
+```
 
-- **@Retention**
+#### @Retention
 
-  表示注解保留的时间范围，用于描述注解的生命周期。（即：被描述的注解在它所修饰的类中可以被保留到何时）
+表示注解保留的时间范围，用于描述注解的生命周期。（即：被描述的注解在它所修饰的类中可以被保留到何时）
 
-  时间范围的取值在`RetentionPolicy`枚举中
+时间范围的取值在`RetentionPolicy`枚举中
 
-  ```java
-  public enum RetentionPolicy {
-   
-      SOURCE,    // 源文件保留
-      CLASS,       // 编译期保留，默认值
-      RUNTIME   // 运行期保留，可通过反射去获取注解信息
-  }
-  ```
+```java
+public enum RetentionPolicy {
+ 
+    SOURCE,    // 源文件保留
+    CLASS,       // 编译期保留，默认值
+    RUNTIME   // 运行期保留，可通过反射去获取注解信息
+}
+```
 
-  级别范围：Source < Class < Runtime
+级别范围：Source < Class < Runtime
 
-  Source级别的注解不会编译到class文件中，而Class级别的注解在运行时不能通过反射获取。
+Source级别的注解不会编译到class文件中，而Class级别的注解在运行时不能通过反射获取。
 
-- **@Documented**
+#### @Documented
 
-  描述在使用 javadoc 工具为类生成帮助文档时会保留其注解信息。
+描述在使用 javadoc 工具为类生成帮助文档时会保留其注解信息。
 
-- **@Inherited**
+#### @Inherited
 
-  说明该注解具有可继承性。
+说明该注解具有可继承性。
 
-  如果一个类被这个注解修饰的注解所修饰，则其子类将自动具有该注解。
+如果一个类被这个注解修饰的注解所修饰，则其子类将自动具有该注解。
 
-- **@Repeatable (Java8)**
+#### @Repeatable (Java8)
 
-  重复注解，允许在同一申明类型(类，属性，或方法)的多次使用同一个注解。
+重复注解，允许在同一申明类型(类，属性，或方法)的多次使用同一个注解。
 
-  ```java
-  @Repeatable(Authorities.class)
-  public @interface Authority {
-       String role();
-  }
-  
-  public class RepeatAnnotationUseNewVersion {
-      @Authority(role="Admin")
-      @Authority(role="Manager")
-      public void doSomeThing(){ }
-  }
-  ```
+```java
+@Repeatable(Authorities.class)
+public @interface Authority {
+     String role();
+}
 
-- **@Native (Java8)**
+public class RepeatAnnotationUseNewVersion {
+    @Authority(role="Admin")
+    @Authority(role="Manager")
+    public void doSomeThing(){ }
+}
+```
 
-  使用 @Native 注解修饰成员变量，则表示这个变量可以被本地代码引用，常常被代码生成工具使用。
+#### @Native (Java8)
+
+使用 @Native 注解修饰成员变量，则表示这个变量可以被本地代码引用，常常被代码生成工具使用。
 
 
 
@@ -2105,12 +2078,48 @@ public class TestMethodAnnotation {
 
 
 
-### 反射获取注解内容
+### 本质
+
+注解本质是一个继承了`Annotation` 的特殊接口：
+
+```java
+// 这里是一个@Override注解
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.SOURCE)
+public @interface Override {
+
+}
+
+public interface Override extends Annotation{
+
+}
+```
+
+
+
+### 注解的解析与原理
+
+注解只有被解析之后才会生效，常见的解析方法有两种：
+
+- **编译期直接扫描** 
+
+  编译器在编译 Java 代码的时候扫描对应的注解并处理，比如某个方法使用`@Override` 注解，编译器在编译的时候就会检测当前的方法是否重写了父类对应的方法。
+
+- **运行期通过反射处理** 
+
+  像框架中自带的注解（比如 Spring 框架的 `@Value` 、`@Component`）都是通过反射来进行处理的。
+
+
+
+#### 反射获取注解内容
+
+- 只有注解生命周期被定义为RetentionPolicy.RUNTIME后，该注解才能是运行时可见，才会被虚拟机读取，通过反射获取。
 
 - 反射包java.lang.reflect下的AnnotatedElement接口提供这些方法，AnnotatedElement 接口是所有程序元素（Class、Method和Constructor）的父接口；
-- 只有注解被定义为RUNTIME后，该注解才能是运行时可见，才会被虚拟机读取。
 
-AnnotatedElement的API：
+
+
+#### AnnotatedElement的API
 
 - `boolean isAnnotationPresent(Class<?extends Annotation> annotationClass)`
 
@@ -2139,6 +2148,35 @@ AnnotatedElement的API：
 - `<T extends Annotation> T[] getDeclaredAnnotationsByType(Class<T> annotationClass)`
 
 - `Annotation[] getDeclaredAnnotations()`
+
+
+
+#### 注解解析原理
+
+https://blog.csdn.net/qq_20009015/article/details/106038023
+
+注解本身是继承了Annotation的接口，
+
+在调用getDeclaredAnnotation()方法的时候，返回一个代理对象（通过JDK动态代理创建）。
+
+- 创建时传入的参数包括接口本身和AnotationInvocationHandler 实例；
+- 创建之前，解析注解时，会从注解的常量池中取出注解信息，包括注解中的参数值。
+- 这些参数值在创建AnnotationInvocationHandler实例时，作为构造函数参数传入。
+- 获取代理对象后，可以调用方法获取注解属性，实际就是调用AnnotationInvocationHandler的逻辑取出存入的注解信息。
+
+
+
+#### 编译时注解处理
+
+https://www.race604.com/annotation-processing/
+
+注解处理器（Annotation Processor）是**javac**的一个工具，它用来在编译时扫描和处理注解（Annotation）。
+
+你可以对自定义注解，并注册相应的注解处理器，每一个处理器都是继承于`AbstractProcessor`。
+
+
+
+
 
 
 
