@@ -136,13 +136,13 @@
 
 - `Win+R`输入`services.msc`快速打开电脑”服务“
 
-  ![在这里插入图片描述](https://img-blog.csdnimg.cn/20201128174401981.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzYwNTI2Ng==,size_16,color_FFFFFF,t_70)
+  ![在这里插入图片描述](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202210151814937.png)
 
 - 找到mysql服务，自行选择开启/开机自启
 
-  <img src="https://img-blog.csdnimg.cn/20201124185352684.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzYwNTI2Ng==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" style="zoom: 67%;" />
+  <img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202210151814467.png" alt="在这里插入图片描述" style="zoom: 67%;" />
 
-  <img src="https://img-blog.csdnimg.cn/2020112321065774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzYwNTI2Ng==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" style="zoom:80%;" />
+  <img src="https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202210151814987.png" alt="在这里插入图片描述" style="zoom:80%;" />
 
 
 
@@ -348,7 +348,7 @@
 
 
 
-#### Docker安装mysql
+#### Docker
 
 - 拉取镜像
 
@@ -363,7 +363,15 @@
   ```
 
   > - **-p 3306:3306** ：映射容器服务的 3306 端口到宿主机的 3306 端口，外部主机可以直接通过 **宿主机ip:3306** 访问到 MySQL 的服务。
+  >
   > - **MYSQL_ROOT_PASSWORD=123456**：设置 MySQL 服务 root 用户的密码。
+  >
+  > - 为了保证容器删除重建后数据还在，可以配置映射目录
+  >
+  >   ```bash
+  >   # 本地数据目录 /my/own/datadir
+  >   docker run --name some-mysql -v /my/own/datadir:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag
+  >   ```
 
 
 
@@ -394,17 +402,19 @@ rm -rf /var/log/mysqld.log.rpmsave
 
 ## 常用命令
 
-```powershell
-#登录root账户
+### 使用root账号连接mysql
+
+```bash
 mysql -u root -p
 ```
 
-```shell
--- 查看版本等信息
-mysql> status;
--- 退出
-mysql> exit;
+### 查看mysql版本
+
+```mysql
+select version();
 ```
+
+
 
 
 
@@ -854,12 +864,14 @@ log-error = /usr/local/mysql/log/mysql-error.log
 
 ## 锁机制与 InnoDB 锁算法
 
-#### MyISAM 和 InnoDB 存储引擎使用的锁
+### MyISAM 和 InnoDB 存储引擎使用的锁
 
 - MyISAM 采用表级锁(table-level locking)。
 - InnoDB 支持行级锁(row-level locking)和表级锁，默认为行级锁
 
-#### 表级锁与行级锁对比
+
+
+### 表级锁与行级锁对比
 
 - **表级锁：** 
 
@@ -879,7 +891,7 @@ log-error = /usr/local/mysql/log/mysql-error.log
 
   
 
-#### InnoDB 存储引擎的锁的算法
+### InnoDB 存储引擎的锁的算法
 
 - **Record lock**：记录锁，单个行记录上的锁
 - **Gap lock**：间隙锁，锁定一个范围，不包括记录本身
@@ -893,7 +905,7 @@ log-error = /usr/local/mysql/log/mysql-error.log
 
 
 
-#### Mysql数据事务的实现原理
+### Mysql数据事务的实现原理
 
 以 MySQL 的 InnoDB 引擎为例，
 
@@ -909,7 +921,7 @@ MySQL InnoDB 引擎使用 **redo log(重做日志)** 保证事务的**持久性*
 
 
 
-#### MySQL默认隔离级别
+### MySQL默认隔离级别
 
 InnoDB 存储引擎的默认支持的隔离级别是 **REPEATABLE-READ(可重读)**
 
@@ -927,16 +939,20 @@ InnoDB 存储引擎在 **分布式事务** 的情况下一般会用到 **SERIALI
 
 
 
-### 存储时间类型的抉择
+### 时间字段类型的选择
+
+
 
 #### 不要用字符串存储日期
 
 1. 字符串占用的空间更大；
 2. 字符串存储的日期效率比较低（逐个字符进行比对），无法用日期相关的 API 进行计算和比较。
 
+
+
 #### Datetime 和 Timestamp 之间抉择
 
-**通常都会首选 Timestamp。**
+**通常都会首选 Timestamp**
 
 ##### 1. DateTime 类型没有时区信息
 
@@ -980,11 +996,11 @@ Timestamp 只需要使用 4 个字节的存储空间，但是 DateTime 需要耗
 
 ##### 时间戳的定义
 
-时间戳的定义是
-
-从一个基准时间开始算起，这个基准时间是「1970-1-1 00:00:00 +0:00」，从这个时间开始，用整数表示，以秒计时，随着时间的流逝这个时间整数不断增加。
+> 从一个基准时间开始算起，这个基准时间是**「1970-1-1 00:00:00 +0:00」**，从这个时间开始，用整数表示，以秒计时，随着时间的流逝这个时间整数不断增加。
 
 这样一来，我只需要一个数值，就可以完美地表示时间了，而且这个数值是一个绝对数值，即无论的身处地球的任何角落，这个表示时间的时间戳，都是一样的，生成的数值都是一样的，并且没有时区的概念，所以在系统的中时间的传输中，都不需要进行额外的转换了，只有在显示给用户的时候，才转换为字符串格式的本地时间。
+
+
 
 ##### 优势
 

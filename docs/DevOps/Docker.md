@@ -163,41 +163,63 @@ vim /lib/systemd/system/docker.service
 
 ### Ubuntu
 
-https://mirror.tuna.tsinghua.edu.cn/help/docker-ce/
+https://www.runoob.com/docker/ubuntu-docker-install.html
 
-- 清除之前的安装
+- 卸载旧版本
 
-  ```bash
-  sudo apt-get remove docker docker-engine docker.io containerd runc
-  ```
+```bash
+sudo apt-get remove docker docker-engine docker.io containerd runc
+```
 
-- 安装依赖
+- 配置docker安装包仓库
 
-  ```bash
-  sudo apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common
-  ```
+  - 更新索引
 
-- 信任 Docker 的 GPG 公钥
+    ```bash
+    sudo apt-get update
+    ```
 
-  ```bash
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-  ```
+  - 安装https相关依赖，用于通过https获取仓库
 
-- 添加软件仓库
+    ```bash
+    sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+    ```
 
-  ```bash
-  echo \
-    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/ubuntu \
-    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  ```
+  - 添加 Docker 的官方 GPG 密钥
 
-- 安装
+    ```bash
+    curl -fsSL https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+    ```
+
+  - 设置稳定版仓库
+
+    ```bash
+    sudo add-apt-repository \
+       "deb [arch=amd64] https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu/ \
+      $(lsb_release -cs) \
+      stable"
+    ```
+
+- 更新索引
 
   ```bash
   sudo apt-get update
-  sudo apt-get install docker-ce
   ```
 
+- 安装最新版本的 Docker Engine-Community 和 containerd
+
+  ```bash
+  apt-get install docker-ce docker-ce-cli containerd.io
+  ```
+
+- 验证是否安装成功
+
+  ```bash
+  docker run hello-world
+  ```
+
+> - 清华源配置：https://mirror.tuna.tsinghua.edu.cn/help/docker-ce/
+>
 > - **安装失败，提示E: Sub-process /usr/bin/dpkg returned an error code (1)**
 >
 >   参考：https://blog.csdn.net/u013832707/article/details/113104006
@@ -232,6 +254,9 @@ https://mirror.tuna.tsinghua.edu.cn/help/docker-ce/
 ### Windows10
 
 待补充
+
+- 如果是用wsl安装，就和linux一样
+- 如果是桌面端，可以直接使用安装包
 
 
 
@@ -272,6 +297,10 @@ https://mirror.tuna.tsinghua.edu.cn/help/docker-ce/
   # 有就修改 没有就添加
   {"registry-mirrors": ["https://hub-mirror.c.163.com", "https://mirror.baidubce.com","刚申请的加速器地址"]}
   ```
+
+
+
+
 
 
 
@@ -739,9 +768,90 @@ docker version
 
 ## 补充
 
+### 开启远程API
 
+开启后可以通过http接口进行docker的一些查询操作
 
+参考：https://docs.docker.com/config/daemon/remote-access/
 
+- 执行指令
+
+  ```bash
+  sudo systemctl edit docker.service
+  ```
+
+- 编辑服务的一些配置，添加如下内容：
+
+  ```ini
+  [Service]
+  ExecStart=
+  ExecStart=/usr/bin/dockerd -H fd:// -H tcp://127.0.0.1:2375
+  ```
+
+  Ctrl+O保存，Ctrl+X退出
+
+- 保存后重载配置
+
+  ```bash
+  systemctl daemon-reload
+  ```
+
+- 重启Docker
+
+  ```bash
+  sudo systemctl restart docker.service
+  ```
+
+- 检查是否成功开启远程端口，默认2375端口
+
+  ```bash
+  sudo netstat -lntp | grep dockerd
+  tcp        0      0 127.0.0.1:2375          0.0.0.0:*               LISTEN      3758/dockerd
+  ```
+
+  
+
+### 修改镜像容器存储位置
+
+#### 方法一
+
+参考https://docs.docker.com/config/daemon/
+
+前提： docker版本  >= v17.05.0
+
+首先，默认存储位置为：
+
+- `/var/lib/docker` on Linux.
+- `C:\ProgramData\docker` on Windows.
+
+- 修改daemon文件
+
+  ```bash
+  vim /etc/docker/daemon.json
+  ```
+
+- 添加如下配置项：
+
+  ```json
+  {
+    "data-root": "/mnt/docker-data"
+  }
+  ```
+
+再重启docker服务即可
+
+#### 方法二
+
+- 备份原目录
+
+- 为新目录设置软链接
+
+  ```bash
+  # 如新目录为/store/software/docker
+  sudo ln -fs /store/software/docker /var/lib/docker
+  ```
+
+  
 
 ## Docker Compose
 

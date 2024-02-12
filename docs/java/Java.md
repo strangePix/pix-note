@@ -1,6 +1,6 @@
 # Java
 
-## 安装
+## 安装/卸载
 
 ### Windows
 
@@ -21,22 +21,51 @@
 
 ### Linux
 
-- 下载
+- 下载：https://www.oracle.com/cn/java/technologies/javase-downloads.html
+
+- 创建目录，将下载的压缩包放置于此
+
+  ```bash
+  mkdir /usr/lib/jvm
+  cd /usr/lib/jvm
+  wget https://download.oracle.com/otn/java/jdk/8u271-b09/61ae65e0886
+  ```
+
+- 解压缩
+
+  ```bash
+  tar -zxvf jdk-8.0.1_linux-x64_bin.tar.gz
+  ```
 
 - 环境变量配置，在
 
   ```sh
   # 编辑/etc/profile 或者 新增一个java配置文件  /etc/profile.d/java.sh
-  export JAVA_HOME=/xxx/jdk1.xxx
+  export JAVA_HOME=/usr/share/jdk1.6.0_14
   export PATH=$JAVA_HOME/bin:$PATH
   export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
   ```
 
+
+
+
+#### 卸载
+
+- 检索java安装信息
+
+  ```bash
+  rpm -qa | grep java
+  rpm -qa | grep gcj
+  rpm -qa | grep jdk
+  ```
+
+- 执行 卸载
+
+  ```bash
+  rpm -e --nodeps xxx
+  ```
+
   
-
-
-
-
 
 ## 面向对象
 

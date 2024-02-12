@@ -8,7 +8,7 @@ Mongodb是为快速开发互联网Web应用而构建的数据库系统，其数�
 
 ## 安装
 
-#### Win
+### Win
 
 - 下载安装包 https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.2.21-signed.msi
 
@@ -65,4 +65,44 @@ Mongodb是为快速开发互联网Web应用而构建的数据库系统，其数�
 > ![image-20220507220839679](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/image-20220507220839679.png)
 
 
+
+### Docker
+
+一句话指令
+
+```bash
+docker run -d --name mongo-datebase \
+	-p 27017:27017 \
+	-e MONGO_INITDB_ROOT_USERNAME=admin \
+	-e MONGO_INITDB_ROOT_PASSWORD=123456 \
+	mongo:latest
+```
+
+#### Docker-compose
+
+配置类似：
+
+```yaml
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+```
 

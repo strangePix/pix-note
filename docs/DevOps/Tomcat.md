@@ -185,6 +185,7 @@ keytool -genkeypair -alias ssoKey  -keyalg RSA -keysize 2048 -keypass 123456 -st
   ```shell
   # alias与证书一致
   keytool -export -file ./.keystore.crt -alias ssoKey -keystore ./.keystore
+  # 需要输入密钥库密码 即storepass
   ```
 
 - 安装到jdk
@@ -224,7 +225,7 @@ keytool -genkeypair -alias ssoKey  -keyalg RSA -keysize 2048 -keypass 123456 -st
   <Connector port="443" protocol="org.apache.coyote.http11.Http11NioProtocol"
   					 maxThreads="150" SSLEnabled="true">
   		<SSLHostConfig>
-  				<Certificate certificateKeystoreFile="conf/test.keystore"
+  				<Certificate certificateKeystoreFile="conf/.keystore"
                                certificateKeystorePassword="123456"
   										 type="RSA" />
   		</SSLHostConfig>

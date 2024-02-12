@@ -9,6 +9,10 @@
 - 卸载已安装Node
 - 在https://github.com/coreybutler/nvm-windows/releases下载最新安装包进行安装
 
+### CentOS7
+
+https://www.jianshu.com/p/959ca0e5495a
+
 
 
 ## 多版本管理安装
@@ -105,6 +109,36 @@ nvm use 6.2.0
 # 卸载对应的版本
 nvm uninstall 6.2.0 
 ```
+
+
+
+#### nvm 1.1.0 版本问题
+
+https://loveky.github.io/2018/04/18/time-to-upgrade-nvm-windows/
+
+大概意思是：nvm-windows 需要维护一个 Node 的版本列表。由于早期 Node 官方并没有这种数据。于是 nvm-windows 的作者创建了这个仓库。后来 Node 官方开始维护 https://nodejs.org/download/release/index.json。于是作者也放弃自己维护这个仓库转而使用官方的列表了。nvm-windows 1.1.0 是最后一个使用非官方列表的版本。
+
+所以1.1.0版本列表非官方列表，后续不维护，升级版本即可，同时升级版本只需运行新版本安装程序即可。
+
+
+
+#### nodejs.org 访问失败问题
+
+拉取node列表或者安装时提示无法访问到nodejs.org
+
+![image-20231107152626858](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202311071526537.png)
+
+https://stackoverflow.com/questions/57342497/use-nvm-behind-the-corporate-firewall
+
+大概是需要翻墙，如果你本地已经配了代理，给nvm也配上即可
+
+```shell
+nvm proxy http://127.0.0.1:7890   -> 设置代理 如使用clash 默认7890端口
+nvm proxy                         -> 查看当前代理
+nvm proxy none                    -> 关闭代理
+```
+
+
 
 ### 安装优化和问题处理
 
