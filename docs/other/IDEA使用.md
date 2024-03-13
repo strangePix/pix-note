@@ -223,9 +223,11 @@ setting - Tools - Terminal  修改Shell Path，选择powershell.exe即可。
 
 
 
-## 类注释/方法注释模板
+## 注释优化
 
-### 插件配置
+### 类注释/方法注释模板
+
+#### 插件配置
 
 之前的注释模板不太规范，配置也比较麻烦，目前使用插件配置
 
@@ -250,6 +252,33 @@ setting - Tools - Terminal  修改Shell Path，选择powershell.exe即可。
    ![image-20220829142018298](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202208291420337.png)
 
 
+
+### 自定义注释被提示不合规
+
+
+
+有时候自己的项目使用的注释并非约定俗成，会被idea提示
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210522223722375.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQzNzE5Mzg4,size_16,color_FFFFFF,t_70)
+
+#### 设置为自定义标签
+
+光标移动到 自定义tag上，Alt enter ---> add as custom tag 即可
+
+![image](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202402180926197.png)
+
+#### 配置全局JavaDoc
+
+参考：https://blog.csdn.net/qq_43719388/article/details/117172841
+
+Settings / Preferences… --> Editor （编辑器）—> Inspections（检查） --> java --> javadoc --> Declaration has Javadoc Problems.（Javadoc声明问题） —> options（选项） --> add java doc tags（附加Javadoc标记）
+
+![在这里插入图片描述](https://strangest.oss-cn-shanghai.aliyuncs.com/markdown/202402181008114.png)
+
+比如我们想全局添加@Chengdu: @JuanWang : 注解，我们只需要，按照如下格式添加即可（以逗号分隔）：
+
+```
+Chengdu:,JuanWang:
+```
 
 
 
